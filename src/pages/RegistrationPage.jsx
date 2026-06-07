@@ -3,6 +3,8 @@ import { registerAssociationUser } from '../services/registrationService';
 
 const initialForm = {
   role: 'student',
+
+  fullName: '',
   email: '',
   password: '',
   confirmPassword: '',
@@ -51,6 +53,7 @@ export default function RegistrationPage() {
     setForm((current) => ({
       ...initialForm,
       role: nextRole,
+      fullName: current.fullName,
       email: current.email,
       password: current.password,
       confirmPassword: current.confirmPassword,
@@ -59,6 +62,7 @@ export default function RegistrationPage() {
       academicSession: current.academicSession,
       presentAddress: current.presentAddress,
       permanentAddress: current.permanentAddress,
+      departmentName: current.departmentName,
     }));
   }
 
@@ -92,7 +96,8 @@ export default function RegistrationPage() {
       <section className="mx-auto grid max-w-7xl grid-cols-1 gap-6 lg:grid-cols-[0.9fr_1.4fr] lg:items-start">
         <aside className="rounded-3xl bg-slate-950 p-6 text-white shadow-soft md:p-8 lg:sticky lg:top-8">
           <p className="text-sm font-semibold uppercase tracking-[0.25em] text-emerald-300">
-            Abhaynagar Somiti          </p>
+            Association Portal
+          </p>
 
           <h1 className="mt-4 text-3xl font-bold leading-tight md:text-4xl">
             Secure Student-Alumni Registration
@@ -106,7 +111,7 @@ export default function RegistrationPage() {
           <div className="mt-8 grid grid-cols-1 gap-3">
             <InfoCard label="Student" value="Roster-based verification" />
             <InfoCard label="Alumni" value="PDF certificate review" />
-            <InfoCard label="Filter" value="Student, Alumni, Session wise" />
+            <InfoCard label="Public View" value="Name, department, session" />
           </div>
         </aside>
 
@@ -154,6 +159,15 @@ export default function RegistrationPage() {
             <FormSection title="Account Information">
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <TextInput
+                  label="Full Name"
+                  name="fullName"
+                  value={form.fullName}
+                  onChange={updateField}
+                  placeholder="Your full name"
+                  required
+                />
+
+                <TextInput
                   label="Email Address"
                   name="email"
                   type="email"
@@ -169,6 +183,15 @@ export default function RegistrationPage() {
                   value={form.contactNumber}
                   onChange={updateField}
                   placeholder="01XXXXXXXXX"
+                  required
+                />
+
+                <TextInput
+                  label="Department Name"
+                  name="departmentName"
+                  value={form.departmentName}
+                  onChange={updateField}
+                  placeholder="cse"
                   required
                 />
 
@@ -225,21 +248,12 @@ export default function RegistrationPage() {
 
             {isStudent ? (
               <FormSection title="Student Information">
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                   <TextInput
                     label="Roll Number"
                     name="rollNumber"
                     value={form.rollNumber}
                     onChange={updateField}
-                    required
-                  />
-
-                  <TextInput
-                    label="Department Name"
-                    name="departmentName"
-                    value={form.departmentName}
-                    onChange={updateField}
-                    placeholder="Computer Science"
                     required
                   />
 

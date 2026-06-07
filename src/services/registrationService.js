@@ -14,6 +14,10 @@ function normalizeEmail(email) {
 }
 
 function validateCommonFields(form) {
+  if (!form.fullName) {
+    throw new Error('Full name is required.');
+  }
+
   if (!form.email || !form.password || !form.confirmPassword) {
     throw new Error('Email, password, and confirm password are required.');
   }
@@ -70,6 +74,10 @@ function validateStudentFields(form) {
 function validateAlumniFields(form) {
   if (!form.registrationNo) {
     throw new Error('Registration number is required.');
+  }
+
+  if (!form.departmentName) {
+    throw new Error('Department name is required.');
   }
 
   if (!form.batch) {
@@ -152,6 +160,7 @@ export async function registerAssociationUser(form) {
   if (form.role === 'student') {
     const { error } = await supabase.rpc('create_student_registration', {
       p_email: email,
+      p_full_name: form.fullName,
       p_roll_number: form.rollNumber,
       p_department_name: form.departmentName,
       p_current_semester: Number(form.currentSemester),
@@ -181,12 +190,13 @@ export async function registerAssociationUser(form) {
       message:
         verificationResult?.verified === true
           ? 'Student registration completed and verified successfully.'
-          : 'Registration submitted, but roster verification failed. Admin review may be required.',
+          : 'Registration submitted, but roster verification failed. Request sent to admin for manual review.',
     };
   }
 
   const { error } = await supabase.rpc('create_alumni_registration', {
     p_email: email,
+    p_full_name: form.fullName,
     p_registration_no: form.registrationNo,
     p_graduation_year: Number(form.graduationYear),
     p_batch: form.batch,
@@ -198,6 +208,7 @@ export async function registerAssociationUser(form) {
     p_academic_session: form.academicSession,
     p_present_address: form.presentAddress,
     p_permanent_address: form.permanentAddress,
+    p_department_name: form.departmentName,
   });
 
   if (error) {
