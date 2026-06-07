@@ -147,7 +147,7 @@ function AppLayout() {
             to="/"
             className="max-w-[180px] text-sm font-bold leading-tight text-slate-950 sm:max-w-none"
           >
-            Dhabi Abhaynagar Poribar
+            Dhabi Abhaynagar Poribar 
           </Link>
 
           <div className="flex items-center gap-1 overflow-x-auto">
@@ -190,7 +190,7 @@ function AppLayout() {
                   </>
                 ) : null}
 
-                <NavItem to="/privacy">Privacy</NavItem>
+                {/* <NavItem to="/privacy">Privacy</NavItem> */}
                 <NavItem to="/privacy/visibility">Visibility</NavItem>
 
                 {isAdmin ? (
