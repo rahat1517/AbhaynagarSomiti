@@ -83,9 +83,7 @@ export default function LoginPage() {
           Sign in to Portal
         </h1>
 
-        <p className="mt-2 text-sm text-slate-500">
-          Login korar por apnar profile page open hobe.
-        </p>
+        
 
         {status.message ? (
           <StatusBox type={status.type} message={status.message} />
