@@ -6,6 +6,11 @@ import {
 } from '../../services/profileService';
 
 const initialForm = {
+  fullName: '',
+  rollNumber: '',
+  departmentName: '',
+  currentSemester: '',
+
   contactNumber: '',
   academicSession: '',
   presentAddress: '',
@@ -47,6 +52,11 @@ export default function ProfilePage() {
       setProfile(data);
 
       setForm({
+        fullName: data.full_name || '',
+        rollNumber: data.roll_number || '',
+        departmentName: data.department_name || '',
+        currentSemester: data.current_semester || '',
+
         contactNumber: data.contact_number || '',
         academicSession: data.academic_session || '',
         presentAddress: data.present_address || '',
@@ -183,8 +193,8 @@ export default function ProfilePage() {
             </h1>
 
             <p className="mt-2 text-sm text-slate-500">
-              You can edit your photo, contact, address, session and visibility
-              settings. Roster/verification fields are locked.
+              You can edit your photo, name, roll, department, semester,
+              contact, address, session and visibility settings.
             </p>
           </div>
 
@@ -217,12 +227,12 @@ export default function ProfilePage() {
               />
 
               <h2 className="mt-6 text-xl font-bold text-slate-950">
-                Locked Information
+                Account Information
               </h2>
 
               <p className="mt-2 text-sm text-slate-500">
-                These fields are used for verification and cannot be edited from
-                profile page.
+                These values are shown here for review. Editable fields can be
+                changed from the right side form.
               </p>
 
               <div className="mt-5 grid grid-cols-1 gap-3">
@@ -286,6 +296,43 @@ export default function ProfilePage() {
 
               <form onSubmit={handleSubmit} className="mt-5 space-y-5">
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                  <TextInput
+                    label="Full Name"
+                    name="fullName"
+                    value={form.fullName}
+                    onChange={updateField}
+                    placeholder="Your full name"
+                  />
+
+                  <TextInput
+                    label="Department Name"
+                    name="departmentName"
+                    value={form.departmentName}
+                    onChange={updateField}
+                    placeholder="cse"
+                  />
+
+                  {isStudent ? (
+                    <>
+                      <TextInput
+                        label="Roll Number"
+                        name="rollNumber"
+                        value={form.rollNumber}
+                        onChange={updateField}
+                        placeholder="Roll number"
+                      />
+
+                      <TextInput
+                        label="Current Semester"
+                        name="currentSemester"
+                        type="number"
+                        value={form.currentSemester}
+                        onChange={updateField}
+                        placeholder="1"
+                      />
+                    </>
+                  ) : null}
+
                   <TextInput
                     label="Contact Number"
                     name="contactNumber"
@@ -557,4 +604,3 @@ function StatusBox({ type, message }) {
     </div>
   );
 }
-

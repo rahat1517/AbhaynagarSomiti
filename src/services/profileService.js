@@ -7,6 +7,13 @@ function emptyToNull(value) {
   return trimmed.length > 0 ? trimmed : null;
 }
 
+function numberOrNull(value) {
+  if (value === undefined || value === null || value === '') return null;
+
+  const numberValue = Number(value);
+  return Number.isFinite(numberValue) ? numberValue : null;
+}
+
 export async function getMyProfileDetails() {
   const { data, error } = await supabase.rpc('get_my_profile_details');
 
@@ -28,12 +35,18 @@ export async function getMyProfileDetails() {
 
 export async function updateMyProfileDetails(form) {
   const { data, error } = await supabase.rpc('update_my_profile_details', {
+    p_full_name: emptyToNull(form.fullName),
+    p_roll_number: emptyToNull(form.rollNumber),
+    p_department_name: emptyToNull(form.departmentName),
+    p_current_semester: numberOrNull(form.currentSemester),
+
     p_contact_number: emptyToNull(form.contactNumber),
     p_academic_session: emptyToNull(form.academicSession),
     p_present_address: emptyToNull(form.presentAddress),
     p_permanent_address: emptyToNull(form.permanentAddress),
     p_current_company: emptyToNull(form.currentCompany),
     p_designation: emptyToNull(form.designation),
+
     p_show_email: Boolean(form.showEmail),
     p_show_contact_number: Boolean(form.showContactNumber),
     p_contact_visibility: form.contactVisibility || 'private',
