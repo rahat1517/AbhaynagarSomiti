@@ -19,7 +19,7 @@ const initialForm = {
   designation: '',
   showEmail: false,
   showContactNumber: false,
-  contactVisibility: 'private',
+  contactVisibility: 'verified_members',
 };
 
 export default function ProfilePage() {
@@ -65,7 +65,7 @@ export default function ProfilePage() {
         designation: data.designation || '',
         showEmail: Boolean(data.show_email),
         showContactNumber: Boolean(data.show_contact_number),
-        contactVisibility: data.contact_visibility || 'private',
+        contactVisibility: data.contact_visibility || 'verified_members',
       });
     } catch (error) {
       setProfile(null);

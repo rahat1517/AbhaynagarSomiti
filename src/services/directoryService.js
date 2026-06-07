@@ -75,7 +75,7 @@ export async function updateMyVisibilityPreferences({
     {
       p_show_email: Boolean(showEmail),
       p_show_contact_number: Boolean(showContactNumber),
-      p_contact_visibility: contactVisibility || 'private',
+      p_contact_visibility: form.contactVisibility || 'verified_members',
     }
   );
 

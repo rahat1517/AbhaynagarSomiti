@@ -5,7 +5,7 @@ export default function VisibilityPreferencesPage() {
   const [form, setForm] = useState({
     showEmail: false,
     showContactNumber: false,
-    contactVisibility: 'private',
+    contactVisibility: 'verified_members',
   });
 
   const [saving, setSaving] = useState(false);
