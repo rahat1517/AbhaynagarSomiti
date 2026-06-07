@@ -71,13 +71,18 @@ export default function LandingPage() {
             </p>
 
             <h1 className="mt-4 text-3xl font-black leading-tight md:text-5xl">
-              Connect Current Students and Alumni by Session
+              Dhabi Abhaynagar Poribar
             </h1>
 
             <p className="mt-4 text-sm leading-6 text-slate-300 md:text-base">
-              Public visitors can see verified members by photo, name,
-              department and session only. Full details are available only after
-              login and according to privacy rules.
+              Abhaynagar Somiti is an online community platform for
+              Abhaynagar students, alumni, verified members, and local people
+              connected with Dhaka University and Abhaynagar.
+            </p>
+
+            <p className="mt-3 text-sm font-semibold leading-6 text-slate-400">
+              Also known as DU Abhaynagar Poribar, Dhaka University Abhaynagar
+              community, and Abhaynagar Student Alumni Association.
             </p>
 
             <div className="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -92,7 +97,8 @@ export default function LandingPage() {
             </h2>
 
             <p className="mt-2 text-sm text-slate-500">
-              Search by role, session, name or department.
+              Search verified members of Dhabi Abhaynagar Poribar by role,
+              session, name or department.
             </p>
 
             <form
@@ -146,6 +152,23 @@ export default function LandingPage() {
             </form>
           </div>
         </div>
+
+        <section className="mt-8 rounded-3xl bg-white p-5 shadow-soft md:p-6">
+          <p className="text-sm font-semibold uppercase tracking-[0.25em] text-emerald-600">
+            About Abhaynagar Somiti
+          </p>
+
+          <h2 className="mt-2 text-2xl font-black text-slate-950">
+            DU Abhaynagar Poribar and Student Alumni Community
+          </h2>
+
+          <p className="mt-3 text-sm leading-7 text-slate-600 md:text-base">
+            Dhabi Abhaynagar Poribar helps Abhaynagar students, alumni, and
+            verified community members stay connected through a secure online
+            directory, profile system, privacy controls, and career networking
+            features.
+          </p>
+        </section>
 
         {status.message ? (
           <div className="mt-6 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm font-semibold text-red-700">
@@ -238,6 +261,7 @@ function StatCard({ label, value }) {
       <p className="text-xs font-bold uppercase tracking-wider text-slate-400">
         {label}
       </p>
+
       <p className="mt-2 text-3xl font-black text-white">{value}</p>
     </div>
   );
@@ -286,6 +310,7 @@ function InfoLine({ label, value }) {
   return (
     <div className="flex items-center justify-between gap-3">
       <span className="text-slate-500">{label}</span>
+
       <span className="text-right font-bold text-slate-900">
         {value || '-'}
       </span>
