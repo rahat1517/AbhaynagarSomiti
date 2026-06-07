@@ -5,7 +5,8 @@ import {
 } from './authService';
 import {
   createAlumniVerificationRequest,
-  uploadAlumniCertificatePdf,
+  uploadProfilePhoto,
+  uploadUniversityDocument,
   verifyStudentAgainstRoster,
 } from './verificationService';
 
@@ -32,6 +33,10 @@ function validateCommonFields(form) {
 
   if (!form.contactNumber) {
     throw new Error('Contact number is required.');
+  }
+
+  if (!form.profilePhotoFile) {
+    throw new Error('Profile photo is required.');
   }
 
   if (!form.academicSession) {
@@ -95,12 +100,19 @@ function validateAlumniFields(form) {
     throw new Error(`Graduation year must be between 1950 and ${currentYear}.`);
   }
 
-  if (!form.certificateFile) {
-    throw new Error('Graduation certificate PDF is required.');
+  if (!form.universityDocumentFile) {
+    throw new Error('University document is required.');
   }
 
-  if (form.certificateFile.type !== 'application/pdf') {
-    throw new Error('Only PDF certificate file is allowed.');
+  const allowedDocumentTypes = [
+    'application/pdf',
+    'image/jpeg',
+    'image/png',
+    'image/webp',
+  ];
+
+  if (!allowedDocumentTypes.includes(form.universityDocumentFile.type)) {
+    throw new Error('Only PDF, JPG, PNG, or WEBP university document is allowed.');
   }
 }
 
@@ -157,10 +169,16 @@ export async function registerAssociationUser(form) {
     password: form.password,
   });
 
+  const profilePhotoUrl = await uploadProfilePhoto({
+    userId: activeUser.id,
+    file: form.profilePhotoFile,
+  });
+
   if (form.role === 'student') {
     const { error } = await supabase.rpc('create_student_registration', {
       p_email: email,
       p_full_name: form.fullName,
+      p_profile_photo_url: profilePhotoUrl,
       p_roll_number: form.rollNumber,
       p_department_name: form.departmentName,
       p_current_semester: Number(form.currentSemester),
@@ -194,16 +212,22 @@ export async function registerAssociationUser(form) {
     };
   }
 
+  const documentPath = await uploadUniversityDocument({
+    userId: activeUser.id,
+    file: form.universityDocumentFile,
+  });
+
   const { error } = await supabase.rpc('create_alumni_registration', {
     p_email: email,
     p_full_name: form.fullName,
+    p_profile_photo_url: profilePhotoUrl,
     p_registration_no: form.registrationNo,
     p_graduation_year: Number(form.graduationYear),
     p_batch: form.batch,
     p_current_company: form.currentCompany || '',
     p_designation: form.designation || '',
     p_contact_number: form.contactNumber,
-    p_verification_doc_url: '',
+    p_verification_doc_url: documentPath,
     p_pdpo_consent: form.pdpoConsent,
     p_academic_session: form.academicSession,
     p_present_address: form.presentAddress,
@@ -216,22 +240,17 @@ export async function registerAssociationUser(form) {
     throw new Error(error.message);
   }
 
-  const certificatePath = await uploadAlumniCertificatePdf({
-    userId: activeUser.id,
-    file: form.certificateFile,
-  });
-
   await createAlumniVerificationRequest({
     registrationNo: form.registrationNo,
     graduationYear: form.graduationYear,
     batch: form.batch,
-    certificateStoragePath: certificatePath,
+    certificateStoragePath: documentPath,
   });
 
   return {
     user: activeUser,
     role: 'alumni',
     message:
-      'Alumni registration submitted successfully. Certificate uploaded for admin verification.',
+      'Alumni registration submitted successfully. University document uploaded for admin verification.',
   };
 }

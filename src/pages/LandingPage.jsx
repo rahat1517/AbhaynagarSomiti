@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
 import { listPublicMembers } from '../services/publicDirectoryService';
 
 const initialFilters = {
@@ -64,30 +63,6 @@ export default function LandingPage() {
 
   return (
     <main className="min-h-screen bg-slate-50">
-      <header className="border-b border-slate-200 bg-white px-4 py-4">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4">
-          <Link to="/" className="text-base font-black text-slate-950">
-            Abhaynagar Somiti
-          </Link>
-
-          <div className="flex items-center gap-2">
-            <Link
-              to="/login"
-              className="min-h-12 rounded-2xl border border-slate-300 px-5 py-3 text-sm font-bold text-slate-700 hover:bg-slate-100"
-            >
-              Login
-            </Link>
-
-            <Link
-              to="/register"
-              className="min-h-12 rounded-2xl bg-emerald-600 px-5 py-3 text-sm font-bold text-white hover:bg-emerald-700"
-            >
-              Register
-            </Link>
-          </div>
-        </div>
-      </header>
-
       <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
           <div className="rounded-3xl bg-slate-950 p-6 text-white shadow-soft md:p-8">
@@ -100,9 +75,9 @@ export default function LandingPage() {
             </h1>
 
             <p className="mt-4 text-sm leading-6 text-slate-300 md:text-base">
-              Public visitors can see verified members by name, department and
-              session only. Full details are available only after login and
-              according to privacy rules.
+              Public visitors can see verified members by photo, name,
+              department and session only. Full details are available only after
+              login and according to privacy rules.
             </p>
 
             <div className="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -217,8 +192,22 @@ export default function LandingPage() {
 function PublicMemberCard({ member }) {
   return (
     <article className="rounded-3xl bg-white p-5 shadow-soft">
-      <div className="flex items-start justify-between gap-3">
-        <div>
+      <div className="flex items-start gap-4">
+        <div className="h-20 w-20 shrink-0 overflow-hidden rounded-3xl bg-slate-100">
+          {member.profile_photo_url ? (
+            <img
+              src={member.profile_photo_url}
+              alt={member.full_name || 'Member'}
+              className="h-full w-full object-cover"
+            />
+          ) : (
+            <div className="flex h-full w-full items-center justify-center text-2xl font-black text-slate-400">
+              {(member.full_name || '?').charAt(0).toUpperCase()}
+            </div>
+          )}
+        </div>
+
+        <div className="min-w-0 flex-1">
           <span
             className={`rounded-full px-3 py-1 text-xs font-bold capitalize ${
               member.role === 'student'
@@ -229,7 +218,7 @@ function PublicMemberCard({ member }) {
             {member.role === 'student' ? 'Current Student' : 'Alumni'}
           </span>
 
-          <h3 className="mt-3 text-lg font-black text-slate-950">
+          <h3 className="mt-3 break-words text-lg font-black text-slate-950">
             {member.full_name || '-'}
           </h3>
         </div>

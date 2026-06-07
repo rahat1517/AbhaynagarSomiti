@@ -11,6 +11,8 @@ const initialForm = {
   contactNumber: '',
   pdpoConsent: false,
 
+  profilePhotoFile: null,
+
   academicSession: '',
   presentAddress: '',
   permanentAddress: '',
@@ -24,7 +26,7 @@ const initialForm = {
   batch: '',
   currentCompany: '',
   designation: '',
-  certificateFile: null,
+  universityDocumentFile: null,
 };
 
 export default function RegistrationPage() {
@@ -59,6 +61,7 @@ export default function RegistrationPage() {
       confirmPassword: current.confirmPassword,
       contactNumber: current.contactNumber,
       pdpoConsent: current.pdpoConsent,
+      profilePhotoFile: current.profilePhotoFile,
       academicSession: current.academicSession,
       presentAddress: current.presentAddress,
       permanentAddress: current.permanentAddress,
@@ -104,14 +107,17 @@ export default function RegistrationPage() {
           </h1>
 
           <p className="mt-4 text-sm leading-6 text-slate-300 md:text-base">
-            Students are verified against roster. Alumni submit certificate PDF
-            for admin approval.
+            Students are verified against roster. Alumni submit any university
+            document for admin approval. Everyone must upload a profile photo.
           </p>
 
           <div className="mt-8 grid grid-cols-1 gap-3">
             <InfoCard label="Student" value="Roster-based verification" />
-            <InfoCard label="Alumni" value="PDF certificate review" />
-            <InfoCard label="Public View" value="Name, department, session" />
+            <InfoCard label="Alumni" value="University document review" />
+            <InfoCard
+              label="Public View"
+              value="Photo, name, department, session"
+            />
           </div>
         </aside>
 
@@ -192,6 +198,14 @@ export default function RegistrationPage() {
                   value={form.departmentName}
                   onChange={updateField}
                   placeholder="cse"
+                  required
+                />
+
+                <FileInput
+                  label="Profile Photo"
+                  name="profilePhotoFile"
+                  accept="image/jpeg,image/png,image/webp"
+                  onChange={updateField}
                   required
                 />
 
@@ -315,9 +329,9 @@ export default function RegistrationPage() {
                   />
 
                   <FileInput
-                    label="Graduation Certificate PDF"
-                    name="certificateFile"
-                    accept="application/pdf"
+                    label="Any University Document"
+                    name="universityDocumentFile"
+                    accept="application/pdf,image/jpeg,image/png,image/webp"
                     onChange={updateField}
                     required
                   />

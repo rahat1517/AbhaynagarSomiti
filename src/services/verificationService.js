@@ -148,3 +148,106 @@ export async function reviewAlumniVerificationRequest({
 
   return data;
 }
+export async function uploadProfilePhoto({ userId, file }) {
+  if (!userId) {
+    throw new Error('User ID is required.');
+  }
+
+  if (!file) {
+    throw new Error('Profile photo is required.');
+  }
+
+  const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+
+  if (!allowedTypes.includes(file.type)) {
+    throw new Error('Only JPG, PNG, or WEBP photo is allowed.');
+  }
+
+  if (file.size > 5 * 1024 * 1024) {
+    throw new Error('Profile photo must be 5MB or smaller.');
+  }
+
+  const timestamp = Date.now();
+  const safeFileName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+  const storagePath = `${userId}/${timestamp}-${safeFileName}`;
+
+  const { data, error } = await supabase.storage
+    .from('profile-photos')
+    .upload(storagePath, file, {
+      contentType: file.type,
+      cacheControl: '3600',
+      upsert: false,
+    });
+
+  if (error) {
+    console.error('uploadProfilePhoto error:', error);
+    throw new Error(error.message);
+  }
+
+  const { data: publicUrlData } = supabase.storage
+    .from('profile-photos')
+    .getPublicUrl(data.path);
+
+  return publicUrlData.publicUrl;
+}
+
+export async function uploadUniversityDocument({ userId, file }) {
+  if (!userId) {
+    throw new Error('User ID is required.');
+  }
+
+  if (!file) {
+    throw new Error('University document is required.');
+  }
+
+  const allowedTypes = [
+    'application/pdf',
+    'image/jpeg',
+    'image/png',
+    'image/webp',
+  ];
+
+  if (!allowedTypes.includes(file.type)) {
+    throw new Error('Only PDF, JPG, PNG, or WEBP university document is allowed.');
+  }
+
+  if (file.size > 10 * 1024 * 1024) {
+    throw new Error('University document must be 10MB or smaller.');
+  }
+
+  const timestamp = Date.now();
+  const safeFileName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+  const storagePath = `${userId}/${timestamp}-${safeFileName}`;
+
+  const { data, error } = await supabase.storage
+    .from('university-documents')
+    .upload(storagePath, file, {
+      contentType: file.type,
+      cacheControl: '3600',
+      upsert: false,
+    });
+
+  if (error) {
+    console.error('uploadUniversityDocument error:', error);
+    throw new Error(error.message);
+  }
+
+  return data.path;
+}
+
+export async function getSignedUniversityDocumentUrl(storagePath) {
+  if (!storagePath) {
+    throw new Error('Document storage path is required.');
+  }
+
+  const { data, error } = await supabase.storage
+    .from('university-documents')
+    .createSignedUrl(storagePath, 60);
+
+  if (error) {
+    console.error('getSignedUniversityDocumentUrl error:', error);
+    throw new Error(error.message);
+  }
+
+  return data.signedUrl;
+}

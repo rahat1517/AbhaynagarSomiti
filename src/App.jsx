@@ -42,8 +42,10 @@ function AppLayout() {
   const [profile, setProfile] = useState(null);
   const [loadingSession, setLoadingSession] = useState(true);
 
-  const isLoggedIn = Boolean(session?.user);
+  const hasAuthSession = Boolean(session?.user);
+  const isLoggedIn = Boolean(session?.user && profile);
   const isAdmin = profile?.role === 'admin';
+  const isVerified = profile?.is_verified === true;
 
   useEffect(() => {
     loadCurrentSession();
@@ -51,9 +53,10 @@ function AppLayout() {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (_event, nextSession) => {
+      setLoadingSession(true);
       setSession(nextSession);
 
-      if (nextSession?.user) {
+      if (nextSession?.user?.id) {
         await loadProfile(nextSession.user.id);
       } else {
         setProfile(null);
@@ -82,7 +85,7 @@ function AppLayout() {
 
       setSession(currentSession);
 
-      if (currentSession?.user) {
+      if (currentSession?.user?.id) {
         await loadProfile(currentSession.user.id);
       } else {
         setProfile(null);
@@ -106,10 +109,16 @@ function AppLayout() {
       .from('profiles')
       .select('id, email, role, is_verified')
       .eq('id', userId)
-      .single();
+      .maybeSingle();
 
     if (error) {
       console.error('Failed to load profile:', error);
+      setProfile(null);
+      return;
+    }
+
+    if (!data) {
+      console.warn('Auth user exists but profile row is missing.');
       setProfile(null);
       return;
     }
@@ -139,7 +148,7 @@ function AppLayout() {
           </Link>
 
           <div className="flex items-center gap-1 overflow-x-auto">
-            {!isLoggedIn ? (
+            {!hasAuthSession ? (
               <>
                 <NavItem to="/">Home</NavItem>
                 <NavItem to="/register">Register</NavItem>
@@ -147,13 +156,37 @@ function AppLayout() {
               </>
             ) : null}
 
+            {hasAuthSession && !profile && !loadingSession ? (
+              <>
+                <NavItem to="/">Home</NavItem>
+
+                <span className="whitespace-nowrap rounded-xl bg-amber-50 px-4 py-3 text-sm font-semibold text-amber-700">
+                  Profile Missing
+                </span>
+
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  className="min-h-12 whitespace-nowrap rounded-xl px-4 py-3 text-sm font-semibold text-red-600 hover:bg-red-50"
+                >
+                  Logout
+                </button>
+              </>
+            ) : null}
+
             {isLoggedIn ? (
               <>
                 <NavItem to="/">Home</NavItem>
                 <NavItem to="/profile">Profile</NavItem>
-                <NavItem to="/directory">Directory</NavItem>
-                <NavItem to="/career/jobs">Jobs</NavItem>
-                <NavItem to="/career/alumni">Alumni Career</NavItem>
+
+                {isVerified ? (
+                  <>
+                    <NavItem to="/directory">Directory</NavItem>
+                    <NavItem to="/career/jobs">Jobs</NavItem>
+                    <NavItem to="/career/alumni">Alumni Career</NavItem>
+                  </>
+                ) : null}
+
                 <NavItem to="/privacy">Privacy</NavItem>
                 <NavItem to="/privacy/visibility">Visibility</NavItem>
 
@@ -203,6 +236,7 @@ function AppLayout() {
         <Route path="/career/alumni" element={<AlumniCareerDashboard />} />
 
         <Route path="/privacy" element={<PrivacyDashboard />} />
+
         <Route
           path="/privacy/visibility"
           element={<VisibilityPreferencesPage />}
