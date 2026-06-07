@@ -1,16 +1,23 @@
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from '../lib/supabaseClient';
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+function emptyToNull(value) {
+  if (value === undefined || value === null) return null;
 
-if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Missing Supabase environment variables.');
+  const trimmed = String(value).trim();
+  return trimmed.length > 0 ? trimmed : null;
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-  auth: {
-    persistSession: true,
-    autoRefreshToken: true,
-    detectSessionInUrl: true,
-  },
-});
+export async function listPublicMembers(filters = {}) {
+  const { data, error } = await supabase.rpc('public_list_members', {
+    p_role: emptyToNull(filters.role),
+    p_academic_session: emptyToNull(filters.academicSession),
+    p_search_text: emptyToNull(filters.searchText),
+  });
+
+  if (error) {
+    console.error('public_list_members error:', error);
+    throw new Error(error.message);
+  }
+
+  return data || [];
+}

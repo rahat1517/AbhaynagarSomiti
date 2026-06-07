@@ -10,6 +10,7 @@ import {
 import { supabase } from './lib/supabaseClient';
 import { signOut } from './services/authService';
 
+import LandingPage from './pages/LandingPage';
 import RegistrationPage from './pages/RegistrationPage';
 import LoginPage from './pages/LoginPage';
 import ProfilePage from './pages/profile/ProfilePage';
@@ -134,18 +135,21 @@ function AppLayout() {
       <nav className="border-b border-slate-200 bg-white px-4 py-3">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-3">
           <Link to="/" className="text-sm font-bold text-slate-950">
-            Abhaynagar Somiti          </Link>
+            Abhaynagar Somiti
+          </Link>
 
           <div className="flex items-center gap-1 overflow-x-auto">
             {!isLoggedIn ? (
               <>
-                <NavItem to="/">Register</NavItem>
+                <NavItem to="/">Home</NavItem>
+                <NavItem to="/register">Register</NavItem>
                 <NavItem to="/login">Login</NavItem>
               </>
             ) : null}
 
             {isLoggedIn ? (
               <>
+                <NavItem to="/">Home</NavItem>
                 <NavItem to="/profile">Profile</NavItem>
                 <NavItem to="/directory">Directory</NavItem>
                 <NavItem to="/career/jobs">Jobs</NavItem>
@@ -187,7 +191,9 @@ function AppLayout() {
       </nav>
 
       <Routes>
-        <Route path="/" element={<RegistrationPage />} />
+        <Route path="/" element={<LandingPage />} />
+
+        <Route path="/register" element={<RegistrationPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/profile" element={<ProfilePage />} />
 
@@ -197,7 +203,6 @@ function AppLayout() {
         <Route path="/career/alumni" element={<AlumniCareerDashboard />} />
 
         <Route path="/privacy" element={<PrivacyDashboard />} />
-
         <Route
           path="/privacy/visibility"
           element={<VisibilityPreferencesPage />}
