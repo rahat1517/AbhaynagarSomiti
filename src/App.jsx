@@ -147,7 +147,7 @@ function AppLayout() {
             to="/"
             className="max-w-[180px] text-sm font-bold leading-tight text-slate-950 sm:max-w-none"
           >
-            Dhabi Abhaynagar Poribar | Abhaynagar Somiti
+            Dhabi Abhaynagar Poribar
           </Link>
 
           <div className="flex items-center gap-1 overflow-x-auto">

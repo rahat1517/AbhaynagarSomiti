@@ -75,7 +75,7 @@ export default function LandingPage() {
             </h1>
 
             <p className="mt-4 text-sm leading-6 text-slate-300 md:text-base">
-              Abhaynagar Somiti is an online community platform for
+              Dhabi Abhaynagar Poribar is an online community platform for
               Abhaynagar students, alumni, verified members, and local people
               connected with Dhaka University and Abhaynagar.
             </p>
@@ -155,7 +155,7 @@ export default function LandingPage() {
 
         <section className="mt-8 rounded-3xl bg-white p-5 shadow-soft md:p-6">
           <p className="text-sm font-semibold uppercase tracking-[0.25em] text-emerald-600">
-            About Abhaynagar Somiti
+            About Dhabi Abhaynagar Poribar
           </p>
 
           <h2 className="mt-2 text-2xl font-black text-slate-950">
