@@ -23,7 +23,7 @@ const initialForm = {
 
   registrationNo: '',
   graduationYear: '',
-  batch: '',
+  hall: '',
   currentCompany: '',
   designation: '',
   universityDocumentFile: null,
@@ -306,11 +306,11 @@ export default function RegistrationPage() {
                   />
 
                   <TextInput
-                    label="Batch"
-                    name="batch"
-                    value={form.batch}
+                    label="Hall"
+                    name="hall"
+                    value={form.hall}
                     onChange={updateField}
-                    placeholder="Batch 2018"
+                    placeholder="Fazlul Huq Muslim Hall"
                     required
                   />
 

@@ -26,7 +26,7 @@ export async function searchDirectoryProfiles({
   const { data, error } = await supabase.rpc('search_directory_profiles', {
     p_role: emptyToNull(filters.role),
     p_department_name: emptyToNull(filters.departmentName),
-    p_batch: emptyToNull(filters.batch),
+    p_hall: emptyToNull(filters.hall),
     p_graduation_year: numberOrNull(filters.graduationYear),
     p_current_company: emptyToNull(filters.currentCompany),
     p_designation: emptyToNull(filters.designation),

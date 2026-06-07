@@ -80,7 +80,7 @@ export default function AdminVerificationDashboard() {
 
       setViewerUrl(signedUrl);
       setViewerTitle(
-        `${requestItem.registration_no} - ${requestItem.batch}`
+        `${requestItem.registration_no} - ${requestItem.hall}`
       );
     } catch (error) {
       setStatus({
@@ -190,7 +190,7 @@ export default function AdminVerificationDashboard() {
 
                     <dl className="mt-4 grid grid-cols-1 gap-3 text-sm sm:grid-cols-3">
                       <Info label="Graduation Year" value={item.graduation_year} />
-                      <Info label="Batch" value={item.batch} />
+                      <Info label="Hall" value={item.hall} />
                       <Info
                         label="Submitted"
                         value={new Date(item.created_at).toLocaleString()}

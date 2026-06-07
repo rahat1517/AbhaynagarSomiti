@@ -61,7 +61,7 @@ export async function uploadAlumniCertificatePdf({ userId, file }) {
 export async function createAlumniVerificationRequest({
   registrationNo,
   graduationYear,
-  batch,
+  hall,
   certificateStoragePath,
 }) {
   const { data, error } = await supabase.rpc(
@@ -69,7 +69,7 @@ export async function createAlumniVerificationRequest({
     {
       p_registration_no: registrationNo,
       p_graduation_year: Number(graduationYear),
-      p_batch: batch,
+      p_hall: hall,
       p_certificate_storage_path: certificateStoragePath,
     }
   );
@@ -91,7 +91,7 @@ export async function listAlumniVerificationRequests() {
       alumni_id,
       registration_no,
       graduation_year,
-      batch,
+      hall,
       certificate_storage_path,
       status,
       admin_remarks,

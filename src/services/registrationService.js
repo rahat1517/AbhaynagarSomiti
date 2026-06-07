@@ -85,8 +85,8 @@ function validateAlumniFields(form) {
     throw new Error('Department name is required.');
   }
 
-  if (!form.batch) {
-    throw new Error('Batch is required.');
+  if (!form.hall) {
+    throw new Error('Hall is required.');
   }
 
   const graduationYear = Number(form.graduationYear);
@@ -223,7 +223,7 @@ export async function registerAssociationUser(form) {
     p_profile_photo_url: profilePhotoUrl,
     p_registration_no: form.registrationNo,
     p_graduation_year: Number(form.graduationYear),
-    p_batch: form.batch,
+    p_hall: form.hall,
     p_current_company: form.currentCompany || '',
     p_designation: form.designation || '',
     p_contact_number: form.contactNumber,
@@ -243,7 +243,7 @@ export async function registerAssociationUser(form) {
   await createAlumniVerificationRequest({
     registrationNo: form.registrationNo,
     graduationYear: form.graduationYear,
-    batch: form.batch,
+    hall: form.hall,
     certificateStoragePath: documentPath,
   });
 

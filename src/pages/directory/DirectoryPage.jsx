@@ -9,7 +9,7 @@ const initialFilters = {
   role: '',
   searchText: '',
   departmentName: '',
-  batch: '',
+  hall: '',
   graduationYear: '',
   currentCompany: '',
   designation: '',
@@ -362,7 +362,7 @@ function FilterPanel({ filters, updateFilter, applyFilters, clearFilters }) {
           name="searchText"
           value={filters.searchText}
           onChange={updateFilter}
-          placeholder="Name, company, batch, department..."
+          placeholder="Name, company, hall, department..."
         />
 
         <TextInput
@@ -374,11 +374,11 @@ function FilterPanel({ filters, updateFilter, applyFilters, clearFilters }) {
         />
 
         <TextInput
-          label="Batch"
-          name="batch"
-          value={filters.batch}
+          label="Hall"
+          name="hall"
+          value={filters.hall}
           onChange={updateFilter}
-          placeholder="Batch 2018"
+          placeholder="Fazlul Huq Muslim Hall"
         />
 
         <TextInput
@@ -492,7 +492,7 @@ function ProfileCard({ profile, onOpen, refProp }) {
           </>
         ) : (
           <>
-            <InfoLine label="Batch" value={profile.batch} />
+            <InfoLine label="Hall" value={profile.hall} />
             <InfoLine label="Graduation" value={profile.graduation_year} />
             <InfoLine label="Company" value={profile.current_company} />
             <InfoLine label="Designation" value={profile.designation} />
@@ -705,7 +705,7 @@ function ProfileDetailsContent({
               value={profile.graduation_year}
             />
 
-            <DetailItem label="Batch" value={profile.batch} />
+            <DetailItem label="Hall" value={profile.hall} />
 
             <DetailItem
               label="Current Company / Job Place"

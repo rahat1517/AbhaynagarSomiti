@@ -271,7 +271,7 @@ export default function ProfilePage() {
                       label="Graduation Year"
                       value={profile.graduation_year}
                     />
-                    <ReadonlyItem label="Batch" value={profile.batch} />
+                    <ReadonlyItem label="Hall" value={profile.hall} />
                     <ReadonlyItem
                       label="Department"
                       value={profile.department_name}
