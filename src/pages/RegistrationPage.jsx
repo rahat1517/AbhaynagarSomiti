@@ -92,8 +92,7 @@ export default function RegistrationPage() {
       <section className="mx-auto grid max-w-7xl grid-cols-1 gap-6 lg:grid-cols-[0.9fr_1.4fr] lg:items-start">
         <aside className="rounded-3xl bg-slate-950 p-6 text-white shadow-soft md:p-8 lg:sticky lg:top-8">
           <p className="text-sm font-semibold uppercase tracking-[0.25em] text-emerald-300">
-            Association Portal
-          </p>
+            Abhaynagar Somiti          </p>
 
           <h1 className="mt-4 text-3xl font-bold leading-tight md:text-4xl">
             Secure Student-Alumni Registration

@@ -134,8 +134,7 @@ function AppLayout() {
       <nav className="border-b border-slate-200 bg-white px-4 py-3">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-3">
           <Link to="/" className="text-sm font-bold text-slate-950">
-            Association Portal
-          </Link>
+            Abhaynagar Somiti          </Link>
 
           <div className="flex items-center gap-1 overflow-x-auto">
             {!isLoggedIn ? (
