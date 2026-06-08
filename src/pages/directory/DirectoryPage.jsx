@@ -710,16 +710,7 @@ function ProfileDetailsContent({ profile }) {
         </div>
       ) : null}
 
-      <DetailsGroup title="Verification">
-        <DetailItem
-          label="Verification Status"
-          value={profile.verification_status}
-        />
-        <DetailItem
-          label="Approved"
-          value={profile.is_approved ? 'Yes' : 'No'}
-        />
-      </DetailsGroup>
+      
     </div>
   );
 }
