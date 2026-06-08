@@ -1,5 +1,24 @@
 import { useEffect, useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { listPublicMembers } from '../services/publicDirectoryService';
+
+function getMemberType(member) {
+  const directType = String(member?.member_type || '').trim().toLowerCase();
+  const occupation = String(member?.occupation || '').trim().toLowerCase();
+
+  if (directType === 'student') return 'student';
+  if (directType === 'alumni') return 'alumni';
+
+  if (occupation === 'student' || occupation === 'current student') {
+    return 'student';
+  }
+
+  return 'alumni';
+}
+
+function getMemberTypeLabel(member) {
+  return getMemberType(member) === 'student' ? 'Current Student' : 'Alumni';
+}
 
 const initialFilters = {
   role: '',
@@ -8,39 +27,38 @@ const initialFilters = {
 };
 
 export default function LandingPage() {
-  const [filters, setFilters] = useState(initialFilters);
   const [members, setMembers] = useState([]);
+  const [filters, setFilters] = useState(initialFilters);
+  const [draftFilters, setDraftFilters] = useState(initialFilters);
   const [loading, setLoading] = useState(true);
   const [status, setStatus] = useState({ type: '', message: '' });
-
-  const studentCount = useMemo(
-    () => members.filter((item) => item.role === 'student').length,
-    [members]
-  );
-
-  const alumniCount = useMemo(
-    () => members.filter((item) => item.role === 'alumni').length,
-    [members]
-  );
 
   useEffect(() => {
     loadMembers(initialFilters);
   }, []);
 
-  function updateFilter(name, value) {
-    setFilters((current) => ({
-      ...current,
-      [name]: value,
-    }));
-  }
+  const studentCount = useMemo(() => {
+    return members.filter((item) => getMemberType(item) === 'student').length;
+  }, [members]);
+
+  const alumniCount = useMemo(() => {
+    return members.filter((item) => getMemberType(item) === 'alumni').length;
+  }, [members]);
 
   async function loadMembers(nextFilters = filters) {
     setLoading(true);
     setStatus({ type: '', message: '' });
 
     try {
-      const data = await listPublicMembers(nextFilters);
+      const data = await listPublicMembers({
+        role: nextFilters.role,
+        academicSession: nextFilters.academicSession,
+        searchText: nextFilters.searchText,
+      });
+
       setMembers(data);
+      setFilters(nextFilters);
+      setDraftFilters(nextFilters);
     } catch (error) {
       setStatus({
         type: 'error',
@@ -51,135 +69,180 @@ export default function LandingPage() {
     }
   }
 
-  async function applyFilters(event) {
-    event.preventDefault();
-    await loadMembers(filters);
+  function updateDraftField(name, value) {
+    setDraftFilters((current) => ({
+      ...current,
+      [name]: value,
+    }));
   }
 
-  async function clearFilters() {
-    setFilters(initialFilters);
-    await loadMembers(initialFilters);
+  function handleSearch(event) {
+    event.preventDefault();
+    loadMembers(draftFilters);
+  }
+
+  function handleClear() {
+    setDraftFilters(initialFilters);
+    loadMembers(initialFilters);
   }
 
   return (
     <main className="min-h-screen bg-slate-50">
-      <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
-          <div className="rounded-3xl bg-slate-950 p-6 text-white shadow-soft md:p-8">
-            <p className="text-sm font-semibold uppercase tracking-[0.25em] text-emerald-300">
+      <section className="border-b border-slate-200 bg-white px-4 py-5 sm:px-6 lg:px-8">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4">
+          <div>
+            <h1 className="text-base font-black text-slate-950">
+              Abhaynagar Somiti
+            </h1>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <Link
+              to="/login"
+              className="min-h-11 rounded-2xl border border-slate-300 px-4 py-3 text-sm font-bold text-slate-700 hover:bg-slate-100"
+            >
+              Login
+            </Link>
+
+            <Link
+              to="/register"
+              className="min-h-11 rounded-2xl bg-emerald-600 px-4 py-3 text-sm font-bold text-white hover:bg-emerald-700"
+            >
+              Register
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      <section className="px-3 py-5 sm:px-6 lg:px-8">
+        <div className="mx-auto grid max-w-7xl grid-cols-1 gap-5 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
+          <div className="rounded-3xl bg-slate-950 p-5 text-white shadow-soft sm:p-7">
+            <p className="text-xs font-bold uppercase tracking-[0.35em] text-emerald-300">
               Student Alumni Association
             </p>
 
-            <h1 className="mt-4 text-3xl font-black leading-tight md:text-5xl">
-              Dhabi Abhaynagar Poribar
-            </h1>
+            <h2 className="mt-4 text-3xl font-black leading-tight sm:text-4xl">
+              Connect Current Students and Alumni by Session
+            </h2>
 
-            <p className="mt-4 text-sm leading-6 text-slate-300 md:text-base">
-              Dhabi Abhaynagar Poribar is an online community platform for
-              Abhaynagar students, alumni, verified members, and local people
-              connected with Dhaka University and Abhaynagar.
+            <p className="mt-4 text-sm leading-6 text-slate-300">
+              Public visitors can see verified members by name, department,
+              session and occupation only. Full details are available after
+              login according to privacy rules.
             </p>
 
-            <p className="mt-3 text-sm font-semibold leading-6 text-slate-400">
-              Also known as DU Abhaynagar Poribar, Dhaka University Abhaynagar
-              community, and Abhaynagar Student Alumni Association.
-            </p>
-
-            <div className="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-2">
-              <StatCard label="Current Students" value={studentCount} />
-              <StatCard label="Alumni" value={alumniCount} />
+            <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <SummaryCard label="Current Students" value={studentCount} />
+              <SummaryCard label="Alumni" value={alumniCount} />
             </div>
           </div>
 
-          <div className="rounded-3xl bg-white p-5 shadow-soft md:p-6">
-            <h2 className="text-xl font-bold text-slate-950">
+          <form
+            onSubmit={handleSearch}
+            className="rounded-3xl bg-white p-5 shadow-soft sm:p-7"
+          >
+            <h2 className="text-xl font-black text-slate-950">
               Public Member Search
             </h2>
 
-            <p className="mt-2 text-sm text-slate-500">
-              Search verified members of Dhabi Abhaynagar Poribar by role,
-              session, name or department.
+            <p className="mt-1 text-sm text-slate-500">
+              Search by member type, session, name or department.
             </p>
 
-            <form
-              onSubmit={applyFilters}
-              className="mt-5 grid grid-cols-1 gap-4 md:grid-cols-2"
-            >
-              <SelectInput
-                label="Member Type"
-                name="role"
-                value={filters.role}
-                onChange={updateFilter}
-                options={[
-                  { label: 'All', value: '' },
-                  { label: 'Current Students', value: 'student' },
-                  { label: 'Alumni', value: 'alumni' },
-                ]}
-              />
+            <div className="mt-5 grid grid-cols-1 gap-4 md:grid-cols-2">
+              <label className="block">
+                <span className="mb-1.5 block text-sm font-bold text-slate-700">
+                  Member Type
+                </span>
 
-              <TextInput
-                label="Session"
-                name="academicSession"
-                value={filters.academicSession}
-                onChange={updateFilter}
-                placeholder="2023-24"
-              />
+                <select
+                  value={draftFilters.role}
+                  onChange={(event) =>
+                    updateDraftField('role', event.target.value)
+                  }
+                  className="min-h-12 w-full rounded-2xl border border-slate-300 bg-white px-4 text-sm outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100"
+                >
+                  <option value="">All Members</option>
+                  <option value="student">Current Students</option>
+                  <option value="alumni">Alumni / Others</option>
+                </select>
+              </label>
 
-              <TextInput
-                label="Search"
-                name="searchText"
-                value={filters.searchText}
-                onChange={updateFilter}
-                placeholder="Name or department"
-              />
+              <label className="block">
+                <span className="mb-1.5 block text-sm font-bold text-slate-700">
+                  Session
+                </span>
+
+                <input
+                  value={draftFilters.academicSession}
+                  onChange={(event) =>
+                    updateDraftField('academicSession', event.target.value)
+                  }
+                  placeholder="2023-24"
+                  className="min-h-12 w-full rounded-2xl border border-slate-300 bg-white px-4 text-sm outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100"
+                />
+              </label>
+
+              <label className="block md:col-span-1">
+                <span className="mb-1.5 block text-sm font-bold text-slate-700">
+                  Search
+                </span>
+
+                <input
+                  value={draftFilters.searchText}
+                  onChange={(event) =>
+                    updateDraftField('searchText', event.target.value)
+                  }
+                  placeholder="Name or department"
+                  className="min-h-12 w-full rounded-2xl border border-slate-300 bg-white px-4 text-sm outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100"
+                />
+              </label>
 
               <div className="flex items-end gap-3">
                 <button
                   type="submit"
-                  className="min-h-12 flex-1 rounded-2xl bg-slate-900 px-5 text-sm font-bold text-white hover:bg-slate-800"
+                  disabled={loading}
+                  className="min-h-12 flex-1 rounded-2xl bg-slate-950 px-5 text-sm font-bold text-white hover:bg-slate-800 disabled:opacity-50"
                 >
-                  Search
+                  {loading ? 'Searching...' : 'Search'}
                 </button>
 
                 <button
                   type="button"
-                  onClick={clearFilters}
-                  className="min-h-12 rounded-2xl border border-slate-300 px-5 text-sm font-semibold text-slate-700 hover:bg-slate-100"
+                  onClick={handleClear}
+                  disabled={loading}
+                  className="min-h-12 rounded-2xl border border-slate-300 bg-white px-5 text-sm font-bold text-slate-700 hover:bg-slate-100 disabled:opacity-50"
                 >
                   Clear
                 </button>
               </div>
-            </form>
-          </div>
+            </div>
+          </form>
         </div>
+      </section>
 
-        <section className="mt-8 rounded-3xl bg-white p-5 shadow-soft md:p-6">
-          <p className="text-sm font-semibold uppercase tracking-[0.25em] text-emerald-600">
-            About Dhabi Abhaynagar Poribar
-          </p>
+      <section className="px-3 pb-10 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl">
+          <div className="rounded-3xl bg-white p-5 shadow-soft sm:p-7">
+            <p className="text-xs font-bold uppercase tracking-[0.35em] text-emerald-600">
+              About Dhabi Abhaynagar Poribar
+            </p>
 
-          <h2 className="mt-2 text-2xl font-black text-slate-950">
-            DU Abhaynagar Poribar and Student Alumni Community
-          </h2>
+            <h2 className="mt-3 text-2xl font-black text-slate-950">
+              DU Abhaynagar Poribar and Student Alumni Community
+            </h2>
 
-          <p className="mt-3 text-sm leading-7 text-slate-600 md:text-base">
-            Dhabi Abhaynagar Poribar helps Abhaynagar students, alumni, and
-            verified community members stay connected through a secure online
-            directory, profile system, privacy controls, and career networking
-            features.
-          </p>
-        </section>
-
-        {status.message ? (
-          <div className="mt-6 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm font-semibold text-red-700">
-            {status.message}
+            <p className="mt-3 text-sm leading-6 text-slate-500">
+              Dhabi Abhaynagar Poribar helps Abhaynagar students, alumni, and
+              verified community members stay connected through a secure online
+              directory, profile system, privacy controls, and career networking
+              features.
+            </p>
           </div>
-        ) : null}
 
-        <section className="mt-8">
-          <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+          <div className="mt-8 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <p className="text-sm font-semibold uppercase tracking-[0.25em] text-emerald-600">
+              <p className="text-xs font-bold uppercase tracking-[0.35em] text-emerald-600">
                 Public Directory
               </p>
 
@@ -189,73 +252,38 @@ export default function LandingPage() {
             </div>
 
             <p className="text-sm font-semibold text-slate-500">
-              {members.length} members found
+              {members.length} member{members.length === 1 ? '' : 's'} found
             </p>
           </div>
 
+          {status.message ? (
+            <StatusBox type={status.type} message={status.message} />
+          ) : null}
+
           {loading ? (
-            <PanelMessage message="Loading public members..." />
+            <div className="mt-5 rounded-3xl border border-slate-200 bg-white p-6 text-sm text-slate-500">
+              Loading members...
+            </div>
           ) : null}
 
           {!loading && members.length === 0 ? (
-            <PanelMessage message="No verified members found." />
+            <div className="mt-5 rounded-3xl border border-slate-200 bg-white p-6 text-sm text-slate-500">
+              No verified members found.
+            </div>
           ) : null}
 
-          <div className="mt-5 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+          <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {members.map((member) => (
-              <PublicMemberCard key={member.profile_id} member={member} />
+              <MemberCard key={member.profile_id} member={member} />
             ))}
           </div>
-        </section>
+        </div>
       </section>
     </main>
   );
 }
 
-function PublicMemberCard({ member }) {
-  return (
-    <article className="rounded-3xl bg-white p-5 shadow-soft">
-      <div className="flex items-start gap-4">
-        <div className="h-20 w-20 shrink-0 overflow-hidden rounded-3xl bg-slate-100">
-          {member.profile_photo_url ? (
-            <img
-              src={member.profile_photo_url}
-              alt={member.full_name || 'Member'}
-              className="h-full w-full object-cover"
-            />
-          ) : (
-            <div className="flex h-full w-full items-center justify-center text-2xl font-black text-slate-400">
-              {(member.full_name || '?').charAt(0).toUpperCase()}
-            </div>
-          )}
-        </div>
-
-        <div className="min-w-0 flex-1">
-          <span
-            className={`rounded-full px-3 py-1 text-xs font-bold capitalize ${
-              member.role === 'student'
-                ? 'bg-emerald-50 text-emerald-700'
-                : 'bg-indigo-50 text-indigo-700'
-            }`}
-          >
-            {member.role === 'student' ? 'Current Student' : 'Alumni'}
-          </span>
-
-          <h3 className="mt-3 break-words text-lg font-black text-slate-950">
-            {member.full_name || '-'}
-          </h3>
-        </div>
-      </div>
-
-      <div className="mt-4 space-y-2 text-sm">
-        <InfoLine label="Department" value={member.department_name} />
-        <InfoLine label="Session" value={member.academic_session} />
-      </div>
-    </article>
-  );
-}
-
-function StatCard({ label, value }) {
+function SummaryCard({ label, value }) {
   return (
     <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
       <p className="text-xs font-bold uppercase tracking-wider text-slate-400">
@@ -267,60 +295,76 @@ function StatCard({ label, value }) {
   );
 }
 
-function TextInput({ label, name, value, onChange, placeholder = '' }) {
+function MemberCard({ member }) {
+  const memberType = getMemberType(member);
+  const label = getMemberTypeLabel(member);
+
   return (
-    <label className="block">
-      <span className="mb-1.5 block text-sm font-semibold text-slate-700">
-        {label}
-      </span>
+    <article className="rounded-3xl border border-slate-200 bg-white p-4 shadow-soft">
+      <div className="flex items-start gap-4">
+        <div className="h-16 w-16 shrink-0 overflow-hidden rounded-2xl bg-slate-100">
+          {member.profile_photo_url ? (
+            <img
+              src={member.profile_photo_url}
+              alt={member.full_name || 'Member'}
+              className="h-full w-full object-cover"
+            />
+          ) : (
+            <div className="flex h-full w-full items-center justify-center text-xl font-black text-slate-400">
+              {(member.full_name || '?').charAt(0).toUpperCase()}
+            </div>
+          )}
+        </div>
 
-      <input
-        value={value}
-        placeholder={placeholder}
-        onChange={(event) => onChange(name, event.target.value)}
-        className="min-h-12 w-full rounded-2xl border border-slate-300 bg-white px-4 text-sm outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100"
-      />
-    </label>
-  );
-}
+        <div className="min-w-0 flex-1">
+          <span
+            className={`inline-flex rounded-full px-3 py-1 text-xs font-black ${
+              memberType === 'student'
+                ? 'bg-emerald-50 text-emerald-700'
+                : 'bg-indigo-50 text-indigo-700'
+            }`}
+          >
+            {label}
+          </span>
 
-function SelectInput({ label, name, value, onChange, options }) {
-  return (
-    <label className="block">
-      <span className="mb-1.5 block text-sm font-semibold text-slate-700">
-        {label}
-      </span>
+          <h3 className="mt-2 break-words text-base font-black text-slate-950">
+            {member.full_name || 'Unnamed Member'}
+          </h3>
+        </div>
+      </div>
 
-      <select
-        value={value}
-        onChange={(event) => onChange(name, event.target.value)}
-        className="min-h-12 w-full rounded-2xl border border-slate-300 bg-white px-4 text-sm outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100"
-      >
-        {options.map((item) => (
-          <option key={item.value || 'all'} value={item.value}>
-            {item.label}
-          </option>
-        ))}
-      </select>
-    </label>
+      <div className="mt-4 space-y-2 text-sm">
+        <InfoLine label="Department" value={member.department_name} />
+        <InfoLine label="Session" value={member.academic_session} />
+
+        {memberType === 'alumni' ? (
+          <InfoLine label="Occupation" value={member.occupation} />
+        ) : null}
+      </div>
+    </article>
   );
 }
 
 function InfoLine({ label, value }) {
   return (
-    <div className="flex items-center justify-between gap-3">
+    <div className="flex items-start justify-between gap-3">
       <span className="text-slate-500">{label}</span>
-
-      <span className="text-right font-bold text-slate-900">
+      <span className="break-words text-right font-bold text-slate-900">
         {value || '-'}
       </span>
     </div>
   );
 }
 
-function PanelMessage({ message }) {
+function StatusBox({ type, message }) {
   return (
-    <div className="mt-5 rounded-3xl bg-white p-6 text-sm text-slate-500 shadow-soft">
+    <div
+      className={`mt-5 rounded-2xl border p-4 text-sm font-medium ${
+        type === 'success'
+          ? 'border-emerald-200 bg-emerald-50 text-emerald-800'
+          : 'border-red-200 bg-red-50 text-red-700'
+      }`}
+    >
       {message}
     </div>
   );
