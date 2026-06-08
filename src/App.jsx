@@ -42,6 +42,8 @@ function AppLayout() {
   const [session, setSession] = useState(null);
   const [profile, setProfile] = useState(null);
   const [loadingSession, setLoadingSession] = useState(true);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
   const [adminNotifications, setAdminNotifications] = useState({
     pendingMembers: 0,
     pendingUpdates: 0,
@@ -68,19 +70,11 @@ function AppLayout() {
         if (nextProfile?.role === 'admin') {
           await loadAdminNotifications();
         } else {
-          setAdminNotifications({
-            pendingMembers: 0,
-            pendingUpdates: 0,
-            total: 0,
-          });
+          resetAdminNotifications();
         }
       } else {
         setProfile(null);
-        setAdminNotifications({
-          pendingMembers: 0,
-          pendingUpdates: 0,
-          total: 0,
-        });
+        resetAdminNotifications();
       }
 
       setLoadingSession(false);
@@ -104,6 +98,14 @@ function AppLayout() {
       window.clearInterval(intervalId);
     };
   }, [isAdmin]);
+
+  function resetAdminNotifications() {
+    setAdminNotifications({
+      pendingMembers: 0,
+      pendingUpdates: 0,
+      total: 0,
+    });
+  }
 
   async function loadCurrentSession() {
     setLoadingSession(true);
@@ -172,11 +174,7 @@ function AppLayout() {
       setAdminNotifications(summary);
     } catch (error) {
       console.error('Failed to load admin notifications:', error);
-      setAdminNotifications({
-        pendingMembers: 0,
-        pendingUpdates: 0,
-        total: 0,
-      });
+      resetAdminNotifications();
     }
   }
 
@@ -186,11 +184,8 @@ function AppLayout() {
 
       setSession(null);
       setProfile(null);
-      setAdminNotifications({
-        pendingMembers: 0,
-        pendingUpdates: 0,
-        total: 0,
-      });
+      setMobileMenuOpen(false);
+      resetAdminNotifications();
 
       navigate('/login');
     } catch (error) {
@@ -198,98 +193,72 @@ function AppLayout() {
     }
   }
 
+  function closeMobileMenu() {
+    setMobileMenuOpen(false);
+  }
+
   return (
     <>
-      <nav className="border-b border-slate-200 bg-white px-4 py-3">
+      <nav className="sticky top-0 z-50 border-b border-slate-200 bg-white px-4 py-3">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-3">
-          <Link to="/" className="text-sm font-bold text-slate-950">
+          <Link
+            to="/"
+            onClick={closeMobileMenu}
+            className="text-sm font-bold text-slate-950"
+          >
             Abhaynagar Somiti
           </Link>
 
-          <div className="flex items-center gap-1 overflow-x-auto">
-            {!hasAuthSession ? (
-              <>
-                <NavItem to="/">Home</NavItem>
-                <NavItem to="/register">Register</NavItem>
-                <NavItem to="/login">Login</NavItem>
-              </>
-            ) : null}
-
-            {hasAuthSession && !profile && !loadingSession ? (
-              <>
-                <NavItem to="/">Home</NavItem>
-
-                <span className="whitespace-nowrap rounded-xl bg-amber-50 px-4 py-3 text-sm font-semibold text-amber-700">
-                  Profile Missing
-                </span>
-
-                <button
-                  type="button"
-                  onClick={handleLogout}
-                  className="min-h-12 whitespace-nowrap rounded-xl px-4 py-3 text-sm font-semibold text-red-600 hover:bg-red-50"
-                >
-                  Logout
-                </button>
-              </>
-            ) : null}
-
-            {isLoggedIn ? (
-              <>
-                <NavItem to="/">Home</NavItem>
-                <NavItem to="/profile">Profile</NavItem>
-
-                {isVerified ? (
-                  <>
-                    <NavItem to="/directory">Directory</NavItem>
-                    <NavItem to="/career/jobs">Jobs</NavItem>
-                    <NavItem to="/career/alumni">Alumni Career</NavItem>
-                  </>
-                ) : null}
-
-                <NavItem to="/privacy">Privacy</NavItem>
-                <NavItem to="/privacy/visibility">Visibility</NavItem>
-
-                {isAdmin ? (
-                  <>
-                    <NavItem to="/admin/members">
-                      <span className="inline-flex items-center gap-2">
-                        Member Verify
-                        {adminNotifications.pendingMembers > 0 ? (
-                          <Badge count={adminNotifications.pendingMembers} />
-                        ) : null}
-                      </span>
-                    </NavItem>
-
-                    <NavItem to="/admin/member-updates">
-                      <span className="inline-flex items-center gap-2">
-                        Update Requests
-                        {adminNotifications.pendingUpdates > 0 ? (
-                          <Badge count={adminNotifications.pendingUpdates} />
-                        ) : null}
-                      </span>
-                    </NavItem>
-
-                    <NavItem to="/admin/roster">Roster</NavItem>
-                  </>
-                ) : null}
-
-                <button
-                  type="button"
-                  onClick={handleLogout}
-                  className="min-h-12 whitespace-nowrap rounded-xl px-4 py-3 text-sm font-semibold text-red-600 hover:bg-red-50"
-                >
-                  Logout
-                </button>
-              </>
-            ) : null}
-
-            {loadingSession ? (
-              <span className="whitespace-nowrap px-3 text-xs font-semibold text-slate-400">
-                Loading...
-              </span>
-            ) : null}
+          <div className="hidden items-center gap-1 md:flex">
+            <NavLinks
+              hasAuthSession={hasAuthSession}
+              isLoggedIn={isLoggedIn}
+              isVerified={isVerified}
+              isAdmin={isAdmin}
+              loadingSession={loadingSession}
+              profile={profile}
+              adminNotifications={adminNotifications}
+              onLogout={handleLogout}
+              onNavigate={closeMobileMenu}
+            />
           </div>
+
+          <button
+            type="button"
+            onClick={() => setMobileMenuOpen((current) => !current)}
+            className="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-slate-200 bg-white text-slate-900 md:hidden"
+            aria-label="Open menu"
+          >
+            {mobileMenuOpen ? (
+              <span className="text-2xl leading-none">×</span>
+            ) : (
+              <span className="flex flex-col gap-1.5">
+                <span className="block h-0.5 w-6 rounded-full bg-slate-900" />
+                <span className="block h-0.5 w-6 rounded-full bg-slate-900" />
+                <span className="block h-0.5 w-6 rounded-full bg-slate-900" />
+              </span>
+            )}
+          </button>
         </div>
+
+        {mobileMenuOpen ? (
+          <div className="mt-3 rounded-3xl border border-slate-200 bg-white p-3 shadow-lg md:hidden">
+            <div className="grid grid-cols-1 gap-2">
+              <NavLinks
+                hasAuthSession={hasAuthSession}
+                isLoggedIn={isLoggedIn}
+                isVerified={isVerified}
+                isAdmin={isAdmin}
+                loadingSession={loadingSession}
+                profile={profile}
+                adminNotifications={adminNotifications}
+                onLogout={handleLogout}
+                onNavigate={closeMobileMenu}
+                mobile
+              />
+            </div>
+          </div>
+        ) : null}
       </nav>
 
       {isAdmin && adminNotifications.total > 0 ? (
@@ -303,6 +272,7 @@ function AppLayout() {
 
             <Link
               to="/admin/members"
+              onClick={closeMobileMenu}
               className="w-fit rounded-xl bg-amber-600 px-4 py-2 text-xs font-bold text-white hover:bg-amber-700"
             >
               Review Now
@@ -346,12 +316,164 @@ function AppLayout() {
   );
 }
 
-function NavItem({ to, children }) {
+function NavLinks({
+  hasAuthSession,
+  isLoggedIn,
+  isVerified,
+  isAdmin,
+  loadingSession,
+  profile,
+  adminNotifications,
+  onLogout,
+  onNavigate,
+  mobile = false,
+}) {
+  const itemClass = mobile
+    ? 'min-h-11 w-full rounded-2xl px-4 py-3 text-left text-sm font-semibold text-slate-700 hover:bg-slate-100'
+    : 'min-h-12 whitespace-nowrap rounded-xl px-4 py-3 text-sm font-semibold text-slate-600 hover:bg-slate-100';
+
+  if (!hasAuthSession) {
+    return (
+      <>
+        <NavItem to="/" className={itemClass} onClick={onNavigate}>
+          Home
+        </NavItem>
+
+        <NavItem to="/register" className={itemClass} onClick={onNavigate}>
+          Register
+        </NavItem>
+
+        <NavItem to="/login" className={itemClass} onClick={onNavigate}>
+          Login
+        </NavItem>
+
+        {loadingSession ? (
+          <span className="px-3 text-xs font-semibold text-slate-400">
+            Loading...
+          </span>
+        ) : null}
+      </>
+    );
+  }
+
+  if (hasAuthSession && !profile && !loadingSession) {
+    return (
+      <>
+        <NavItem to="/" className={itemClass} onClick={onNavigate}>
+          Home
+        </NavItem>
+
+        <span className="rounded-xl bg-amber-50 px-4 py-3 text-sm font-semibold text-amber-700">
+          Profile Missing
+        </span>
+
+        <button
+          type="button"
+          onClick={onLogout}
+          className={`${itemClass} text-red-600 hover:bg-red-50`}
+        >
+          Logout
+        </button>
+      </>
+    );
+  }
+
+  if (!isLoggedIn) {
+    return null;
+  }
+
   return (
-    <Link
-      to={to}
-      className="min-h-12 whitespace-nowrap rounded-xl px-4 py-3 text-sm font-semibold text-slate-600 hover:bg-slate-100"
-    >
+    <>
+      <NavItem to="/" className={itemClass} onClick={onNavigate}>
+        Home
+      </NavItem>
+
+      <NavItem to="/profile" className={itemClass} onClick={onNavigate}>
+        Profile
+      </NavItem>
+
+      {isVerified ? (
+        <>
+          <NavItem to="/directory" className={itemClass} onClick={onNavigate}>
+            Directory
+          </NavItem>
+
+          <NavItem to="/career/jobs" className={itemClass} onClick={onNavigate}>
+            Jobs
+          </NavItem>
+
+          <NavItem
+            to="/career/alumni"
+            className={itemClass}
+            onClick={onNavigate}
+          >
+            Alumni Career
+          </NavItem>
+        </>
+      ) : null}
+
+      <NavItem to="/privacy" className={itemClass} onClick={onNavigate}>
+        Privacy
+      </NavItem>
+
+      <NavItem
+        to="/privacy/visibility"
+        className={itemClass}
+        onClick={onNavigate}
+      >
+        Visibility
+      </NavItem>
+
+      {isAdmin ? (
+        <>
+          <NavItem to="/admin/members" className={itemClass} onClick={onNavigate}>
+            <span className="inline-flex items-center gap-2">
+              Member Verify
+              {adminNotifications.pendingMembers > 0 ? (
+                <Badge count={adminNotifications.pendingMembers} />
+              ) : null}
+            </span>
+          </NavItem>
+
+          <NavItem
+            to="/admin/member-updates"
+            className={itemClass}
+            onClick={onNavigate}
+          >
+            <span className="inline-flex items-center gap-2">
+              Update Requests
+              {adminNotifications.pendingUpdates > 0 ? (
+                <Badge count={adminNotifications.pendingUpdates} />
+              ) : null}
+            </span>
+          </NavItem>
+
+          <NavItem to="/admin/roster" className={itemClass} onClick={onNavigate}>
+            Roster
+          </NavItem>
+        </>
+      ) : null}
+
+      <button
+        type="button"
+        onClick={onLogout}
+        className={`${itemClass} text-red-600 hover:bg-red-50`}
+      >
+        Logout
+      </button>
+
+      {loadingSession ? (
+        <span className="px-3 text-xs font-semibold text-slate-400">
+          Loading...
+        </span>
+      ) : null}
+    </>
+  );
+}
+
+function NavItem({ to, children, className, onClick }) {
+  return (
+    <Link to={to} onClick={onClick} className={className}>
       {children}
     </Link>
   );
