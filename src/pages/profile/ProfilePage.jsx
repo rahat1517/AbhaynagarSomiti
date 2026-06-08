@@ -345,7 +345,7 @@ export default function ProfilePage() {
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-slate-50 px-4 py-6 sm:px-6 lg:px-8">
+      <main className="min-h-screen bg-slate-50 px-3 py-4 sm:px-6 sm:py-6 lg:px-8">
         <section className="mx-auto max-w-5xl rounded-3xl bg-white p-6 shadow-soft">
           <p className="text-sm text-slate-500">Loading profile...</p>
         </section>
@@ -355,7 +355,7 @@ export default function ProfilePage() {
 
   if (!profile) {
     return (
-      <main className="min-h-screen bg-slate-50 px-4 py-6 sm:px-6 lg:px-8">
+      <main className="min-h-screen bg-slate-50 px-3 py-4 sm:px-6 sm:py-6 lg:px-8">
         <section className="mx-auto max-w-5xl rounded-3xl bg-white p-6 shadow-soft">
           <h1 className="text-2xl font-bold text-slate-950">
             Profile not found
@@ -384,7 +384,7 @@ export default function ProfilePage() {
 
   if (isAdmin) {
     return (
-      <main className="min-h-screen bg-slate-50 px-4 py-6 sm:px-6 lg:px-8">
+      <main className="min-h-screen bg-slate-50 px-3 py-4 sm:px-6 sm:py-6 lg:px-8">
         <section className="mx-auto max-w-5xl rounded-3xl bg-white p-6 shadow-soft">
           <ProfileHeader
             profile={profile}
@@ -411,7 +411,7 @@ export default function ProfilePage() {
   }
 
   return (
-    <main className="min-h-screen bg-slate-50 px-4 py-6 sm:px-6 lg:px-8">
+    <main className="min-h-screen bg-slate-50 px-3 py-4 sm:px-6 sm:py-6 lg:px-8">
       <section className="mx-auto max-w-7xl">
         <div className="flex flex-col gap-3 border-b border-slate-200 pb-5 md:flex-row md:items-end md:justify-between">
           <div>
@@ -442,7 +442,7 @@ export default function ProfilePage() {
           <StatusBox type={status.type} message={status.message} />
         ) : null}
 
-        <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-[0.8fr_1.4fr]">
+        <div className="profile-mobile-stack mt-5 grid grid-cols-1 gap-4 lg:grid-cols-[0.75fr_1.45fr] lg:gap-6">
           <section className="rounded-3xl bg-white p-5 shadow-soft md:p-6">
             <ProfileHeader
               profile={profile}
@@ -749,15 +749,15 @@ export default function ProfilePage() {
                 />
               </FormSection>
 
-              <button
-                type="submit"
-                disabled={saving}
-                className="min-h-12 w-full rounded-2xl bg-emerald-600 px-5 text-sm font-bold text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:bg-emerald-300"
-              >
-                {saving
-                  ? 'Submitting Request...'
-                  : 'Submit Update Request'}
-              </button>
+              <div className="sticky bottom-0 z-20 -mx-5 border-t border-slate-200 bg-white/95 px-5 py-3 backdrop-blur sm:static sm:mx-0 sm:border-0 sm:bg-transparent sm:p-0">
+                <button
+                  type="submit"
+                  disabled={saving}
+                  className="min-h-12 w-full rounded-2xl bg-emerald-600 px-5 text-sm font-bold text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:bg-emerald-300"
+                >
+                  {saving ? 'Submitting Request...' : 'Submit Update Request'}
+                </button>
+              </div>
             </form>
           </section>
         </div>
@@ -818,8 +818,10 @@ function ProfileHeader({ profile, onPhotoChange, photoUploading }) {
 
 function FormSection({ title, children }) {
   return (
-    <section className="rounded-2xl border border-slate-200 p-4 md:p-5">
-      <h3 className="mb-4 text-base font-bold text-slate-900">{title}</h3>
+    <section className="rounded-2xl border border-slate-200 p-3 sm:p-4 md:p-5">
+      <h3 className="mb-3 text-base font-bold text-slate-900 sm:mb-4">
+        {title}
+      </h3>
       {children}
     </section>
   );

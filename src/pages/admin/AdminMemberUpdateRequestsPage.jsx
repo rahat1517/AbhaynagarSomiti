@@ -73,7 +73,7 @@ export default function AdminMemberUpdateRequestsPage() {
   const pendingRequests = requests.filter((item) => item.status === 'pending');
 
   return (
-    <main className="min-h-screen bg-slate-50 px-4 py-6 sm:px-6 lg:px-8">
+    <main className="min-h-screen bg-slate-50 px-3 py-4 sm:px-6 sm:py-6 lg:px-8">
       <section className="mx-auto max-w-7xl">
         <div className="flex flex-col gap-3 border-b border-slate-200 pb-5 md:flex-row md:items-end md:justify-between">
           <div>

@@ -222,7 +222,7 @@ export default function AdminRosterPage() {
 
   if (loading && !adminProfile) {
     return (
-      <main className="min-h-screen bg-slate-50 px-4 py-6 sm:px-6 lg:px-8">
+      <main className="min-h-screen bg-slate-50 px-3 py-4 sm:px-6 sm:py-6 lg:px-8">
         <section className="mx-auto max-w-7xl rounded-3xl bg-white p-6 shadow-soft">
           <p className="text-sm text-slate-500">Loading roster page...</p>
         </section>
@@ -232,7 +232,7 @@ export default function AdminRosterPage() {
 
   if (status.type === 'error' && !adminProfile) {
     return (
-      <main className="min-h-screen bg-slate-50 px-4 py-6 sm:px-6 lg:px-8">
+      <main className="min-h-screen bg-slate-50 px-3 py-4 sm:px-6 sm:py-6 lg:px-8">
         <section className="mx-auto max-w-xl rounded-3xl bg-white p-6 shadow-soft">
           <StatusBox type="error" message={status.message} />
         </section>
@@ -241,7 +241,7 @@ export default function AdminRosterPage() {
   }
 
   return (
-    <main className="min-h-screen bg-slate-50 px-4 py-6 sm:px-6 lg:px-8">
+    <main className="min-h-screen bg-slate-50 px-3 py-4 sm:px-6 sm:py-6 lg:px-8">
       <section className="mx-auto max-w-7xl">
         <div className="flex flex-col gap-4 border-b border-slate-200 pb-5 md:flex-row md:items-end md:justify-between">
           <div>

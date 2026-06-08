@@ -280,8 +280,8 @@ export default function RegistrationPage() {
   }
 
   return (
-    <main className="min-h-screen bg-slate-50 px-4 py-6 sm:px-6 lg:px-8">
-      <section className="mx-auto grid max-w-7xl grid-cols-1 gap-6 lg:grid-cols-[0.85fr_1.5fr] lg:items-start">
+    <main className="min-h-screen bg-slate-50 px-3 py-4 sm:px-6 sm:py-6 lg:px-8">
+      <section className="mx-auto grid max-w-7xl grid-cols-1 gap-4 lg:grid-cols-[0.85fr_1.5fr] lg:items-start lg:gap-6">
         <aside className="rounded-3xl bg-slate-950 p-6 text-white shadow-soft md:p-8 lg:sticky lg:top-8">
           <p className="text-sm font-semibold uppercase tracking-[0.25em] text-emerald-300">
             Association Portal
@@ -727,7 +727,7 @@ export default function RegistrationPage() {
               </label>
             </div>
 
-            <div className="flex flex-col-reverse gap-3 border-t border-slate-200 pt-5 sm:flex-row sm:justify-end">
+            <div className="sticky bottom-0 z-20 -mx-4 flex flex-col-reverse gap-3 border-t border-slate-200 bg-white/95 px-4 py-3 backdrop-blur sm:static sm:mx-0 sm:flex-row sm:justify-end sm:bg-transparent sm:px-0 sm:pt-5">
               <button
                 type="button"
                 onClick={() => {
@@ -781,8 +781,10 @@ function StatusBox({ type, message }) {
 
 function FormSection({ title, children }) {
   return (
-    <section className="rounded-2xl border border-slate-200 p-4 md:p-5">
-      <h3 className="mb-4 text-base font-bold text-slate-900">{title}</h3>
+    <section className="rounded-2xl border border-slate-200 p-3 sm:p-4 md:p-5">
+      <h3 className="mb-3 text-base font-bold text-slate-900 sm:mb-4">
+        {title}
+      </h3>
       {children}
     </section>
   );
