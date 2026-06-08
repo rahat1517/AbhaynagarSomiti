@@ -25,7 +25,7 @@ const hallOptions = [
   'IBA Hostel',
   'Dr. Qudrat-E-Khuda Hostel',
   'Shahid Athlet Sultana Kamal Hostel',
-  'Other',
+  
 ];
 
 const unionOptions = [
@@ -441,7 +441,7 @@ export default function RegistrationPage() {
                 />
 
                 <TextInput
-                  label="Mobile Number"
+                  label="Mobile Number (Personal WhatsApp Number)"
                   name="contactNumber"
                   type="tel"
                   value={form.contactNumber}
@@ -526,13 +526,7 @@ export default function RegistrationPage() {
                   required
                 />
 
-                <FileInput
-                  label="University Document"
-                  name="universityDocumentFile"
-                  accept="application/pdf,image/jpeg,image/png,image/webp"
-                  onChange={updateField}
-                  required
-                />
+               
               </div>
             </FormSection>
 
