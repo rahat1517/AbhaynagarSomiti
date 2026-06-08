@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
 import { listPublicMembers } from '../services/publicDirectoryService';
 
 function getMemberType(member) {
@@ -56,7 +55,7 @@ export default function LandingPage() {
         searchText: nextFilters.searchText,
       });
 
-      setMembers(data);
+      setMembers(data || []);
       setFilters(nextFilters);
       setDraftFilters(nextFilters);
     } catch (error) {
@@ -88,32 +87,6 @@ export default function LandingPage() {
 
   return (
     <main className="min-h-screen bg-slate-50">
-      <section className="border-b border-slate-200 bg-white px-4 py-5 sm:px-6 lg:px-8">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4">
-          <div>
-            <h1 className="text-base font-black text-slate-950">
-              Abhaynagar Somiti
-            </h1>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <Link
-              to="/login"
-              className="min-h-11 rounded-2xl border border-slate-300 px-4 py-3 text-sm font-bold text-slate-700 hover:bg-slate-100"
-            >
-              Login
-            </Link>
-
-            <Link
-              to="/register"
-              className="min-h-11 rounded-2xl bg-emerald-600 px-4 py-3 text-sm font-bold text-white hover:bg-emerald-700"
-            >
-              Register
-            </Link>
-          </div>
-        </div>
-      </section>
-
       <section className="px-3 py-5 sm:px-6 lg:px-8">
         <div className="mx-auto grid max-w-7xl grid-cols-1 gap-5 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
           <div className="rounded-3xl bg-slate-950 p-5 text-white shadow-soft sm:p-7">
@@ -127,8 +100,8 @@ export default function LandingPage() {
 
             <p className="mt-4 text-sm leading-6 text-slate-300">
               Public visitors can see verified members by name, department,
-              session and occupation only. Full details are available after
-              login according to privacy rules.
+              session and occupation only. Full profile details are available
+              from the logged-in Directory page.
             </p>
 
             <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -274,7 +247,7 @@ export default function LandingPage() {
 
           <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {members.map((member) => (
-              <MemberCard key={member.profile_id} member={member} />
+              <PublicMemberCard key={member.profile_id} member={member} />
             ))}
           </div>
         </div>
@@ -295,7 +268,7 @@ function SummaryCard({ label, value }) {
   );
 }
 
-function MemberCard({ member }) {
+function PublicMemberCard({ member }) {
   const memberType = getMemberType(member);
   const label = getMemberTypeLabel(member);
 

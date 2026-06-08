@@ -2,83 +2,204 @@ import { useEffect, useMemo, useState } from 'react';
 import { registerAssociationUser } from '../services/registrationService';
 
 const hallOptions = [
-  'Ruqayyah Hall',
-  'Bangamata Sheikh Fazilatunnesa Mujib Hall',
-  'Shamsun Nahar Hall',
-  'Bangladesh-Kuwait Maitree Hall',
-  'Kabi Sufia Kamal Hall',
-  'Dr. Muhammad Shahidullah Hall',
-  'Fazlul Huq Muslim Hall',
-  'Amar Ekushey Hall',
   'Salimullah Muslim Hall',
+  'Dr. Muhammad Shahidullah Hall',
   'Jagannath Hall',
-  'Shahid Sergeant Zahurul Haque Hall',
+  'Fazlul Huq Muslim Hall',
+  'Shahid Sergeant Zahurul Huq Hall',
+  'Ruqayyah Hall',
   'Surja Sen Hall',
   'Haji Muhammad Mohsin Hall',
+  'Shamsun Nahar Hall',
   'Kabi Jasimuddin Hall',
   'A.F. Rahman Hall',
   'Muktijoddha Ziaur Rahman Hall',
   'Sheikh Mujibur Rahman Hall',
+  'Bangladesh-Kuwait Maitree Hall',
+  'Sir P.J. Hartog International Hall',
+  'Bangamata Sheikh Fazilatunnesa Mujib Hall',
+  'Amar Ekushey Hall',
+  'Kabi Sufia Kamal Hall',
   'Bijoy Ekattor Hall',
+  'Nabab Foyzunnessa Chowdhurani Chhatrinibash',
   'IBA Hostel',
+  'Dr. Qudrat-E-Khuda Hostel',
+  'Shahid Athlet Sultana Kamal Hostel',
   'Other',
 ];
 
 const unionOptions = [
-  'Sreedharpur Union',
   'Prembag Union',
-  'Baghutia Union',
-  'Subha Para Union',
-  'Siddhipasha Union',
-  'Sundoli Union',
-  'Noapara Paurashava',
+  'Sundali Union',
   'Chalishia Union',
   'Payra Union',
+  'Sreedharpur Union',
+  'Subharara Union',
+  'Siddhipasha Union',
+  'Baghutia Union',
+  'Noapara Paurashava',
   'Other',
 ];
 
-const genderOptions = ['Male', 'Female', 'Other'];
+const genderOptions = ['Male', 'Female'];
 
-const bloodGroupOptions = [
-  'A+',
-  'A-',
-  'B+',
-  'B-',
-  'AB+',
-  'AB-',
-  'O+',
-  'O-',
-];
+const bloodGroupOptions = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
 
 const occupationOptions = [
   'Student',
-  'Alumni',
-  'Service Holder',
-  'Business',
   'Teacher',
-  'Banker',
   'Doctor',
   'Engineer',
   'Lawyer',
+  'Banker',
+  'Business',
+  'Service Holder',
+  'Government Employee',
+  'Private Employee',
   'Freelancer',
+  'Entrepreneur',
+  'Farmer',
+  'Journalist',
+  'Researcher',
+  'Housewife',
+  'Retired',
   'Unemployed',
+  'Other',
+];
+
+const departmentOptions = [
+  'Faculty of Arts',
+  'Faculty of Sciences',
+  'Faculty of Law',
+  'Faculty of Business Studies',
+  'Faculty of Social Sciences',
+  'Faculty of Biological Sciences',
+  'Faculty of Pharmacy',
+  'Faculty of Earth & Environmental Sciences',
+  'Faculty of Engineering & Technology',
+  'Faculty of Fine Arts',
+  'Faculty of Medicine',
+  'Faculty of Education',
+  'Faculty of Postgraduate Medical Sciences & Research',
+
+  'Institute of Education and Research',
+  'Institute of Statistical Research and Training',
+  'Institute of Business Administration',
+  'Institute of Nutrition and Food Science',
+  'Institute of Social Welfare and Research',
+  'Institute of Modern Languages',
+  'Institute of Health Economics',
+  'Institute of Information Technology',
+  'Institute of Energy',
+  'Institute of Disaster Management and Vulnerability Studies',
+  'Institute of Leather Engineering and Technology',
+  'Confucius Institute',
+  'Bangabandhu Sheikh Mujib Research Institute for Peace and Liberty',
+
+  'Department of Accounting',
+  'Department of Anthropology',
+  'Department of Applied Chemistry & Chemical Engineering',
+  'Department of Applied Mathematics',
+  'Department of Arabic',
+  'Department of Art History',
+  'Department of Bangla',
+  'Department of Banking and Insurance',
+  'Department of Biochemistry and Molecular Biology',
+  'Department of Biomedical Physics & Technology',
+  'Department of Botany',
+  'Department of Ceramic',
+  'Department of Chemistry',
+  'Department of Clinical Pharmacy and Pharmacology',
+  'Department of Clinical Psychology',
+  'Department of Communication Disorders',
+  'Department of Computer Science and Engineering',
+  'Department of Craft',
+  'Department of Criminology',
+  'Department of Dance',
+  'Department of Development Studies',
+  'Department of Disaster Science and Climate Resilience',
+  'Department of Drawing and Painting',
+  'Department of Economics',
+  'Department of Educational and Counselling Psychology',
+  'Department of Electrical and Electronic Engineering',
+  'Department of English',
+  'Department of Finance',
+  'Department of Fisheries',
+  'Department of Genetic Engineering and Biotechnology',
+  'Department of Geography & Environment',
+  'Department of Geology',
+  'Department of Graphic Design',
+  'Department of History',
+  'Department of Information Science and Library Management',
+  'Department of International Business',
+  'Department of International Relations',
+  'Department of Islamic History & Culture',
+  'Department of Islamic Studies',
+  'Department of Japanese Studies',
+  'Department of Law',
+  'Department of Linguistics',
+  'Department of Management',
+  'Department of Management Information Systems (MIS)',
+  'Department of Marketing',
+  'Department of Mass Communication & Journalism',
+  'Department of Mathematics',
+  'Department of Meteorology',
+  'Department of Microbiology',
+  'Department of Music',
+  'Department of Nuclear Engineering',
+  'Department of Oceanography',
+  'Department of Organization Strategy and Leadership',
+  'Department of Oriental Art',
+  'Department of Pali and Buddhist Studies',
+  'Department of Peace and Conflict Studies',
+  'Department of Persian Language and Literature',
+  'Department of Pharmaceutical Chemistry',
+  'Department of Pharmaceutical Technology',
+  'Department of Pharmacy',
+  'Department of Philosophy',
+  'Department of Physics',
+  'Department of Political Science',
+  'Department of Population Sciences',
+  'Department of Printing and Publication Studies',
+  'Department of Printmaking',
+  'Department of Psychology',
+  'Department of Public Administration',
+  'Department of Public Health',
+  'Department of Robotics and Mechatronics Engineering',
+  'Department of Sanskrit',
+  'Department of Sculpture',
+  'Department of Sociology',
+  'Department of Soil, Water & Environment',
+  'Department of Statistics',
+  'Department of Television, Film and Photography',
+  'Department of Theatre and Performance Studies',
+  'Department of Theoretical and Computational Chemistry',
+  'Department of Theoretical Physics',
+  'Department of Tourism and Hospitality Management',
+  'Department of Urdu',
+  'Department of Women and Gender Studies',
+  'Department of World Religions and Culture',
+  'Department of Zoology',
   'Other',
 ];
 
 const degreeOptions = [
   'Bachelor',
   'Masters',
-  'BBA',
   'MBA',
-  'BA',
-  'MA',
-  'BSS',
-  'MSS',
-  'BSc',
   'MSc',
-  'LLB',
+  'MA',
+  'MSS',
+  'MCom',
   'LLM',
+  'MEd',
+  'MPharm',
+  'MPH',
+  'MEng',
+  'MPhil',
   'PhD',
+  'Postgraduate Diploma',
+  'Professional Certification',
   'Other',
 ];
 
@@ -140,23 +261,6 @@ const initialForm = {
   pdpoConsent: false,
 };
 
-function isRunningDegree(degreeName) {
-  return [
-    'Bachelor',
-    'Masters',
-    'BBA',
-    'MBA',
-    'BA',
-    'MA',
-    'BSS',
-    'MSS',
-    'BSc',
-    'MSc',
-    'LLB',
-    'LLM',
-  ].includes(degreeName);
-}
-
 export default function RegistrationPage() {
   const [form, setForm] = useState(initialForm);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -170,18 +274,6 @@ export default function RegistrationPage() {
   useEffect(() => {
     if (isStudentOccupation && form.professionalDetails) {
       updateField('professionalDetails', '');
-    }
-
-    if (isStudentOccupation) {
-      setForm((current) => ({
-        ...current,
-        degreeQualifications: current.degreeQualifications.map((item) => ({
-          ...item,
-          passingYear: isRunningDegree(item.degreeName)
-            ? item.passingYear || 'current student'
-            : item.passingYear,
-        })),
-      }));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isStudentOccupation]);
@@ -199,21 +291,10 @@ export default function RegistrationPage() {
         (item, itemIndex) => {
           if (itemIndex !== index) return item;
 
-          const nextItem = {
+          return {
             ...item,
             [name]: value,
           };
-
-          if (
-            name === 'degreeName' &&
-            isStudentOccupation &&
-            isRunningDegree(value) &&
-            !nextItem.passingYear
-          ) {
-            nextItem.passingYear = 'current student';
-          }
-
-          return nextItem;
         }
       );
 
@@ -280,32 +361,30 @@ export default function RegistrationPage() {
   }
 
   return (
-    <main className="min-h-screen bg-slate-50 px-3 py-4 sm:px-6 sm:py-6 lg:px-8">
-      <section className="mx-auto grid max-w-7xl grid-cols-1 gap-4 lg:grid-cols-[0.85fr_1.5fr] lg:items-start lg:gap-6">
-        <aside className="rounded-3xl bg-slate-950 p-6 text-white shadow-soft md:p-8 lg:sticky lg:top-8">
-          <p className="text-sm font-semibold uppercase tracking-[0.25em] text-emerald-300">
+    <main className="min-h-screen bg-slate-50 px-3 py-3 text-slate-900 sm:px-6 sm:py-6 lg:px-8">
+      <section className="mx-auto grid w-full max-w-7xl grid-cols-1 gap-4 lg:grid-cols-[0.85fr_1.5fr] lg:items-start lg:gap-6">
+        <aside className="rounded-2xl bg-slate-950 p-4 text-white shadow-soft sm:rounded-3xl sm:p-6 md:p-8 lg:sticky lg:top-8">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-300 sm:text-sm sm:tracking-[0.25em]">
             Association Portal
           </p>
 
-          <h1 className="mt-4 text-3xl font-bold leading-tight md:text-4xl">
+          <h1 className="mt-3 text-2xl font-bold leading-tight sm:mt-4 sm:text-3xl md:text-4xl">
             Member Registration
           </h1>
 
-          <p className="mt-4 text-sm leading-6 text-slate-300 md:text-base">
+          <p className="mt-3 text-sm leading-6 text-slate-300 sm:mt-4 md:text-base">
             Fill the single member form. Admin approval is required before your
             profile becomes visible in public directory.
           </p>
-
-          
         </aside>
 
-        <section className="rounded-3xl bg-white p-4 shadow-soft sm:p-6 md:p-8">
-          <div className="border-b border-slate-200 pb-5">
-            <h2 className="text-2xl font-bold text-slate-950">
+        <section className="rounded-2xl bg-white p-3 shadow-soft sm:rounded-3xl sm:p-6 md:p-8">
+          <div className="border-b border-slate-200 pb-4 sm:pb-5">
+            <h2 className="text-xl font-bold text-slate-950 sm:text-2xl">
               Registration Form
             </h2>
 
-            <p className="mt-1 text-sm text-slate-500">
+            <p className="mt-1 text-xs text-slate-500 sm:text-sm">
               Fields are based on the member information sheet.
             </p>
           </div>
@@ -314,9 +393,12 @@ export default function RegistrationPage() {
             <StatusBox type={status.type} message={status.message} />
           ) : null}
 
-          <form onSubmit={handleSubmit} className="mt-6 space-y-6">
+          <form
+            onSubmit={handleSubmit}
+            className="mt-4 space-y-4 sm:mt-6 sm:space-y-6"
+          >
             <FormSection title="Basic Information">
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <div className="grid grid-cols-1 gap-3 sm:gap-4 md:grid-cols-2">
                 <TextInput
                   label="Full Name (In English as NID)"
                   name="fullName"
@@ -414,9 +496,9 @@ export default function RegistrationPage() {
             </FormSection>
 
             <FormSection title="University Information">
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <div className="grid grid-cols-1 gap-3 sm:gap-4 md:grid-cols-2">
                 <SelectInput
-                  label="University Hall Name"
+                  label="Hall Name"
                   name="universityHallName"
                   value={form.universityHallName}
                   onChange={updateField}
@@ -426,7 +508,7 @@ export default function RegistrationPage() {
                 />
 
                 <TextInput
-                  label="University First Year Admission Session"
+                  label="First Year Admission Session"
                   name="firstYearAdmissionSession"
                   value={form.firstYearAdmissionSession}
                   onChange={updateField}
@@ -434,12 +516,13 @@ export default function RegistrationPage() {
                   required
                 />
 
-                <TextInput
-                  label="University Subject / Department"
+                <SelectInput
+                  label="Subject / Department"
                   name="universitySubject"
                   value={form.universitySubject}
                   onChange={updateField}
-                  placeholder="Software Engineering"
+                  options={departmentOptions}
+                  placeholder="Select Subject / Department"
                   required
                 />
 
@@ -454,24 +537,24 @@ export default function RegistrationPage() {
             </FormSection>
 
             <FormSection title="Academic Qualification">
-              <div className="space-y-5">
-                <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                  <h4 className="mb-4 text-sm font-bold text-slate-900">
+              <div className="space-y-4 sm:space-y-5">
+                <div className="rounded-2xl border border-slate-200 bg-slate-50 p-3 sm:p-4">
+                  <h4 className="mb-3 text-sm font-bold text-slate-900 sm:mb-4">
                     SSC Information
                   </h4>
 
-                  <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
+                  <div className="grid grid-cols-1 gap-3 sm:gap-4 md:grid-cols-2 xl:grid-cols-4">
                     <TextInput
-                      label="SSC Institute Name"
+                      label="Institute Name"
                       name="sscInstitutionName"
                       value={form.sscInstitutionName}
                       onChange={updateField}
-                      placeholder="Noapara Model School"
+                      placeholder="Pairahat High School"
                       required
                     />
 
                     <TextInput
-                      label="SSC Group"
+                      label="Group"
                       name="sscGroup"
                       value={form.sscGroup}
                       onChange={updateField}
@@ -480,16 +563,16 @@ export default function RegistrationPage() {
                     />
 
                     <TextInput
-                      label="SSC Passing Year"
+                      label="Passing Year"
                       name="sscPassingYear"
                       value={form.sscPassingYear}
                       onChange={updateField}
-                      placeholder="2018"
+                      placeholder="2020"
                       required
                     />
 
                     <TextInput
-                      label="SSC GPA"
+                      label="GPA"
                       name="sscGpa"
                       value={form.sscGpa}
                       onChange={updateField}
@@ -498,23 +581,23 @@ export default function RegistrationPage() {
                   </div>
                 </div>
 
-                <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                  <h4 className="mb-4 text-sm font-bold text-slate-900">
+                <div className="rounded-2xl border border-slate-200 bg-slate-50 p-3 sm:p-4">
+                  <h4 className="mb-3 text-sm font-bold text-slate-900 sm:mb-4">
                     HSC Information
                   </h4>
 
-                  <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
+                  <div className="grid grid-cols-1 gap-3 sm:gap-4 md:grid-cols-2 xl:grid-cols-4">
                     <TextInput
-                      label="HSC Institute Name"
+                      label="Institute Name"
                       name="hscInstitutionName"
                       value={form.hscInstitutionName}
                       onChange={updateField}
-                      placeholder="Cantonment College, Jashore"
+                      placeholder="Pairahat United College"
                       required
                     />
 
                     <TextInput
-                      label="HSC Group"
+                      label="Group"
                       name="hscGroup"
                       value={form.hscGroup}
                       onChange={updateField}
@@ -523,16 +606,16 @@ export default function RegistrationPage() {
                     />
 
                     <TextInput
-                      label="HSC Passing Year"
+                      label="Passing Year"
                       name="hscPassingYear"
                       value={form.hscPassingYear}
                       onChange={updateField}
-                      placeholder="2020"
+                      placeholder="2022"
                       required
                     />
 
                     <TextInput
-                      label="HSC GPA"
+                      label="GPA"
                       name="hscGpa"
                       value={form.hscGpa}
                       onChange={updateField}
@@ -541,26 +624,21 @@ export default function RegistrationPage() {
                   </div>
                 </div>
 
-                <div className="rounded-2xl border border-slate-200 bg-white p-4">
+                <div className="rounded-2xl border border-slate-200 bg-white p-3 sm:p-4">
                   <div className="mb-4">
-                    <h4 className="text-sm font-bold text-slate-900">
-                      Achieved / Running Degree
+                    <h4 className="text-sm font-bold text-slate-900 sm:text-base">
+                      Higher Degree
                     </h4>
-
-                    <p className="mt-1 text-xs text-slate-500">
-                      Select degree name and mention passing year. For running
-                      students, write “current student” in passing year.
-                    </p>
                   </div>
 
                   <div className="space-y-4">
                     {form.degreeQualifications.map((qualification, index) => (
                       <div
                         key={index}
-                        className="rounded-2xl border border-slate-200 bg-slate-50 p-4"
+                        className="rounded-2xl border border-slate-200 bg-slate-50 p-3 sm:p-4"
                       >
                         <div className="mb-4 flex items-center justify-between gap-3">
-                          <h5 className="text-sm font-bold text-slate-900">
+                          <h5 className="text-sm font-bold text-slate-900 sm:text-base">
                             Degree {index + 1}
                           </h5>
 
@@ -574,7 +652,7 @@ export default function RegistrationPage() {
                           </button>
                         </div>
 
-                        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                        <div className="grid grid-cols-1 gap-3 sm:gap-4 md:grid-cols-2">
                           <SelectInput
                             label="Degree Name"
                             name="degreeName"
@@ -614,9 +692,7 @@ export default function RegistrationPage() {
                             onChange={(name, value) =>
                               updateDegreeQualification(index, name, value)
                             }
-                            placeholder={
-                              isStudentOccupation ? 'current student' : '2024'
-                            }
+                            placeholder="2024"
                           />
                         </div>
                       </div>
@@ -625,7 +701,7 @@ export default function RegistrationPage() {
                     <button
                       type="button"
                       onClick={addDegreeQualification}
-                      className="min-h-12 rounded-2xl border border-emerald-300 bg-emerald-50 px-5 text-sm font-bold text-emerald-700 hover:bg-emerald-100"
+                      className="min-h-11 rounded-xl border border-emerald-300 bg-emerald-50 px-4 text-sm font-bold text-emerald-700 hover:bg-emerald-100 sm:min-h-12 sm:rounded-2xl sm:px-5"
                     >
                       + Add Degree
                     </button>
@@ -635,7 +711,7 @@ export default function RegistrationPage() {
             </FormSection>
 
             <FormSection title="Address in Abhaynagar">
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+              <div className="grid grid-cols-1 gap-3 sm:gap-4 md:grid-cols-3">
                 <SelectInput
                   label="Union / Pouroshova Name"
                   name="unionPouroshovaName"
@@ -673,7 +749,7 @@ export default function RegistrationPage() {
             </FormSection>
 
             <FormSection title="Occupation">
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <div className="grid grid-cols-1 gap-3 sm:gap-4 md:grid-cols-2">
                 <SelectInput
                   label="Occupation"
                   name="occupation"
@@ -708,7 +784,7 @@ export default function RegistrationPage() {
               />
             </FormSection>
 
-            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-3 sm:p-4">
               <label className="flex cursor-pointer items-start gap-3">
                 <input
                   type="checkbox"
@@ -727,14 +803,14 @@ export default function RegistrationPage() {
               </label>
             </div>
 
-            <div className="sticky bottom-0 z-20 -mx-4 flex flex-col-reverse gap-3 border-t border-slate-200 bg-white/95 px-4 py-3 backdrop-blur sm:static sm:mx-0 sm:flex-row sm:justify-end sm:bg-transparent sm:px-0 sm:pt-5">
+            <div className="sticky bottom-0 z-20 -mx-3 flex flex-col-reverse gap-3 border-t border-slate-200 bg-white/95 px-3 py-3 backdrop-blur sm:static sm:mx-0 sm:flex-row sm:justify-end sm:bg-transparent sm:px-0 sm:pt-5">
               <button
                 type="button"
                 onClick={() => {
                   setForm(initialForm);
                   setStatus({ type: '', message: '' });
                 }}
-                className="min-h-12 rounded-2xl border border-slate-300 px-5 text-sm font-semibold text-slate-700"
+                className="min-h-11 rounded-xl border border-slate-300 px-4 text-sm font-semibold text-slate-700 sm:min-h-12 sm:rounded-2xl sm:px-5"
               >
                 Reset
               </button>
@@ -742,7 +818,7 @@ export default function RegistrationPage() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="min-h-12 rounded-2xl bg-emerald-600 px-6 text-sm font-bold text-white disabled:bg-emerald-300"
+                className="min-h-11 rounded-xl bg-emerald-600 px-4 text-sm font-bold text-white disabled:bg-emerald-300 sm:min-h-12 sm:rounded-2xl sm:px-6"
               >
                 {isSubmitting ? 'Submitting...' : 'Submit Registration'}
               </button>
@@ -751,17 +827,6 @@ export default function RegistrationPage() {
         </section>
       </section>
     </main>
-  );
-}
-
-function InfoCard({ label, value }) {
-  return (
-    <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-      <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-        {label}
-      </p>
-      <p className="mt-1 text-sm font-semibold text-white">{value}</p>
-    </div>
   );
 }
 
@@ -782,7 +847,7 @@ function StatusBox({ type, message }) {
 function FormSection({ title, children }) {
   return (
     <section className="rounded-2xl border border-slate-200 p-3 sm:p-4 md:p-5">
-      <h3 className="mb-3 text-base font-bold text-slate-900 sm:mb-4">
+      <h3 className="mb-3 text-sm font-bold text-slate-900 sm:mb-4 sm:text-base">
         {title}
       </h3>
       {children}
@@ -802,7 +867,7 @@ function TextInput({
 }) {
   return (
     <label className="block">
-      <span className="mb-1.5 block text-sm font-semibold text-slate-700">
+      <span className="mb-1.5 block text-xs font-semibold text-slate-700 sm:text-sm">
         {label}
         {required ? <span className="text-red-500"> *</span> : null}
       </span>
@@ -815,7 +880,7 @@ function TextInput({
         disabled={disabled}
         placeholder={placeholder}
         onChange={(event) => onChange(name, event.target.value)}
-        className="min-h-12 w-full rounded-2xl border border-slate-300 bg-white px-4 text-sm outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400"
+        className="min-h-11 w-full rounded-xl border border-slate-300 bg-white px-3 text-sm outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400 sm:min-h-12 sm:rounded-2xl sm:px-4"
       />
     </label>
   );
@@ -833,7 +898,7 @@ function TextArea({
 }) {
   return (
     <label className="block">
-      <span className="mb-1.5 block text-sm font-semibold text-slate-700">
+      <span className="mb-1.5 block text-xs font-semibold text-slate-700 sm:text-sm">
         {label}
         {required ? <span className="text-red-500"> *</span> : null}
       </span>
@@ -846,7 +911,7 @@ function TextArea({
         disabled={disabled}
         placeholder={placeholder}
         onChange={(event) => onChange(name, event.target.value)}
-        className="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400"
+        className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400 sm:rounded-2xl sm:px-4 sm:py-3"
       />
     </label>
   );
@@ -863,7 +928,7 @@ function SelectInput({
 }) {
   return (
     <label className="block">
-      <span className="mb-1.5 block text-sm font-semibold text-slate-700">
+      <span className="mb-1.5 block text-xs font-semibold text-slate-700 sm:text-sm">
         {label}
         {required ? <span className="text-red-500"> *</span> : null}
       </span>
@@ -873,7 +938,7 @@ function SelectInput({
         value={value || ''}
         required={required}
         onChange={(event) => onChange(name, event.target.value)}
-        className="min-h-12 w-full rounded-2xl border border-slate-300 bg-white px-4 text-sm outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100"
+        className="min-h-11 w-full rounded-xl border border-slate-300 bg-white px-3 text-sm outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 sm:min-h-12 sm:rounded-2xl sm:px-4"
       >
         {placeholder ? <option value="">{placeholder}</option> : null}
 
@@ -890,7 +955,7 @@ function SelectInput({
 function FileInput({ label, name, onChange, accept, required = false }) {
   return (
     <label className="block">
-      <span className="mb-1.5 block text-sm font-semibold text-slate-700">
+      <span className="mb-1.5 block text-xs font-semibold text-slate-700 sm:text-sm">
         {label}
         {required ? <span className="text-red-500"> *</span> : null}
       </span>
@@ -901,7 +966,7 @@ function FileInput({ label, name, onChange, accept, required = false }) {
         accept={accept}
         required={required}
         onChange={(event) => onChange(name, event.target.files?.[0] || null)}
-        className="block min-h-12 w-full rounded-2xl border border-slate-300 bg-white text-sm file:mr-4 file:min-h-12 file:border-0 file:bg-slate-900 file:px-4 file:text-sm file:font-semibold file:text-white"
+        className="block min-h-11 w-full rounded-xl border border-slate-300 bg-white text-xs file:mr-3 file:min-h-11 file:border-0 file:bg-slate-900 file:px-3 file:text-xs file:font-semibold file:text-white sm:min-h-12 sm:rounded-2xl sm:text-sm sm:file:mr-4 sm:file:min-h-12 sm:file:px-4 sm:file:text-sm"
       />
     </label>
   );

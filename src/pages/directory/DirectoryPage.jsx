@@ -3,7 +3,6 @@ import {
   getDirectoryProfileDetails,
   searchDirectoryProfiles,
 } from '../../services/directoryService';
-import { requestMentorship } from '../../services/mentorshipService';
 
 const initialFilters = {
   role: '',
@@ -20,17 +19,16 @@ export default function DirectoryPage() {
   const [appliedFilters, setAppliedFilters] = useState(initialFilters);
   const [profiles, setProfiles] = useState([]);
   const [selectedProfile, setSelectedProfile] = useState(null);
+
   const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
   const [isProfileDrawerOpen, setIsProfileDrawerOpen] = useState(false);
+
   const [loading, setLoading] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
   const [detailLoading, setDetailLoading] = useState(false);
+
   const [hasMore, setHasMore] = useState(true);
   const [status, setStatus] = useState({ type: '', message: '' });
-
-  const [mentorshipTopic, setMentorshipTopic] = useState('');
-  const [mentorshipMessage, setMentorshipMessage] = useState('');
-  const [mentorshipLoading, setMentorshipLoading] = useState(false);
 
   const observerRef = useRef(null);
   const lastItemRef = useRef(null);
@@ -126,14 +124,12 @@ export default function DirectoryPage() {
     const nextFilters = { ...filters };
     setAppliedFilters(nextFilters);
     setIsFilterDrawerOpen(false);
-
     loadProfilesWithFilters(nextFilters);
   }
 
   function clearFilters() {
     setFilters(initialFilters);
     setAppliedFilters(initialFilters);
-
     loadProfilesWithFilters(initialFilters);
   }
 
@@ -166,8 +162,6 @@ export default function DirectoryPage() {
     setDetailLoading(true);
     setSelectedProfile(null);
     setIsProfileDrawerOpen(true);
-    setMentorshipTopic('');
-    setMentorshipMessage('');
     setStatus({ type: '', message: '' });
 
     try {
@@ -183,130 +177,109 @@ export default function DirectoryPage() {
     }
   }
 
-  async function handleMentorshipRequest(alumniId) {
-    setMentorshipLoading(true);
-    setStatus({ type: '', message: '' });
-
-    try {
-      await requestMentorship({
-        alumniId,
-        topic: mentorshipTopic,
-        message: mentorshipMessage,
-      });
-
-      setStatus({
-        type: 'success',
-        message: 'Mentorship request sent successfully.',
-      });
-
-      setMentorshipTopic('');
-      setMentorshipMessage('');
-      setIsProfileDrawerOpen(false);
-    } catch (error) {
-      setStatus({
-        type: 'error',
-        message: error.message || 'Failed to request mentorship.',
-      });
-    } finally {
-      setMentorshipLoading(false);
-    }
-  }
-
   return (
-    <main className="min-h-screen bg-slate-50">
-      <section className="mx-auto max-w-7xl px-4 py-5 sm:px-6 lg:px-8">
-        <div className="flex flex-col gap-4 border-b border-slate-200 pb-5 md:flex-row md:items-end md:justify-between">
-          <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.25em] text-emerald-600">
+    <main className="min-h-screen bg-gradient-to-br from-emerald-50 via-slate-50 to-sky-50">
+      <section className="mx-auto max-w-7xl px-3 py-4 sm:px-6 sm:py-6 lg:px-8">
+        <div className="overflow-hidden rounded-[28px] border border-white/70 bg-white/80 shadow-xl shadow-slate-200/70 backdrop-blur">
+          <div className="bg-gradient-to-r from-slate-950 via-slate-900 to-emerald-900 px-4 py-6 text-white sm:px-6 sm:py-8">
+            <p className="text-[11px] font-bold uppercase tracking-[0.32em] text-emerald-300 sm:text-sm">
               Directory
             </p>
 
-            <h1 className="mt-2 text-3xl font-bold text-slate-950">
-              Student & Alumni Directory
-            </h1>
-
-            <p className="mt-2 text-sm text-slate-500">
-              Search verified students and alumni. Private contact information
-              is shown only when visibility rules allow it.
-            </p>
-          </div>
-
-          <button
-            type="button"
-            onClick={() => setIsFilterDrawerOpen(true)}
-            className="min-h-12 rounded-2xl bg-slate-900 px-5 text-sm font-bold text-white md:hidden"
-          >
-            Open Filters
-          </button>
-        </div>
-
-        {status.message ? (
-          <StatusBox type={status.type} message={status.message} />
-        ) : null}
-
-        <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-[280px_1fr]">
-          <aside className="hidden md:block">
-            <div className="sticky top-5 rounded-3xl bg-white p-5 shadow-soft">
-              <FilterPanel
-                filters={filters}
-                updateFilter={updateFilter}
-                applyFilters={applyFilters}
-                clearFilters={clearFilters}
-              />
-            </div>
-          </aside>
-
-          <section>
-            <div className="mb-4 flex flex-col gap-3 rounded-3xl bg-white p-4 shadow-soft sm:flex-row sm:items-center sm:justify-between">
+            <div className="mt-3 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
               <div>
-                <p className="text-sm font-bold text-slate-950">
-                  {profiles.length} profiles loaded
-                </p>
-                <p className="text-xs text-slate-500">
-                  Scroll down to load more results.
+                <h1 className="text-2xl font-black leading-tight sm:text-3xl lg:text-4xl">
+                  Student & Alumni Directory
+                </h1>
+
+                <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-200 sm:text-base">
+                  Search verified students and alumni. Logged-in members can
+                  view full profile details from this page.
                 </p>
               </div>
 
+              <div className="grid grid-cols-2 gap-3 sm:min-w-64">
+                <MiniStat label="Loaded" value={profiles.length} />
+                <MiniStat label="Status" value={loading ? 'Loading' : 'Ready'} />
+              </div>
+            </div>
+          </div>
+
+          <div className="border-b border-slate-200 bg-white/90 px-4 py-4 sm:px-6">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <button
                 type="button"
-                onClick={() => loadProfiles({ reset: true })}
-                className="min-h-12 rounded-2xl border border-slate-300 px-5 text-sm font-semibold text-slate-700 transition hover:bg-slate-100"
+                onClick={() => setIsFilterDrawerOpen(true)}
+                className="min-h-12 rounded-2xl bg-slate-950 px-5 text-sm font-bold text-white shadow-lg shadow-slate-300/60 transition hover:bg-slate-800 md:hidden"
               >
-                Refresh
+                Open Filters
               </button>
+
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-end md:ml-auto">
+                <p className="text-sm font-semibold text-slate-500">
+                  {profiles.length} profiles loaded
+                </p>
+
+                <button
+                  type="button"
+                  onClick={() => loadProfiles({ reset: true })}
+                  className="min-h-12 rounded-2xl border border-emerald-200 bg-emerald-50 px-5 text-sm font-bold text-emerald-700 transition hover:bg-emerald-100"
+                >
+                  Refresh
+                </button>
+              </div>
             </div>
+          </div>
 
-            {loading ? (
-              <PanelMessage message="Loading directory..." />
-            ) : null}
-
-            {!loading && profiles.length === 0 ? (
-              <PanelMessage message="No matching verified profiles found." />
-            ) : null}
-
-            <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 xl:grid-cols-3">
-              {profiles.map((profile, index) => {
-                const isLast = index === profiles.length - 1;
-
-                return (
-                  <ProfileCard
-                    key={profile.profile_id}
-                    profile={profile}
-                    onOpen={() => openProfile(profile.profile_id)}
-                    refProp={isLast ? lastItemRef : null}
-                  />
-                );
-              })}
+          {status.message ? (
+            <div className="px-4 sm:px-6">
+              <StatusBox type={status.type} message={status.message} />
             </div>
+          ) : null}
 
-            {loadingMore ? (
-              <PanelMessage message="Loading more profiles..." />
-            ) : null}
+          <div className="grid grid-cols-1 gap-5 p-4 sm:p-6 md:grid-cols-[300px_1fr]">
+            <aside className="hidden md:block">
+              <div className="sticky top-5 rounded-[26px] border border-slate-200 bg-white p-5 shadow-lg shadow-slate-200/70">
+                <FilterPanel
+                  filters={filters}
+                  updateFilter={updateFilter}
+                  applyFilters={applyFilters}
+                  clearFilters={clearFilters}
+                />
+              </div>
+            </aside>
 
-            {!hasMore && profiles.length > 0 ? (
-              <PanelMessage message="End of directory results." />
-            ) : null}
-          </section>
+            <section>
+              {loading ? <PanelMessage message="Loading directory..." /> : null}
+
+              {!loading && profiles.length === 0 ? (
+                <PanelMessage message="No matching verified profiles found." />
+              ) : null}
+
+              <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+                {profiles.map((profile, index) => {
+                  const isLast = index === profiles.length - 1;
+
+                  return (
+                    <ProfileCard
+                      key={profile.profile_id}
+                      profile={profile}
+                      onOpen={() => openProfile(profile.profile_id)}
+                      refProp={isLast ? lastItemRef : null}
+                    />
+                  );
+                })}
+              </div>
+
+              {loadingMore ? (
+                <PanelMessage message="Loading more profiles..." />
+              ) : null}
+
+              {!hasMore && profiles.length > 0 ? (
+                <PanelMessage message="End of directory results." />
+              ) : null}
+            </section>
+          </div>
         </div>
       </section>
 
@@ -327,22 +300,31 @@ export default function DirectoryPage() {
         onClose={() => setIsProfileDrawerOpen(false)}
         loading={detailLoading}
         profile={selectedProfile}
-        mentorshipTopic={mentorshipTopic}
-        setMentorshipTopic={setMentorshipTopic}
-        mentorshipMessage={mentorshipMessage}
-        setMentorshipMessage={setMentorshipMessage}
-        mentorshipLoading={mentorshipLoading}
-        onMentorshipRequest={handleMentorshipRequest}
       />
     </main>
+  );
+}
+
+function MiniStat({ label, value }) {
+  return (
+    <div className="rounded-2xl border border-white/10 bg-white/10 p-3 backdrop-blur">
+      <p className="text-[11px] font-bold uppercase tracking-wider text-slate-300">
+        {label}
+      </p>
+      <p className="mt-1 truncate text-sm font-black text-white">{value}</p>
+    </div>
   );
 }
 
 function FilterPanel({ filters, updateFilter, applyFilters, clearFilters }) {
   return (
     <div>
-      <h2 className="text-lg font-bold text-slate-950">Filters</h2>
-      <p className="mt-1 text-sm text-slate-500">Refine directory results.</p>
+      <div>
+        <h2 className="text-lg font-black text-slate-950">Filters</h2>
+        <p className="mt-1 text-sm text-slate-500">
+          Refine directory results.
+        </p>
+      </div>
 
       <div className="mt-5 space-y-4">
         <SelectInput
@@ -362,7 +344,7 @@ function FilterPanel({ filters, updateFilter, applyFilters, clearFilters }) {
           name="searchText"
           value={filters.searchText}
           onChange={updateFilter}
-          placeholder="Name, company, hall, department..."
+          placeholder="Name, hall, department..."
         />
 
         <TextInput
@@ -370,7 +352,7 @@ function FilterPanel({ filters, updateFilter, applyFilters, clearFilters }) {
           name="departmentName"
           value={filters.departmentName}
           onChange={updateFilter}
-          placeholder="Computer Science"
+          placeholder="Software Engineering"
         />
 
         <TextInput
@@ -382,12 +364,11 @@ function FilterPanel({ filters, updateFilter, applyFilters, clearFilters }) {
         />
 
         <TextInput
-          label="Graduation Year"
+          label="Session"
           name="graduationYear"
-          type="number"
           value={filters.graduationYear}
           onChange={updateFilter}
-          placeholder="2024"
+          placeholder="2022-23"
         />
 
         <TextInput
@@ -407,11 +388,11 @@ function FilterPanel({ filters, updateFilter, applyFilters, clearFilters }) {
         />
       </div>
 
-      <div className="mt-5 grid grid-cols-1 gap-3">
+      <div className="mt-6 grid grid-cols-1 gap-3">
         <button
           type="button"
           onClick={applyFilters}
-          className="min-h-12 rounded-2xl bg-emerald-600 px-5 text-sm font-bold text-white transition hover:bg-emerald-700"
+          className="min-h-12 rounded-2xl bg-emerald-600 px-5 text-sm font-black text-white shadow-lg shadow-emerald-200 transition hover:bg-emerald-700"
         >
           Apply Filters
         </button>
@@ -419,7 +400,7 @@ function FilterPanel({ filters, updateFilter, applyFilters, clearFilters }) {
         <button
           type="button"
           onClick={clearFilters}
-          className="min-h-12 rounded-2xl border border-slate-300 px-5 text-sm font-semibold text-slate-700 transition hover:bg-slate-100"
+          className="min-h-12 rounded-2xl border border-slate-300 bg-white px-5 text-sm font-bold text-slate-700 transition hover:bg-slate-100"
         >
           Clear
         </button>
@@ -434,10 +415,10 @@ function ProfileCard({ profile, onOpen, refProp }) {
   return (
     <article
       ref={refProp}
-      className="rounded-3xl bg-white p-5 shadow-soft transition hover:-translate-y-0.5 hover:shadow-lg"
+      className="group rounded-[26px] border border-white bg-white p-4 shadow-lg shadow-slate-200/80 transition hover:-translate-y-1 hover:shadow-xl sm:p-5"
     >
       <div className="flex items-start gap-4">
-        <div className="h-16 w-16 shrink-0 overflow-hidden rounded-2xl bg-slate-100">
+        <div className="h-16 w-16 shrink-0 overflow-hidden rounded-2xl bg-gradient-to-br from-slate-100 to-emerald-50 ring-1 ring-slate-200 sm:h-20 sm:w-20">
           {profile.profile_photo_url ? (
             <img
               src={profile.profile_photo_url}
@@ -445,65 +426,55 @@ function ProfileCard({ profile, onOpen, refProp }) {
               className="h-full w-full object-cover"
             />
           ) : (
-            <div className="flex h-full w-full items-center justify-center text-xl font-black text-slate-400">
+            <div className="flex h-full w-full items-center justify-center text-2xl font-black text-slate-400">
               {(profile.full_name || '?').charAt(0).toUpperCase()}
             </div>
           )}
         </div>
 
         <div className="min-w-0 flex-1">
-          <div className="flex items-center justify-between gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <span
-              className={`rounded-full px-3 py-1 text-xs font-bold capitalize ${
+              className={`rounded-full px-3 py-1 text-[11px] font-black sm:text-xs ${
                 isStudent
-                  ? 'bg-emerald-50 text-emerald-700'
-                  : 'bg-indigo-50 text-indigo-700'
+                  ? 'bg-emerald-100 text-emerald-700'
+                  : 'bg-indigo-100 text-indigo-700'
               }`}
             >
-              {isStudent ? 'Student' : 'Alumni'}
+              {isStudent ? 'Current Student' : 'Alumni'}
             </span>
 
-            <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-600">
+            <span className="rounded-full bg-slate-100 px-3 py-1 text-[11px] font-black text-slate-600 sm:text-xs">
               Verified
             </span>
           </div>
 
-          <h2 className="mt-3 break-words text-lg font-bold text-slate-950">
+          <h2 className="mt-3 break-words text-base font-black leading-snug text-slate-950 sm:text-lg">
             {profile.full_name || profile.email || 'Unnamed Member'}
           </h2>
-
-          <p className="mt-1 text-sm text-slate-500">
-            {profile.email || 'Email hidden'}
-          </p>
-
-          <p className="mt-1 text-xs font-semibold text-slate-400">
-            {isStudent
-              ? `Roll: ${profile.roll_number || '-'}`
-              : `Registration: ${profile.registration_no || '-'}`}
-          </p>
         </div>
       </div>
 
-      <div className="mt-4 space-y-2 text-sm">
-        {isStudent ? (
+      <div className="mt-5 space-y-3 rounded-2xl bg-slate-50 p-4 text-sm">
+        <InfoLine label="Department" value={profile.department_name} />
+        <InfoLine label="Hall" value={profile.hall} />
+        <InfoLine label="Session" value={profile.academic_session} />
+
+        {!isStudent ? (
           <>
-            <InfoLine label="Department" value={profile.department_name} />
-            <InfoLine label="Semester" value={profile.current_semester} />
+            <InfoLine label="Occupation" value={profile.occupation} />
+            <InfoLine
+              label="Professional"
+              value={profile.professional_details}
+            />
           </>
-        ) : (
-          <>
-            <InfoLine label="Hall" value={profile.hall} />
-            <InfoLine label="Graduation" value={profile.graduation_year} />
-            <InfoLine label="Company" value={profile.current_company} />
-            <InfoLine label="Designation" value={profile.designation} />
-          </>
-        )}
+        ) : null}
       </div>
 
       <button
         type="button"
         onClick={onOpen}
-        className="mt-5 min-h-12 w-full rounded-2xl bg-slate-900 px-5 text-sm font-bold text-white transition hover:bg-slate-800"
+        className="mt-5 min-h-12 w-full rounded-2xl bg-gradient-to-r from-slate-950 to-emerald-900 px-5 text-sm font-black text-white shadow-lg shadow-slate-300 transition hover:from-slate-800 hover:to-emerald-800"
       >
         View Details
       </button>
@@ -511,18 +482,7 @@ function ProfileCard({ profile, onOpen, refProp }) {
   );
 }
 
-function ProfileDetailsDrawer({
-  open,
-  onClose,
-  loading,
-  profile,
-  mentorshipTopic,
-  setMentorshipTopic,
-  mentorshipMessage,
-  setMentorshipMessage,
-  mentorshipLoading,
-  onMentorshipRequest,
-}) {
+function ProfileDetailsDrawer({ open, onClose, loading, profile }) {
   return (
     <div
       className={`fixed inset-0 z-50 transition ${
@@ -531,58 +491,49 @@ function ProfileDetailsDrawer({
     >
       <div
         onClick={onClose}
-        className={`absolute inset-0 bg-slate-950/50 transition-opacity ${
+        className={`absolute inset-0 bg-slate-950/60 backdrop-blur-sm transition-opacity ${
           open ? 'opacity-100' : 'opacity-0'
         }`}
       />
 
       <aside
-        className={`absolute bottom-0 right-0 w-full rounded-t-3xl bg-white shadow-2xl transition-transform duration-300 md:top-0 md:h-full md:max-w-md md:rounded-l-3xl md:rounded-t-none ${
+        className={`absolute bottom-0 right-0 w-full rounded-t-[30px] bg-white shadow-2xl transition-transform duration-300 md:top-0 md:h-full md:max-w-2xl md:rounded-l-[30px] md:rounded-t-none ${
           open
             ? 'translate-y-0 md:translate-x-0'
             : 'translate-y-full md:translate-x-full md:translate-y-0'
         }`}
       >
-        <div className="flex items-center justify-between border-b border-slate-200 p-5">
+        <div className="sticky top-0 z-10 flex items-center justify-between border-b border-slate-200 bg-white/95 p-4 backdrop-blur sm:p-5">
           <div>
-            <h2 className="text-lg font-bold text-slate-950">
+            <h2 className="text-lg font-black text-slate-950">
               Profile Details
             </h2>
+
             <p className="text-sm text-slate-500">
-              Privacy-aware contact view
+              Full verified member information
             </p>
           </div>
 
           <button
             type="button"
             onClick={onClose}
-            className="min-h-12 rounded-2xl border border-slate-300 px-4 text-sm font-semibold text-slate-700"
+            className="min-h-11 rounded-2xl border border-slate-300 px-4 text-sm font-bold text-slate-700 transition hover:bg-slate-100"
           >
             Close
           </button>
         </div>
 
-        <div className="max-h-[75vh] overflow-y-auto p-5 md:max-h-[calc(100vh-90px)]">
+        <div className="max-h-[78vh] overflow-y-auto p-4 sm:p-5 md:max-h-[calc(100vh-82px)]">
           {loading ? (
-            <p className="text-sm text-slate-500">Loading profile...</p>
+            <PanelMessage message="Loading profile details..." />
           ) : null}
 
           {!loading && !profile ? (
-            <p className="text-sm text-slate-500">
-              Select a profile to view details.
-            </p>
+            <PanelMessage message="Select a profile to view details." />
           ) : null}
 
           {!loading && profile ? (
-            <ProfileDetailsContent
-              profile={profile}
-              mentorshipTopic={mentorshipTopic}
-              setMentorshipTopic={setMentorshipTopic}
-              mentorshipMessage={mentorshipMessage}
-              setMentorshipMessage={setMentorshipMessage}
-              mentorshipLoading={mentorshipLoading}
-              onMentorshipRequest={onMentorshipRequest}
-            />
+            <ProfileDetailsContent profile={profile} />
           ) : null}
         </div>
       </aside>
@@ -590,23 +541,14 @@ function ProfileDetailsDrawer({
   );
 }
 
-function ProfileDetailsContent({
-  profile,
-  mentorshipTopic,
-  setMentorshipTopic,
-  mentorshipMessage,
-  setMentorshipMessage,
-  mentorshipLoading,
-  onMentorshipRequest,
-}) {
+function ProfileDetailsContent({ profile }) {
   const isStudent = profile.role === 'student';
-  const isAlumni = profile.role === 'alumni';
 
   return (
     <div>
-      <div className="rounded-3xl bg-slate-50 p-5">
+      <div className="rounded-[26px] bg-gradient-to-br from-slate-950 to-emerald-900 p-5 text-white">
         <div className="flex items-start gap-4">
-          <div className="h-20 w-20 shrink-0 overflow-hidden rounded-3xl bg-slate-100">
+          <div className="h-20 w-20 shrink-0 overflow-hidden rounded-3xl bg-white/10 ring-2 ring-white/20">
             {profile.profile_photo_url ? (
               <img
                 src={profile.profile_photo_url}
@@ -614,30 +556,34 @@ function ProfileDetailsContent({
                 className="h-full w-full object-cover"
               />
             ) : (
-              <div className="flex h-full w-full items-center justify-center text-2xl font-black text-slate-400">
+              <div className="flex h-full w-full items-center justify-center text-2xl font-black text-white/70">
                 {(profile.full_name || '?').charAt(0).toUpperCase()}
               </div>
             )}
           </div>
 
           <div className="min-w-0 flex-1">
-            <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold capitalize text-emerald-700">
-              {profile.role}
+            <span
+              className={`rounded-full px-3 py-1 text-xs font-black ${
+                isStudent
+                  ? 'bg-emerald-300 text-emerald-950'
+                  : 'bg-indigo-300 text-indigo-950'
+              }`}
+            >
+              {isStudent ? 'Current Student' : 'Alumni'}
             </span>
 
-            <h3 className="mt-3 break-words text-xl font-bold text-slate-950">
+            <h3 className="mt-3 break-words text-xl font-black sm:text-2xl">
               {profile.full_name || profile.email || 'Unnamed Member'}
             </h3>
 
-            <p className="mt-1 text-sm font-semibold text-slate-500">
-              {isStudent
-                ? `Roll: ${profile.roll_number || '-'}`
-                : isAlumni
-                  ? `Registration: ${profile.registration_no || '-'}`
-                  : profile.role}
-            </p>
+            {profile.nick_name ? (
+              <p className="mt-1 text-sm text-slate-200">
+                Nick Name: {profile.nick_name}
+              </p>
+            ) : null}
 
-            <p className="mt-1 text-sm text-slate-500">
+            <p className="mt-1 text-sm text-slate-300">
               Joined{' '}
               {profile.created_at
                 ? new Date(profile.created_at).toLocaleDateString()
@@ -647,139 +593,142 @@ function ProfileDetailsContent({
         </div>
       </div>
 
-      <div className="mt-5 grid grid-cols-1 gap-3">
-        <DetailItem label="Role" value={profile.role} />
+      <DetailsGroup title="Basic Information">
+        <DetailItem label="Full Name" value={profile.full_name} />
+        <DetailItem label="Nick Name" value={profile.nick_name} />
+        <DetailItem label="Date of Birth" value={profile.date_of_birth} />
+        <DetailItem label="Gender" value={profile.gender} />
+        <DetailItem label="Blood Group" value={profile.blood_group} />
+      </DetailsGroup>
 
+      <DetailsGroup title="Contact Information">
+        <DetailItem label="Email" value={profile.email} />
+        <DetailItem label="Contact Number" value={profile.contact_number} />
         <DetailItem
-          label="Verification Status"
-          value={profile.is_verified ? 'Verified' : 'Not Verified'}
+          label="Facebook Profile"
+          value={profile.facebook_profile_link}
         />
+      </DetailsGroup>
 
+      <DetailsGroup title="University Information">
+        <DetailItem label="Hall Name" value={profile.university_hall_name} />
         <DetailItem
-          label="Email"
-          value={profile.email || 'Hidden by privacy preference'}
+          label="First Year Admission Session"
+          value={profile.first_year_admission_session}
         />
-
         <DetailItem
-          label="Contact Number"
-          value={profile.contact_number || 'Hidden by privacy preference'}
+          label="Subject / Department"
+          value={profile.university_subject || profile.department_name}
         />
-
         <DetailItem
-          label="Academic Session"
-          value={profile.academic_session}
+          label="University Document"
+          value={profile.university_document_url ? 'Uploaded' : 'Not uploaded'}
         />
+      </DetailsGroup>
 
+      <DetailsGroup title="SSC Information">
         <DetailItem
-          label="Present Address"
-          value={profile.present_address}
+          label="SSC Institute"
+          value={profile.ssc_institution_name}
         />
-
+        <DetailItem label="SSC Group" value={profile.ssc_group} />
         <DetailItem
-          label="Permanent Address"
-          value={profile.permanent_address}
+          label="SSC Passing Year"
+          value={profile.ssc_passing_year}
         />
+        <DetailItem label="SSC GPA" value={profile.ssc_gpa} />
+      </DetailsGroup>
 
-        {isStudent ? (
-          <>
-            <DetailItem label="Roll Number" value={profile.roll_number} />
+      <DetailsGroup title="HSC Information">
+        <DetailItem
+          label="HSC Institute"
+          value={profile.hsc_institution_name}
+        />
+        <DetailItem label="HSC Group" value={profile.hsc_group} />
+        <DetailItem
+          label="HSC Passing Year"
+          value={profile.hsc_passing_year}
+        />
+        <DetailItem label="HSC GPA" value={profile.hsc_gpa} />
+      </DetailsGroup>
 
-            <DetailItem label="Department" value={profile.department_name} />
+      <DetailsGroup title="Address">
+        <DetailItem
+          label="Union / Pouroshova"
+          value={profile.union_pouroshova_name}
+        />
+        <DetailItem
+          label="Ward / Village"
+          value={profile.ward_village_name}
+        />
+        <DetailItem
+          label="Para / Moholla"
+          value={profile.para_moholla_name}
+        />
+        <DetailItem label="Present Address" value={profile.present_address} />
+      </DetailsGroup>
 
-            <DetailItem
-              label="Current Semester"
-              value={profile.current_semester}
-            />
-          </>
-        ) : null}
+      <DetailsGroup title="Occupation">
+        <DetailItem label="Occupation" value={profile.occupation} />
+        <DetailItem
+          label="Professional Details"
+          value={profile.professional_details}
+        />
+      </DetailsGroup>
 
-        {isAlumni ? (
-          <>
-            <DetailItem
-              label="Registration No"
-              value={profile.registration_no}
-            />
+      {profile.member_degree_qualifications?.length ? (
+        <DetailsGroup title="Higher Degree">
+          {profile.member_degree_qualifications.map((degree, index) => (
+            <div
+              key={index}
+              className="rounded-2xl border border-emerald-100 bg-emerald-50/70 p-4"
+            >
+              <DetailItem label="Degree" value={degree.degree_name} />
+              <DetailItem
+                label="Institution"
+                value={degree.institution_name}
+              />
+              <DetailItem
+                label="Subject / Department"
+                value={degree.subject_department}
+              />
+              <DetailItem label="Passing Year" value={degree.passing_year} />
+            </div>
+          ))}
+        </DetailsGroup>
+      ) : null}
 
-            <DetailItem
-              label="Graduation Year"
-              value={profile.graduation_year}
-            />
-
-            <DetailItem label="Hall" value={profile.hall} />
-
-            <DetailItem
-              label="Current Company / Job Place"
-              value={profile.current_company}
-            />
-
-            <DetailItem
-              label="Current Job Position / Designation"
-              value={profile.designation}
-            />
-
-            <DetailItem
-              label="University Document"
-              value={
-                profile.verification_doc_url
-                  ? 'Uploaded / Admin review record'
-                  : 'Not uploaded'
-              }
-            />
-          </>
-        ) : null}
-      </div>
-
-      {isAlumni ? (
-        <form
-          onSubmit={(event) => {
-            event.preventDefault();
-            onMentorshipRequest(profile.profile_id);
-          }}
-          className="mt-5 rounded-3xl border border-slate-200 bg-white p-4"
-        >
-          <h4 className="text-sm font-bold text-slate-950">
-            Request Mentorship
+      {profile.life_story ? (
+        <div className="mt-5 rounded-[26px] border border-slate-200 bg-white p-4 shadow-sm">
+          <h4 className="text-sm font-black text-slate-950">
+            Memories and Stories
           </h4>
 
-          <label className="mt-4 block">
-            <span className="mb-1.5 block text-sm font-semibold text-slate-700">
-              Topic
-            </span>
-
-            <input
-              value={mentorshipTopic}
-              required
-              onChange={(event) => setMentorshipTopic(event.target.value)}
-              className="min-h-12 w-full rounded-2xl border border-slate-300 px-4 text-sm outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100"
-              placeholder="Career guidance, CV review, interview prep..."
-            />
-          </label>
-
-          <label className="mt-4 block">
-            <span className="mb-1.5 block text-sm font-semibold text-slate-700">
-              Message
-            </span>
-
-            <textarea
-              rows={5}
-              value={mentorshipMessage}
-              required
-              minLength={20}
-              onChange={(event) => setMentorshipMessage(event.target.value)}
-              className="w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100"
-              placeholder="Write at least 20 characters explaining why you want mentorship..."
-            />
-          </label>
-
-          <button
-            type="submit"
-            disabled={mentorshipLoading}
-            className="mt-4 min-h-12 w-full rounded-2xl bg-emerald-600 px-5 text-sm font-bold text-white hover:bg-emerald-700 disabled:bg-emerald-300"
-          >
-            {mentorshipLoading ? 'Sending...' : 'Request Mentorship'}
-          </button>
-        </form>
+          <p className="mt-3 whitespace-pre-line text-sm leading-6 text-slate-700">
+            {profile.life_story}
+          </p>
+        </div>
       ) : null}
+
+      <DetailsGroup title="Verification">
+        <DetailItem
+          label="Verification Status"
+          value={profile.verification_status}
+        />
+        <DetailItem
+          label="Approved"
+          value={profile.is_approved ? 'Yes' : 'No'}
+        />
+      </DetailsGroup>
+    </div>
+  );
+}
+
+function DetailsGroup({ title, children }) {
+  return (
+    <div className="mt-5 rounded-[26px] border border-slate-200 bg-white p-4 shadow-sm">
+      <h4 className="text-sm font-black text-slate-950">{title}</h4>
+      <div className="mt-4 grid grid-cols-1 gap-3">{children}</div>
     </div>
   );
 }
@@ -793,25 +742,28 @@ function MobileFilterDrawer({ open, onClose, children }) {
     >
       <div
         onClick={onClose}
-        className={`absolute inset-0 bg-slate-950/50 transition-opacity ${
+        className={`absolute inset-0 bg-slate-950/60 backdrop-blur-sm transition-opacity ${
           open ? 'opacity-100' : 'opacity-0'
         }`}
       />
 
       <aside
-        className={`absolute bottom-0 left-0 right-0 max-h-[85vh] overflow-y-auto rounded-t-3xl bg-white p-5 shadow-2xl transition-transform duration-300 ${
+        className={`absolute bottom-0 left-0 right-0 max-h-[88vh] overflow-y-auto rounded-t-[30px] bg-white p-5 shadow-2xl transition-transform duration-300 ${
           open ? 'translate-y-0' : 'translate-y-full'
         }`}
       >
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-lg font-bold text-slate-950">
-            Directory Filters
-          </h2>
+          <div>
+            <h2 className="text-lg font-black text-slate-950">
+              Directory Filters
+            </h2>
+            <p className="text-sm text-slate-500">Find members faster.</p>
+          </div>
 
           <button
             type="button"
             onClick={onClose}
-            className="min-h-12 rounded-2xl border border-slate-300 px-4 text-sm font-semibold text-slate-700"
+            className="min-h-11 rounded-2xl border border-slate-300 px-4 text-sm font-bold text-slate-700"
           >
             Close
           </button>
@@ -833,16 +785,16 @@ function TextInput({
 }) {
   return (
     <label className="block">
-      <span className="mb-1.5 block text-sm font-semibold text-slate-700">
+      <span className="mb-1.5 block text-sm font-bold text-slate-700">
         {label}
       </span>
 
       <input
         type={type}
-        value={value}
+        value={value || ''}
         placeholder={placeholder}
         onChange={(event) => onChange(name, event.target.value)}
-        className="min-h-12 w-full rounded-2xl border border-slate-300 bg-white px-4 text-sm outline-none transition focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100"
+        className="min-h-12 w-full rounded-2xl border border-slate-300 bg-white px-4 text-sm outline-none transition placeholder:text-slate-400 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100"
       />
     </label>
   );
@@ -851,12 +803,12 @@ function TextInput({
 function SelectInput({ label, name, value, onChange, options }) {
   return (
     <label className="block">
-      <span className="mb-1.5 block text-sm font-semibold text-slate-700">
+      <span className="mb-1.5 block text-sm font-bold text-slate-700">
         {label}
       </span>
 
       <select
-        value={value}
+        value={value || ''}
         onChange={(event) => onChange(name, event.target.value)}
         className="min-h-12 w-full rounded-2xl border border-slate-300 bg-white px-4 text-sm outline-none transition focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100"
       >
@@ -873,7 +825,7 @@ function SelectInput({ label, name, value, onChange, options }) {
 function StatusBox({ type, message }) {
   return (
     <div
-      className={`mt-5 rounded-2xl border p-4 text-sm font-medium ${
+      className={`mt-5 rounded-2xl border p-4 text-sm font-bold ${
         type === 'success'
           ? 'border-emerald-200 bg-emerald-50 text-emerald-800'
           : 'border-red-200 bg-red-50 text-red-700'
@@ -886,9 +838,9 @@ function StatusBox({ type, message }) {
 
 function InfoLine({ label, value }) {
   return (
-    <div className="flex items-center justify-between gap-3">
-      <span className="text-slate-500">{label}</span>
-      <span className="text-right font-semibold text-slate-800">
+    <div className="flex items-start justify-between gap-4">
+      <span className="shrink-0 text-slate-500">{label}</span>
+      <span className="break-words text-right font-black text-slate-900">
         {value || '-'}
       </span>
     </div>
@@ -897,11 +849,12 @@ function InfoLine({ label, value }) {
 
 function DetailItem({ label, value }) {
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-4">
-      <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+    <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+      <p className="text-[11px] font-black uppercase tracking-wider text-slate-400">
         {label}
       </p>
-      <p className="mt-1 break-words text-sm font-bold text-slate-900">
+
+      <p className="mt-1 break-words text-sm font-bold leading-6 text-slate-900">
         {value || '-'}
       </p>
     </div>
@@ -910,7 +863,7 @@ function DetailItem({ label, value }) {
 
 function PanelMessage({ message }) {
   return (
-    <div className="mt-4 rounded-3xl bg-white p-6 text-sm text-slate-500 shadow-soft">
+    <div className="mt-4 rounded-[26px] border border-white bg-white p-6 text-sm font-semibold text-slate-500 shadow-lg shadow-slate-200/70">
       {message}
     </div>
   );

@@ -70,7 +70,7 @@ const occupationOptions = [
   'Other',
 ];
 
-const degreeOptions = [
+const departmentOptions = [
   'Secondary',
   'Higher Secondary',
   'Bachelor',
@@ -614,7 +614,7 @@ export default function ProfilePage() {
                           onChange={(name, value) =>
                             updateQualification(index, name, value)
                           }
-                          options={degreeOptions}
+                          options={departmentOptions}
                           placeholder="Select degree"
                         />
 
