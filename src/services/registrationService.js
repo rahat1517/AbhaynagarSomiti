@@ -66,7 +66,9 @@ function validateCommonFields(form) {
   }
 
   if (!isStudentOccupation(form.occupation) && !form.professionalDetails) {
-    throw new Error('Professional details are required when occupation is not Student.');
+    throw new Error(
+      'Professional details are required when occupation is not Student.'
+    );
   }
 
   if (!form.universityDocumentFile) {
@@ -78,35 +80,79 @@ function validateCommonFields(form) {
   }
 }
 
-function validateAcademicQualifications(qualifications) {
-  if (!Array.isArray(qualifications) || qualifications.length === 0) {
-    throw new Error('At least one academic qualification is required.');
+function validateAcademicQualifications(form) {
+  if (!form.sscInstitutionName) {
+    throw new Error('SSC institute name is required.');
   }
 
-  const hasValidRow = qualifications.some((item) => {
+  if (!form.sscGroup) {
+    throw new Error('SSC group is required.');
+  }
+
+  if (!form.sscPassingYear) {
+    throw new Error('SSC passing year is required.');
+  }
+
+  if (!form.hscInstitutionName) {
+    throw new Error('HSC institute name is required.');
+  }
+
+  if (!form.hscGroup) {
+    throw new Error('HSC group is required.');
+  }
+
+  if (!form.hscPassingYear) {
+    throw new Error('HSC passing year is required.');
+  }
+
+  if (
+    !Array.isArray(form.degreeQualifications) ||
+    form.degreeQualifications.length === 0
+  ) {
+    throw new Error('At least one degree information is required.');
+  }
+
+  const hasValidDegree = form.degreeQualifications.some((item) => {
     return (
       String(item.degreeName || '').trim() ||
       String(item.institutionName || '').trim() ||
       String(item.passingYear || '').trim() ||
-      String(item.subjectDepartment || '').trim() ||
-      String(item.academicDegreeName || '').trim()
+      String(item.subjectDepartment || '').trim()
     );
   });
 
-  if (!hasValidRow) {
-    throw new Error('At least one academic qualification row must be filled.');
+  if (!hasValidDegree) {
+    throw new Error('At least one degree row must be filled.');
   }
 }
 
-function mapAcademicQualifications(qualifications) {
-  return qualifications
+function mapAcademicQualifications(form) {
+  const rows = [
+    {
+      degree_name: 'Secondary',
+      institution_name: String(form.sscInstitutionName || '').trim(),
+      passing_year: String(form.sscPassingYear || '').trim(),
+      subject_department: String(form.sscGroup || '').trim(),
+      academic_degree_name: 'SSC',
+      gpa: String(form.sscGpa || '').trim(),
+    },
+    {
+      degree_name: 'Higher Secondary',
+      institution_name: String(form.hscInstitutionName || '').trim(),
+      passing_year: String(form.hscPassingYear || '').trim(),
+      subject_department: String(form.hscGroup || '').trim(),
+      academic_degree_name: 'HSC',
+      gpa: String(form.hscGpa || '').trim(),
+    },
+  ];
+
+  const degreeRows = form.degreeQualifications
     .filter((item) => {
       return (
         String(item.degreeName || '').trim() ||
         String(item.institutionName || '').trim() ||
         String(item.passingYear || '').trim() ||
-        String(item.subjectDepartment || '').trim() ||
-        String(item.academicDegreeName || '').trim()
+        String(item.subjectDepartment || '').trim()
       );
     })
     .map((item) => ({
@@ -114,8 +160,11 @@ function mapAcademicQualifications(qualifications) {
       institution_name: String(item.institutionName || '').trim(),
       passing_year: String(item.passingYear || '').trim(),
       subject_department: String(item.subjectDepartment || '').trim(),
-      academic_degree_name: String(item.academicDegreeName || '').trim(),
+      academic_degree_name: String(item.degreeName || '').trim(),
+      gpa: '',
     }));
+
+  return [...rows, ...degreeRows];
 }
 
 async function ensureActiveSession({ email, password }) {
@@ -146,7 +195,7 @@ async function ensureActiveSession({ email, password }) {
 
 export async function registerAssociationUser(form) {
   validateCommonFields(form);
-  validateAcademicQualifications(form.academicQualifications);
+  validateAcademicQualifications(form);
 
   const email = normalizeEmail(form.email);
 
@@ -203,9 +252,7 @@ export async function registerAssociationUser(form) {
     p_professional_details: studentOccupation ? '' : form.professionalDetails,
 
     p_university_document_url: documentPath,
-    p_academic_qualifications: mapAcademicQualifications(
-      form.academicQualifications
-    ),
+    p_academic_qualifications: mapAcademicQualifications(form),
 
     p_life_story: form.lifeStory || '',
     p_pdpo_consent: form.pdpoConsent,

@@ -66,8 +66,6 @@ const occupationOptions = [
 ];
 
 const degreeOptions = [
-  'Secondary',
-  'Higher Secondary',
   'Bachelor',
   'Masters',
   'BBA',
@@ -84,12 +82,11 @@ const degreeOptions = [
   'Other',
 ];
 
-const emptyQualification = {
+const emptyDegreeQualification = {
   degreeName: '',
   institutionName: '',
   passingYear: '',
   subjectDepartment: '',
-  academicDegreeName: '',
 };
 
 const initialForm = {
@@ -111,9 +108,19 @@ const initialForm = {
   firstYearAdmissionSession: '',
   universitySubject: '',
 
-  academicQualifications: [
+  sscInstitutionName: '',
+  sscGroup: '',
+  sscPassingYear: '',
+  sscGpa: '',
+
+  hscInstitutionName: '',
+  hscGroup: '',
+  hscPassingYear: '',
+  hscGpa: '',
+
+  degreeQualifications: [
     {
-      ...emptyQualification,
+      ...emptyDegreeQualification,
       degreeName: 'Bachelor',
     },
   ],
@@ -133,6 +140,23 @@ const initialForm = {
   pdpoConsent: false,
 };
 
+function isRunningDegree(degreeName) {
+  return [
+    'Bachelor',
+    'Masters',
+    'BBA',
+    'MBA',
+    'BA',
+    'MA',
+    'BSS',
+    'MSS',
+    'BSc',
+    'MSc',
+    'LLB',
+    'LLM',
+  ].includes(degreeName);
+}
+
 export default function RegistrationPage() {
   const [form, setForm] = useState(initialForm);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -151,23 +175,11 @@ export default function RegistrationPage() {
     if (isStudentOccupation) {
       setForm((current) => ({
         ...current,
-        academicQualifications: current.academicQualifications.map((item) => ({
+        degreeQualifications: current.degreeQualifications.map((item) => ({
           ...item,
-          passingYear:
-            item.degreeName === 'Bachelor' ||
-            item.degreeName === 'Masters' ||
-            item.degreeName === 'BBA' ||
-            item.degreeName === 'MBA' ||
-            item.degreeName === 'BA' ||
-            item.degreeName === 'MA' ||
-            item.degreeName === 'BSS' ||
-            item.degreeName === 'MSS' ||
-            item.degreeName === 'BSc' ||
-            item.degreeName === 'MSc' ||
-            item.degreeName === 'LLB' ||
-            item.degreeName === 'LLM'
-              ? item.passingYear || 'current student'
-              : item.passingYear,
+          passingYear: isRunningDegree(item.degreeName)
+            ? item.passingYear || 'current student'
+            : item.passingYear,
         })),
       }));
     }
@@ -181,45 +193,56 @@ export default function RegistrationPage() {
     }));
   }
 
-  function updateQualification(index, name, value) {
+  function updateDegreeQualification(index, name, value) {
     setForm((current) => {
-      const nextQualifications = current.academicQualifications.map(
+      const nextQualifications = current.degreeQualifications.map(
         (item, itemIndex) => {
           if (itemIndex !== index) return item;
 
-          return {
+          const nextItem = {
             ...item,
             [name]: value,
           };
+
+          if (
+            name === 'degreeName' &&
+            isStudentOccupation &&
+            isRunningDegree(value) &&
+            !nextItem.passingYear
+          ) {
+            nextItem.passingYear = 'current student';
+          }
+
+          return nextItem;
         }
       );
 
       return {
         ...current,
-        academicQualifications: nextQualifications,
+        degreeQualifications: nextQualifications,
       };
     });
   }
 
-  function addQualification() {
+  function addDegreeQualification() {
     setForm((current) => ({
       ...current,
-      academicQualifications: [
-        ...current.academicQualifications,
-        { ...emptyQualification },
+      degreeQualifications: [
+        ...current.degreeQualifications,
+        { ...emptyDegreeQualification },
       ],
     }));
   }
 
-  function removeQualification(index) {
+  function removeDegreeQualification(index) {
     setForm((current) => {
-      if (current.academicQualifications.length === 1) {
+      if (current.degreeQualifications.length === 1) {
         return current;
       }
 
       return {
         ...current,
-        academicQualifications: current.academicQualifications.filter(
+        degreeQualifications: current.degreeQualifications.filter(
           (_item, itemIndex) => itemIndex !== index
         ),
       };
@@ -273,21 +296,7 @@ export default function RegistrationPage() {
             profile becomes visible in public directory.
           </p>
 
-          <div className="mt-8 grid grid-cols-1 gap-3">
-            <InfoCard label="Single Form" value="No separate Student/Alumni tab" />
-            <InfoCard
-              label="Occupation Logic"
-              value="Student হলে professional details disabled"
-            />
-            <InfoCard
-              label="Public View"
-              value="Photo, name, subject, session, occupation"
-            />
-            <InfoCard
-              label="Admin Approval"
-              value="Registration and profile update need approval"
-            />
-          </div>
+          
         </aside>
 
         <section className="rounded-3xl bg-white p-4 shadow-soft sm:p-6 md:p-8">
@@ -445,91 +454,183 @@ export default function RegistrationPage() {
             </FormSection>
 
             <FormSection title="Academic Qualification">
-              <div className="space-y-4">
-                {form.academicQualifications.map((qualification, index) => (
-                  <div
-                    key={index}
-                    className="rounded-2xl border border-slate-200 bg-slate-50 p-4"
-                  >
-                    <div className="mb-4 flex items-center justify-between gap-3">
-                      <h4 className="text-sm font-bold text-slate-900">
-                        Qualification {index + 1}
-                      </h4>
+              <div className="space-y-5">
+                <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                  <h4 className="mb-4 text-sm font-bold text-slate-900">
+                    SSC Information
+                  </h4>
 
-                      <button
-                        type="button"
-                        onClick={() => removeQualification(index)}
-                        disabled={form.academicQualifications.length === 1}
-                        className="rounded-xl border border-red-200 px-3 py-2 text-xs font-bold text-red-600 disabled:cursor-not-allowed disabled:opacity-40"
-                      >
-                        Remove
-                      </button>
-                    </div>
+                  <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
+                    <TextInput
+                      label="SSC Institute Name"
+                      name="sscInstitutionName"
+                      value={form.sscInstitutionName}
+                      onChange={updateField}
+                      placeholder="Noapara Model School"
+                      required
+                    />
 
-                    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                      <SelectInput
-                        label="Degree Name"
-                        name="degreeName"
-                        value={qualification.degreeName}
-                        onChange={(name, value) =>
-                          updateQualification(index, name, value)
-                        }
-                        options={degreeOptions}
-                        placeholder="Select degree"
-                      />
+                    <TextInput
+                      label="SSC Group"
+                      name="sscGroup"
+                      value={form.sscGroup}
+                      onChange={updateField}
+                      placeholder="Science / Commerce / Arts"
+                      required
+                    />
 
-                      <TextInput
-                        label="Institution Name"
-                        name="institutionName"
-                        value={qualification.institutionName}
-                        onChange={(name, value) =>
-                          updateQualification(index, name, value)
-                        }
-                        placeholder="University of Dhaka"
-                      />
+                    <TextInput
+                      label="SSC Passing Year"
+                      name="sscPassingYear"
+                      value={form.sscPassingYear}
+                      onChange={updateField}
+                      placeholder="2018"
+                      required
+                    />
 
-                      <TextInput
-                        label="Passing Year"
-                        name="passingYear"
-                        value={qualification.passingYear}
-                        onChange={(name, value) =>
-                          updateQualification(index, name, value)
-                        }
-                        placeholder={
-                          isStudentOccupation ? 'current student' : '2024'
-                        }
-                      />
-
-                      <TextInput
-                        label="Subject / Department"
-                        name="subjectDepartment"
-                        value={qualification.subjectDepartment}
-                        onChange={(name, value) =>
-                          updateQualification(index, name, value)
-                        }
-                        placeholder="Marketing"
-                      />
-
-                      <TextInput
-                        label="Academic Degree Name"
-                        name="academicDegreeName"
-                        value={qualification.academicDegreeName}
-                        onChange={(name, value) =>
-                          updateQualification(index, name, value)
-                        }
-                        placeholder="BBA / MBA / SSC / HSC"
-                      />
-                    </div>
+                    <TextInput
+                      label="SSC GPA"
+                      name="sscGpa"
+                      value={form.sscGpa}
+                      onChange={updateField}
+                      placeholder="5.00"
+                    />
                   </div>
-                ))}
+                </div>
 
-                <button
-                  type="button"
-                  onClick={addQualification}
-                  className="min-h-12 rounded-2xl border border-emerald-300 bg-emerald-50 px-5 text-sm font-bold text-emerald-700 hover:bg-emerald-100"
-                >
-                  + Add Qualification
-                </button>
+                <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                  <h4 className="mb-4 text-sm font-bold text-slate-900">
+                    HSC Information
+                  </h4>
+
+                  <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
+                    <TextInput
+                      label="HSC Institute Name"
+                      name="hscInstitutionName"
+                      value={form.hscInstitutionName}
+                      onChange={updateField}
+                      placeholder="Cantonment College, Jashore"
+                      required
+                    />
+
+                    <TextInput
+                      label="HSC Group"
+                      name="hscGroup"
+                      value={form.hscGroup}
+                      onChange={updateField}
+                      placeholder="Science / Commerce / Arts"
+                      required
+                    />
+
+                    <TextInput
+                      label="HSC Passing Year"
+                      name="hscPassingYear"
+                      value={form.hscPassingYear}
+                      onChange={updateField}
+                      placeholder="2020"
+                      required
+                    />
+
+                    <TextInput
+                      label="HSC GPA"
+                      name="hscGpa"
+                      value={form.hscGpa}
+                      onChange={updateField}
+                      placeholder="5.00"
+                    />
+                  </div>
+                </div>
+
+                <div className="rounded-2xl border border-slate-200 bg-white p-4">
+                  <div className="mb-4">
+                    <h4 className="text-sm font-bold text-slate-900">
+                      Achieved / Running Degree
+                    </h4>
+
+                    <p className="mt-1 text-xs text-slate-500">
+                      Select degree name and mention passing year. For running
+                      students, write “current student” in passing year.
+                    </p>
+                  </div>
+
+                  <div className="space-y-4">
+                    {form.degreeQualifications.map((qualification, index) => (
+                      <div
+                        key={index}
+                        className="rounded-2xl border border-slate-200 bg-slate-50 p-4"
+                      >
+                        <div className="mb-4 flex items-center justify-between gap-3">
+                          <h5 className="text-sm font-bold text-slate-900">
+                            Degree {index + 1}
+                          </h5>
+
+                          <button
+                            type="button"
+                            onClick={() => removeDegreeQualification(index)}
+                            disabled={form.degreeQualifications.length === 1}
+                            className="rounded-xl border border-red-200 px-3 py-2 text-xs font-bold text-red-600 disabled:cursor-not-allowed disabled:opacity-40"
+                          >
+                            Remove
+                          </button>
+                        </div>
+
+                        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                          <SelectInput
+                            label="Degree Name"
+                            name="degreeName"
+                            value={qualification.degreeName}
+                            onChange={(name, value) =>
+                              updateDegreeQualification(index, name, value)
+                            }
+                            options={degreeOptions}
+                            placeholder="Select degree"
+                            required
+                          />
+
+                          <TextInput
+                            label="Institution Name"
+                            name="institutionName"
+                            value={qualification.institutionName}
+                            onChange={(name, value) =>
+                              updateDegreeQualification(index, name, value)
+                            }
+                            placeholder="University of Dhaka"
+                          />
+
+                          <TextInput
+                            label="Subject / Department"
+                            name="subjectDepartment"
+                            value={qualification.subjectDepartment}
+                            onChange={(name, value) =>
+                              updateDegreeQualification(index, name, value)
+                            }
+                            placeholder="Marketing / Software Engineering"
+                          />
+
+                          <TextInput
+                            label="Passing Year"
+                            name="passingYear"
+                            value={qualification.passingYear}
+                            onChange={(name, value) =>
+                              updateDegreeQualification(index, name, value)
+                            }
+                            placeholder={
+                              isStudentOccupation ? 'current student' : '2024'
+                            }
+                          />
+                        </div>
+                      </div>
+                    ))}
+
+                    <button
+                      type="button"
+                      onClick={addDegreeQualification}
+                      className="min-h-12 rounded-2xl border border-emerald-300 bg-emerald-50 px-5 text-sm font-bold text-emerald-700 hover:bg-emerald-100"
+                    >
+                      + Add Degree
+                    </button>
+                  </div>
+                </div>
               </div>
             </FormSection>
 
