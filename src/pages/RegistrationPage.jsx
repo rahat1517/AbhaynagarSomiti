@@ -565,13 +565,7 @@ export default function RegistrationPage() {
                       required
                     />
 
-                    <TextInput
-                      label="GPA"
-                      name="sscGpa"
-                      value={form.sscGpa}
-                      onChange={updateField}
-                      placeholder="5.00"
-                    />
+                   
                   </div>
                 </div>
 
@@ -608,13 +602,7 @@ export default function RegistrationPage() {
                       required
                     />
 
-                    <TextInput
-                      label="GPA"
-                      name="hscGpa"
-                      value={form.hscGpa}
-                      onChange={updateField}
-                      placeholder="5.00"
-                    />
+                  
                   </div>
                 </div>
 
