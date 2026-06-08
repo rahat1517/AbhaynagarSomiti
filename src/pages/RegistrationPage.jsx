@@ -417,9 +417,9 @@ export default function RegistrationPage() {
                 <TextInput
                   label="Date of Birth"
                   name="dateOfBirth"
-                  type="date"
                   value={form.dateOfBirth}
                   onChange={updateField}
+                  placeholder="MM-DD, e.g. 06-09"
                 />
 
                 <SelectInput
