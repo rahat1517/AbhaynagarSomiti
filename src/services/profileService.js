@@ -1,4 +1,8 @@
 import { supabase } from '../lib/supabaseClient';
+import {
+  uploadProfilePhoto,
+  uploadUniversityDocument,
+} from './verificationService';
 
 function emptyToNull(value) {
   if (value === undefined || value === null) return null;
@@ -7,18 +11,40 @@ function emptyToNull(value) {
   return trimmed.length > 0 ? trimmed : null;
 }
 
-function numberOrNull(value) {
-  if (value === undefined || value === null || value === '') return null;
+function isStudentOccupation(occupation) {
+  return String(occupation || '').trim().toLowerCase() === 'student';
+}
 
-  const numberValue = Number(value);
-  return Number.isFinite(numberValue) ? numberValue : null;
+function mapAcademicQualifications(qualifications) {
+  if (!Array.isArray(qualifications)) return [];
+
+  return qualifications
+    .filter((item) => {
+      return (
+        String(item.degree_name || item.degreeName || '').trim() ||
+        String(item.institution_name || item.institutionName || '').trim() ||
+        String(item.passing_year || item.passingYear || '').trim() ||
+        String(item.subject_department || item.subjectDepartment || '').trim() ||
+        String(item.academic_degree_name || item.academicDegreeName || '').trim()
+      );
+    })
+    .map((item) => ({
+      degree_name: String(item.degree_name || item.degreeName || '').trim() || 'Other',
+      institution_name: String(item.institution_name || item.institutionName || '').trim(),
+      passing_year: String(item.passing_year || item.passingYear || '').trim(),
+      subject_department: String(item.subject_department || item.subjectDepartment || '').trim(),
+      academic_degree_name: String(
+        item.academic_degree_name || item.academicDegreeName || ''
+      ).trim(),
+      gpa: String(item.gpa || '').trim(),
+    }));
 }
 
 export async function getMyProfileDetails() {
-  const { data, error } = await supabase.rpc('get_my_profile_details');
+  const { data, error } = await supabase.rpc('get_my_member_profile');
 
   if (error) {
-    console.error('get_my_profile_details error:', error);
+    console.error('get_my_member_profile error:', error);
     throw new Error(error.message);
   }
 
@@ -33,46 +59,56 @@ export async function getMyProfileDetails() {
   return data;
 }
 
-export async function updateMyProfileDetails(form) {
-  const { data, error } = await supabase.rpc('update_my_profile_details', {
-    p_full_name: emptyToNull(form.fullName),
-    p_roll_number: emptyToNull(form.rollNumber),
-    p_department_name: emptyToNull(form.departmentName),
-    p_current_semester: numberOrNull(form.currentSemester),
+export async function requestMyProfileUpdate(form) {
+  const studentOccupation = isStudentOccupation(form.occupation);
 
-    p_contact_number: emptyToNull(form.contactNumber),
-    p_academic_session: emptyToNull(form.academicSession),
-    p_present_address: emptyToNull(form.presentAddress),
-    p_permanent_address: emptyToNull(form.permanentAddress),
-    p_current_company: emptyToNull(form.currentCompany),
-    p_designation: emptyToNull(form.designation),
+  const requestedData = {
+    full_name: emptyToNull(form.fullName),
+    nick_name: emptyToNull(form.nickName),
+    date_of_birth: emptyToNull(form.dateOfBirth),
+    gender: emptyToNull(form.gender),
+    blood_group: emptyToNull(form.bloodGroup),
 
-    p_show_email: Boolean(form.showEmail),
-    p_show_contact_number: Boolean(form.showContactNumber),
-    p_contact_visibility: form.contactVisibility || 'private',
+    contact_number: emptyToNull(form.contactNumber),
+    facebook_profile_link: emptyToNull(form.facebookProfileLink),
+
+    university_hall_name: emptyToNull(form.universityHallName),
+    first_year_admission_session: emptyToNull(form.firstYearAdmissionSession),
+    university_subject: emptyToNull(form.universitySubject),
+
+    union_pouroshova_name: emptyToNull(form.unionPouroshovaName),
+    ward_village_name: emptyToNull(form.wardVillageName),
+    para_moholla_name: emptyToNull(form.paraMohollaName),
+
+    present_address: emptyToNull(form.presentAddress),
+
+    occupation: emptyToNull(form.occupation),
+    professional_details: studentOccupation
+      ? null
+      : emptyToNull(form.professionalDetails),
+
+    life_story: emptyToNull(form.lifeStory),
+
+    academic_qualifications: mapAcademicQualifications(
+      form.academicQualifications
+    ),
+  };
+
+  const { data, error } = await supabase.rpc('request_member_profile_update', {
+    p_requested_data: requestedData,
   });
 
   if (error) {
-    console.error('update_my_profile_details error:', error);
+    console.error('request_member_profile_update error:', error);
     throw new Error(error.message);
   }
 
   return data;
 }
 
-export async function updateMyProfilePhoto(file) {
+export async function requestMyProfilePhotoUpdate(file) {
   if (!file) {
     throw new Error('Profile photo is required.');
-  }
-
-  const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
-
-  if (!allowedTypes.includes(file.type)) {
-    throw new Error('Only JPG, PNG, or WEBP photo is allowed.');
-  }
-
-  if (file.size > 5 * 1024 * 1024) {
-    throw new Error('Profile photo must be 5MB or smaller.');
   }
 
   const {
@@ -88,43 +124,58 @@ export async function updateMyProfilePhoto(file) {
     throw new Error('Authentication required.');
   }
 
-  const timestamp = Date.now();
-  const safeFileName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
-  const storagePath = `${user.id}/${timestamp}-${safeFileName}`;
+  const profilePhotoUrl = await uploadProfilePhoto({
+    userId: user.id,
+    file,
+  });
 
-  const { data: uploadData, error: uploadError } = await supabase.storage
-    .from('profile-photos')
-    .upload(storagePath, file, {
-      contentType: file.type,
-      cacheControl: '3600',
-      upsert: false,
-    });
+  const { data, error } = await supabase.rpc('request_member_profile_update', {
+    p_requested_data: {
+      profile_photo_url: profilePhotoUrl,
+    },
+  });
 
-  if (uploadError) {
-    console.error('updateMyProfilePhoto upload error:', uploadError);
-    throw new Error(uploadError.message);
+  if (error) {
+    console.error('request profile photo update error:', error);
+    throw new Error(error.message);
   }
 
-  const { data: publicUrlData } = supabase.storage
-    .from('profile-photos')
-    .getPublicUrl(uploadData.path);
+  return data;
+}
 
-  const photoUrl = publicUrlData.publicUrl;
-
-  const { error: updateError } = await supabase
-    .from('profiles')
-    .update({
-      profile_photo_url: photoUrl,
-    })
-    .eq('id', user.id);
-
-  if (updateError) {
-    console.error('updateMyProfilePhoto db error:', updateError);
-    throw new Error(updateError.message);
+export async function requestMyUniversityDocumentUpdate(file) {
+  if (!file) {
+    throw new Error('University document is required.');
   }
 
-  return {
-    message: 'Profile photo updated successfully.',
-    profile_photo_url: photoUrl,
-  };
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
+
+  if (userError) {
+    throw new Error(userError.message);
+  }
+
+  if (!user?.id) {
+    throw new Error('Authentication required.');
+  }
+
+  const documentPath = await uploadUniversityDocument({
+    userId: user.id,
+    file,
+  });
+
+  const { data, error } = await supabase.rpc('request_member_profile_update', {
+    p_requested_data: {
+      university_document_url: documentPath,
+    },
+  });
+
+  if (error) {
+    console.error('request university document update error:', error);
+    throw new Error(error.message);
+  }
+
+  return data;
 }

@@ -1,16 +1,15 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   BrowserRouter,
   Link,
-  NavLink,
   Route,
   Routes,
-  useLocation,
   useNavigate,
 } from 'react-router-dom';
 
 import { supabase } from './lib/supabaseClient';
 import { signOut } from './services/authService';
+import { getAdminNotificationSummary } from './services/adminMemberService';
 
 import LandingPage from './pages/LandingPage';
 import RegistrationPage from './pages/RegistrationPage';
@@ -25,8 +24,8 @@ import VisibilityPreferencesPage from './pages/privacy/VisibilityPreferencesPage
 import StudentCareerBoard from './pages/career/StudentCareerBoard';
 import AlumniCareerDashboard from './pages/career/AlumniCareerDashboard';
 
-import AdminVerificationDashboard from './pages/admin/AdminVerificationDashboard';
-import AdminStudentVerificationPage from './pages/admin/AdminStudentVerificationPage';
+import AdminMemberVerificationPage from './pages/admin/AdminMemberVerificationPage';
+import AdminMemberUpdateRequestsPage from './pages/admin/AdminMemberUpdateRequestsPage';
 import AdminRosterPage from './pages/admin/AdminRosterPage';
 
 export default function App() {
@@ -39,58 +38,20 @@ export default function App() {
 
 function AppLayout() {
   const navigate = useNavigate();
-  const location = useLocation();
 
   const [session, setSession] = useState(null);
   const [profile, setProfile] = useState(null);
   const [loadingSession, setLoadingSession] = useState(true);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [adminNotifications, setAdminNotifications] = useState({
+    pendingMembers: 0,
+    pendingUpdates: 0,
+    total: 0,
+  });
 
   const hasAuthSession = Boolean(session?.user);
   const isLoggedIn = Boolean(session?.user && profile);
   const isAdmin = profile?.role === 'admin';
   const isVerified = profile?.is_verified === true;
-
-  const navigationItems = useMemo(() => {
-    if (!hasAuthSession) {
-      return [
-        { to: '/', label: 'Home' },
-        { to: '/register', label: 'Register' },
-        { to: '/login', label: 'Login' },
-      ];
-    }
-
-    if (hasAuthSession && !profile && !loadingSession) {
-      return [{ to: '/', label: 'Home' }];
-    }
-
-    if (!isLoggedIn) return [];
-
-    const items = [
-      { to: '/', label: 'Home' },
-      { to: '/profile', label: 'Profile' },
-    ];
-
-    if (isVerified) {
-      items.push(
-        { to: '/directory', label: 'Directory' },
-        { to: '/career/jobs', label: 'Jobs' },
-        { to: '/career/alumni', label: 'Alumni Career' }
-      );
-    }
-
-    items.push({ to: '/privacy/visibility', label: 'Visibility' });
-
-    if (isAdmin) {
-      items.push(
-        { to: '/admin/verifications', label: 'Alumni Verify' },
-        { to: '/admin/student-verifications', label: 'Student Verify' },
-        { to: '/admin/roster', label: 'Roster' }
-      );
-    }
-
-    return items;
-  }, [hasAuthSession, isAdmin, isLoggedIn, isVerified, loadingSession, profile]);
 
   useEffect(() => {
     loadCurrentSession();
@@ -102,9 +63,24 @@ function AppLayout() {
       setSession(nextSession);
 
       if (nextSession?.user?.id) {
-        await loadProfile(nextSession.user.id);
+        const nextProfile = await loadProfile(nextSession.user.id);
+
+        if (nextProfile?.role === 'admin') {
+          await loadAdminNotifications();
+        } else {
+          setAdminNotifications({
+            pendingMembers: 0,
+            pendingUpdates: 0,
+            total: 0,
+          });
+        }
       } else {
         setProfile(null);
+        setAdminNotifications({
+          pendingMembers: 0,
+          pendingUpdates: 0,
+          total: 0,
+        });
       }
 
       setLoadingSession(false);
@@ -116,8 +92,18 @@ function AppLayout() {
   }, []);
 
   useEffect(() => {
-    setMobileMenuOpen(false);
-  }, [location.pathname]);
+    if (!isAdmin) return;
+
+    loadAdminNotifications();
+
+    const intervalId = window.setInterval(() => {
+      loadAdminNotifications();
+    }, 30000);
+
+    return () => {
+      window.clearInterval(intervalId);
+    };
+  }, [isAdmin]);
 
   async function loadCurrentSession() {
     setLoadingSession(true);
@@ -135,7 +121,11 @@ function AppLayout() {
       setSession(currentSession);
 
       if (currentSession?.user?.id) {
-        await loadProfile(currentSession.user.id);
+        const nextProfile = await loadProfile(currentSession.user.id);
+
+        if (nextProfile?.role === 'admin') {
+          await loadAdminNotifications();
+        }
       } else {
         setProfile(null);
       }
@@ -151,7 +141,7 @@ function AppLayout() {
   async function loadProfile(userId) {
     if (!userId) {
       setProfile(null);
-      return;
+      return null;
     }
 
     const { data, error } = await supabase
@@ -163,16 +153,31 @@ function AppLayout() {
     if (error) {
       console.error('Failed to load profile:', error);
       setProfile(null);
-      return;
+      return null;
     }
 
     if (!data) {
       console.warn('Auth user exists but profile row is missing.');
       setProfile(null);
-      return;
+      return null;
     }
 
     setProfile(data);
+    return data;
+  }
+
+  async function loadAdminNotifications() {
+    try {
+      const summary = await getAdminNotificationSummary();
+      setAdminNotifications(summary);
+    } catch (error) {
+      console.error('Failed to load admin notifications:', error);
+      setAdminNotifications({
+        pendingMembers: 0,
+        pendingUpdates: 0,
+        total: 0,
+      });
+    }
   }
 
   async function handleLogout() {
@@ -181,7 +186,11 @@ function AppLayout() {
 
       setSession(null);
       setProfile(null);
-      setMobileMenuOpen(false);
+      setAdminNotifications({
+        pendingMembers: 0,
+        pendingUpdates: 0,
+        total: 0,
+      });
 
       navigate('/login');
     } catch (error) {
@@ -191,105 +200,116 @@ function AppLayout() {
 
   return (
     <>
-      <header className="sticky top-0 z-50 border-b border-slate-200/80 bg-white/95 shadow-sm backdrop-blur">
-        <nav className="mx-auto max-w-7xl px-4 py-3 sm:px-6 lg:px-8">
-          <div className="flex min-h-12 items-center justify-between gap-3">
-            <Link to="/" className="flex min-w-0 items-center gap-3">
-              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-emerald-600 text-sm font-black text-white shadow-sm">
-                DA
-              </span>
+      <nav className="border-b border-slate-200 bg-white px-4 py-3">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-3">
+          <Link to="/" className="text-sm font-bold text-slate-950">
+            Abhaynagar Somiti
+          </Link>
 
-              <span className="min-w-0">
-                <span className="block truncate text-base font-black leading-tight text-slate-950 sm:text-lg">
-                  Dhabi Abhaynagar Poribar
-                </span>
-                <span className="hidden text-xs font-semibold text-slate-500 sm:block">
-                  Student Alumni Association
-                </span>
-              </span>
-            </Link>
+          <div className="flex items-center gap-1 overflow-x-auto">
+            {!hasAuthSession ? (
+              <>
+                <NavItem to="/">Home</NavItem>
+                <NavItem to="/register">Register</NavItem>
+                <NavItem to="/login">Login</NavItem>
+              </>
+            ) : null}
 
-            <div className="hidden items-center gap-1 lg:flex">
-              {navigationItems.map((item) => (
-                <NavItem key={item.to} to={item.to}>
-                  {item.label}
-                </NavItem>
-              ))}
+            {hasAuthSession && !profile && !loadingSession ? (
+              <>
+                <NavItem to="/">Home</NavItem>
 
-              {hasAuthSession && !profile && !loadingSession ? (
                 <span className="whitespace-nowrap rounded-xl bg-amber-50 px-4 py-3 text-sm font-semibold text-amber-700">
                   Profile Missing
                 </span>
-              ) : null}
 
-              {hasAuthSession ? (
                 <button
                   type="button"
                   onClick={handleLogout}
-                  className="min-h-12 whitespace-nowrap rounded-xl px-4 py-3 text-sm font-semibold text-red-600 transition hover:bg-red-50"
+                  className="min-h-12 whitespace-nowrap rounded-xl px-4 py-3 text-sm font-semibold text-red-600 hover:bg-red-50"
                 >
                   Logout
                 </button>
-              ) : null}
+              </>
+            ) : null}
 
-              {loadingSession ? (
-                <span className="whitespace-nowrap px-3 text-xs font-semibold text-slate-400">
-                  Loading...
-                </span>
-              ) : null}
-            </div>
+            {isLoggedIn ? (
+              <>
+                <NavItem to="/">Home</NavItem>
+                <NavItem to="/profile">Profile</NavItem>
 
-            <button
-              type="button"
-              onClick={() => setMobileMenuOpen((current) => !current)}
-              className="inline-flex min-h-12 min-w-12 items-center justify-center rounded-2xl border border-slate-200 bg-white text-slate-800 shadow-sm transition hover:bg-slate-50 lg:hidden"
-              aria-label="Toggle navigation menu"
-              aria-expanded={mobileMenuOpen}
-            >
-              <span className="sr-only">Menu</span>
-              <span className="flex flex-col gap-1.5">
-                <span className="h-0.5 w-5 rounded-full bg-current" />
-                <span className="h-0.5 w-5 rounded-full bg-current" />
-                <span className="h-0.5 w-5 rounded-full bg-current" />
+                {isVerified ? (
+                  <>
+                    <NavItem to="/directory">Directory</NavItem>
+                    <NavItem to="/career/jobs">Jobs</NavItem>
+                    <NavItem to="/career/alumni">Alumni Career</NavItem>
+                  </>
+                ) : null}
+
+                <NavItem to="/privacy">Privacy</NavItem>
+                <NavItem to="/privacy/visibility">Visibility</NavItem>
+
+                {isAdmin ? (
+                  <>
+                    <NavItem to="/admin/members">
+                      <span className="inline-flex items-center gap-2">
+                        Member Verify
+                        {adminNotifications.pendingMembers > 0 ? (
+                          <Badge count={adminNotifications.pendingMembers} />
+                        ) : null}
+                      </span>
+                    </NavItem>
+
+                    <NavItem to="/admin/member-updates">
+                      <span className="inline-flex items-center gap-2">
+                        Update Requests
+                        {adminNotifications.pendingUpdates > 0 ? (
+                          <Badge count={adminNotifications.pendingUpdates} />
+                        ) : null}
+                      </span>
+                    </NavItem>
+
+                    <NavItem to="/admin/roster">Roster</NavItem>
+                  </>
+                ) : null}
+
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  className="min-h-12 whitespace-nowrap rounded-xl px-4 py-3 text-sm font-semibold text-red-600 hover:bg-red-50"
+                >
+                  Logout
+                </button>
+              </>
+            ) : null}
+
+            {loadingSession ? (
+              <span className="whitespace-nowrap px-3 text-xs font-semibold text-slate-400">
+                Loading...
               </span>
-            </button>
+            ) : null}
           </div>
+        </div>
+      </nav>
 
-          {mobileMenuOpen ? (
-            <div className="mt-3 rounded-3xl border border-slate-200 bg-white p-3 shadow-xl lg:hidden">
-              <div className="grid grid-cols-1 gap-2">
-                {navigationItems.map((item) => (
-                  <MobileNavItem key={item.to} to={item.to}>
-                    {item.label}
-                  </MobileNavItem>
-                ))}
+      {isAdmin && adminNotifications.total > 0 ? (
+        <div className="border-b border-amber-200 bg-amber-50 px-4 py-2">
+          <div className="mx-auto flex max-w-7xl flex-col gap-2 text-sm font-semibold text-amber-800 md:flex-row md:items-center md:justify-between">
+            <span>
+              Admin notification: {adminNotifications.pendingMembers} new
+              registration(s), {adminNotifications.pendingUpdates} update
+              request(s).
+            </span>
 
-                {hasAuthSession && !profile && !loadingSession ? (
-                  <span className="rounded-2xl bg-amber-50 px-4 py-3 text-sm font-bold text-amber-700">
-                    Profile Missing
-                  </span>
-                ) : null}
-
-                {hasAuthSession ? (
-                  <button
-                    type="button"
-                    onClick={handleLogout}
-                    className="min-h-12 w-full rounded-2xl bg-red-50 px-4 py-3 text-left text-sm font-bold text-red-700 transition hover:bg-red-100"
-                  >
-                    Logout
-                  </button>
-                ) : null}
-
-                {loadingSession ? (
-                  <span className="px-4 py-3 text-sm font-semibold text-slate-400">
-                    Loading...
-                  </span>
-                ) : null}
-              </div>
-            </div>
-          ) : null}
-        </nav>
-      </header>
+            <Link
+              to="/admin/members"
+              className="w-fit rounded-xl bg-amber-600 px-4 py-2 text-xs font-bold text-white hover:bg-amber-700"
+            >
+              Review Now
+            </Link>
+          </div>
+        </div>
+      ) : null}
 
       <Routes>
         <Route path="/" element={<LandingPage />} />
@@ -311,13 +331,13 @@ function AppLayout() {
         />
 
         <Route
-          path="/admin/verifications"
-          element={<AdminVerificationDashboard />}
+          path="/admin/members"
+          element={<AdminMemberVerificationPage />}
         />
 
         <Route
-          path="/admin/student-verifications"
-          element={<AdminStudentVerificationPage />}
+          path="/admin/member-updates"
+          element={<AdminMemberUpdateRequestsPage />}
         />
 
         <Route path="/admin/roster" element={<AdminRosterPage />} />
@@ -328,36 +348,19 @@ function AppLayout() {
 
 function NavItem({ to, children }) {
   return (
-    <NavLink
+    <Link
       to={to}
-      end={to === '/'}
-      className={({ isActive }) =>
-        `min-h-12 whitespace-nowrap rounded-xl px-4 py-3 text-sm font-semibold transition ${
-          isActive
-            ? 'bg-slate-950 text-white shadow-sm'
-            : 'text-slate-600 hover:bg-slate-100 hover:text-slate-950'
-        }`
-      }
+      className="min-h-12 whitespace-nowrap rounded-xl px-4 py-3 text-sm font-semibold text-slate-600 hover:bg-slate-100"
     >
       {children}
-    </NavLink>
+    </Link>
   );
 }
 
-function MobileNavItem({ to, children }) {
+function Badge({ count }) {
   return (
-    <NavLink
-      to={to}
-      end={to === '/'}
-      className={({ isActive }) =>
-        `min-h-12 rounded-2xl px-4 py-3 text-sm font-bold transition ${
-          isActive
-            ? 'bg-slate-950 text-white shadow-sm'
-            : 'bg-slate-50 text-slate-700 hover:bg-slate-100 hover:text-slate-950'
-        }`
-      }
-    >
-      {children}
-    </NavLink>
+    <span className="inline-flex h-6 min-w-6 items-center justify-center rounded-full bg-red-600 px-2 text-xs font-black text-white">
+      {count > 99 ? '99+' : count}
+    </span>
   );
 }
