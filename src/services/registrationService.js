@@ -4,14 +4,16 @@ import {
   signUpWithEmailPassword,
 } from './authService';
 import {
-  createAlumniVerificationRequest,
   uploadProfilePhoto,
   uploadUniversityDocument,
-  verifyStudentAgainstRoster,
 } from './verificationService';
 
 function normalizeEmail(email) {
   return String(email || '').trim().toLowerCase();
+}
+
+function isStudentOccupation(occupation) {
+  return String(occupation || '').trim().toLowerCase() === 'student';
 }
 
 function validateCommonFields(form) {
@@ -32,88 +34,88 @@ function validateCommonFields(form) {
   }
 
   if (!form.contactNumber) {
-    throw new Error('Contact number is required.');
+    throw new Error('Mobile number is required.');
   }
 
   if (!form.profilePhotoFile) {
     throw new Error('Profile photo is required.');
   }
 
-  if (!form.academicSession) {
-    throw new Error('Academic session is required.');
+  if (!form.universityHallName) {
+    throw new Error('University hall name is required.');
+  }
+
+  if (!form.firstYearAdmissionSession) {
+    throw new Error('University first year admission session is required.');
+  }
+
+  if (!form.universitySubject) {
+    throw new Error('University subject is required.');
+  }
+
+  if (!form.unionPouroshovaName) {
+    throw new Error('Union/Pouroshova name is required.');
   }
 
   if (!form.presentAddress) {
     throw new Error('Present address is required.');
   }
 
-  if (!form.permanentAddress) {
-    throw new Error('Permanent address is required.');
+  if (!form.occupation) {
+    throw new Error('Occupation is required.');
   }
 
-  if (!form.pdpoConsent) {
-    throw new Error('You must agree to the PDPO 2025 privacy consent.');
-  }
-
-  if (!['student', 'alumni'].includes(form.role)) {
-    throw new Error('Invalid registration role.');
-  }
-}
-
-function validateStudentFields(form) {
-  if (!form.rollNumber) {
-    throw new Error('Roll number is required.');
-  }
-
-  if (!form.departmentName) {
-    throw new Error('Department name is required.');
-  }
-
-  const semester = Number(form.currentSemester);
-
-  if (!Number.isInteger(semester) || semester < 1 || semester > 12) {
-    throw new Error('Current semester must be between 1 and 12.');
-  }
-}
-
-function validateAlumniFields(form) {
-  if (!form.registrationNo) {
-    throw new Error('Registration number is required.');
-  }
-
-  if (!form.departmentName) {
-    throw new Error('Department name is required.');
-  }
-
-  if (!form.hall) {
-    throw new Error('Hall is required.');
-  }
-
-  const graduationYear = Number(form.graduationYear);
-  const currentYear = new Date().getFullYear();
-
-  if (
-    !Number.isInteger(graduationYear) ||
-    graduationYear < 1950 ||
-    graduationYear > currentYear
-  ) {
-    throw new Error(`Graduation year must be between 1950 and ${currentYear}.`);
+  if (!isStudentOccupation(form.occupation) && !form.professionalDetails) {
+    throw new Error('Professional details are required when occupation is not Student.');
   }
 
   if (!form.universityDocumentFile) {
     throw new Error('University document is required.');
   }
 
-  const allowedDocumentTypes = [
-    'application/pdf',
-    'image/jpeg',
-    'image/png',
-    'image/webp',
-  ];
-
-  if (!allowedDocumentTypes.includes(form.universityDocumentFile.type)) {
-    throw new Error('Only PDF, JPG, PNG, or WEBP university document is allowed.');
+  if (!form.pdpoConsent) {
+    throw new Error('You must agree to the privacy consent.');
   }
+}
+
+function validateAcademicQualifications(qualifications) {
+  if (!Array.isArray(qualifications) || qualifications.length === 0) {
+    throw new Error('At least one academic qualification is required.');
+  }
+
+  const hasValidRow = qualifications.some((item) => {
+    return (
+      String(item.degreeName || '').trim() ||
+      String(item.institutionName || '').trim() ||
+      String(item.passingYear || '').trim() ||
+      String(item.subjectDepartment || '').trim() ||
+      String(item.academicDegreeName || '').trim()
+    );
+  });
+
+  if (!hasValidRow) {
+    throw new Error('At least one academic qualification row must be filled.');
+  }
+}
+
+function mapAcademicQualifications(qualifications) {
+  return qualifications
+    .filter((item) => {
+      return (
+        String(item.degreeName || '').trim() ||
+        String(item.institutionName || '').trim() ||
+        String(item.passingYear || '').trim() ||
+        String(item.subjectDepartment || '').trim() ||
+        String(item.academicDegreeName || '').trim()
+      );
+    })
+    .map((item) => ({
+      degree_name: String(item.degreeName || '').trim() || 'Other',
+      institution_name: String(item.institutionName || '').trim(),
+      passing_year: String(item.passingYear || '').trim(),
+      subject_department: String(item.subjectDepartment || '').trim(),
+      academic_degree_name: String(item.academicDegreeName || '').trim(),
+    }));
 }
 
 async function ensureActiveSession({ email, password }) {
@@ -144,14 +146,7 @@ async function ensureActiveSession({ email, password }) {
 
 export async function registerAssociationUser(form) {
   validateCommonFields(form);
-
-  if (form.role === 'student') {
-    validateStudentFields(form);
-  }
-
-  if (form.role === 'alumni') {
-    validateAlumniFields(form);
-  }
+  validateAcademicQualifications(form.academicQualifications);
 
   const email = normalizeEmail(form.email);
 
@@ -174,83 +169,58 @@ export async function registerAssociationUser(form) {
     file: form.profilePhotoFile,
   });
 
-  if (form.role === 'student') {
-    const { error } = await supabase.rpc('create_student_registration', {
-      p_email: email,
-      p_full_name: form.fullName,
-      p_profile_photo_url: profilePhotoUrl,
-      p_roll_number: form.rollNumber,
-      p_department_name: form.departmentName,
-      p_current_semester: Number(form.currentSemester),
-      p_contact_number: form.contactNumber,
-      p_pdpo_consent: form.pdpoConsent,
-      p_academic_session: form.academicSession,
-      p_present_address: form.presentAddress,
-      p_permanent_address: form.permanentAddress,
-    });
-
-    if (error) {
-      console.error('create_student_registration error:', error);
-      throw new Error(error.message);
-    }
-
-    const verificationResult = await verifyStudentAgainstRoster({
-      rollNumber: form.rollNumber,
-      departmentName: form.departmentName,
-      currentSemester: form.currentSemester,
-      academicSession: form.academicSession,
-    });
-
-    return {
-      user: activeUser,
-      role: 'student',
-      verificationResult,
-      message:
-        verificationResult?.verified === true
-          ? 'Student registration completed and verified successfully.'
-          : 'Registration submitted, but roster verification failed. Request sent to admin for manual review.',
-    };
-  }
-
   const documentPath = await uploadUniversityDocument({
     userId: activeUser.id,
     file: form.universityDocumentFile,
   });
 
-  const { error } = await supabase.rpc('create_alumni_registration', {
+  const studentOccupation = isStudentOccupation(form.occupation);
+
+  const { data, error } = await supabase.rpc('create_member_registration', {
     p_email: email,
     p_full_name: form.fullName,
     p_profile_photo_url: profilePhotoUrl,
-    p_registration_no: form.registrationNo,
-    p_graduation_year: Number(form.graduationYear),
-    p_hall: form.hall,
-    p_current_company: form.currentCompany || '',
-    p_designation: form.designation || '',
+
+    p_nick_name: form.nickName || '',
+    p_date_of_birth: form.dateOfBirth || null,
+    p_gender: form.gender || '',
+    p_blood_group: form.bloodGroup || '',
+
     p_contact_number: form.contactNumber,
-    p_verification_doc_url: documentPath,
-    p_pdpo_consent: form.pdpoConsent,
-    p_academic_session: form.academicSession,
+    p_facebook_profile_link: form.facebookProfileLink || '',
+
+    p_university_hall_name: form.universityHallName,
+    p_first_year_admission_session: form.firstYearAdmissionSession,
+    p_university_subject: form.universitySubject,
+
+    p_union_pouroshova_name: form.unionPouroshovaName,
+    p_ward_village_name: form.wardVillageName || '',
+    p_para_moholla_name: form.paraMohollaName || '',
+
     p_present_address: form.presentAddress,
-    p_permanent_address: form.permanentAddress,
-    p_department_name: form.departmentName,
+
+    p_occupation: form.occupation,
+    p_professional_details: studentOccupation ? '' : form.professionalDetails,
+
+    p_university_document_url: documentPath,
+    p_academic_qualifications: mapAcademicQualifications(
+      form.academicQualifications
+    ),
+
+    p_life_story: form.lifeStory || '',
+    p_pdpo_consent: form.pdpoConsent,
   });
 
   if (error) {
-    console.error('create_alumni_registration error:', error);
+    console.error('create_member_registration error:', error);
     throw new Error(error.message);
   }
 
-  await createAlumniVerificationRequest({
-    registrationNo: form.registrationNo,
-    graduationYear: form.graduationYear,
-    hall: form.hall,
-    certificateStoragePath: documentPath,
-  });
-
   return {
     user: activeUser,
-    role: 'alumni',
+    role: 'member',
     message:
-      'Alumni registration submitted successfully. University document uploaded for admin verification.',
+      data?.message ||
+      'Registration submitted successfully. Admin approval is required.',
   };
 }

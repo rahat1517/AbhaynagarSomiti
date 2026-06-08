@@ -1,32 +1,136 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { registerAssociationUser } from '../services/registrationService';
 
-const initialForm = {
-  role: 'student',
+const hallOptions = [
+  'Ruqayyah Hall',
+  'Bangamata Sheikh Fazilatunnesa Mujib Hall',
+  'Shamsun Nahar Hall',
+  'Bangladesh-Kuwait Maitree Hall',
+  'Kabi Sufia Kamal Hall',
+  'Dr. Muhammad Shahidullah Hall',
+  'Fazlul Huq Muslim Hall',
+  'Amar Ekushey Hall',
+  'Salimullah Muslim Hall',
+  'Jagannath Hall',
+  'Shahid Sergeant Zahurul Haque Hall',
+  'Surja Sen Hall',
+  'Haji Muhammad Mohsin Hall',
+  'Kabi Jasimuddin Hall',
+  'A.F. Rahman Hall',
+  'Muktijoddha Ziaur Rahman Hall',
+  'Sheikh Mujibur Rahman Hall',
+  'Bijoy Ekattor Hall',
+  'IBA Hostel',
+  'Other',
+];
 
+const unionOptions = [
+  'Sreedharpur Union',
+  'Prembag Union',
+  'Baghutia Union',
+  'Subha Para Union',
+  'Siddhipasha Union',
+  'Sundoli Union',
+  'Noapara Paurashava',
+  'Chalishia Union',
+  'Payra Union',
+  'Other',
+];
+
+const genderOptions = ['Male', 'Female', 'Other'];
+
+const bloodGroupOptions = [
+  'A+',
+  'A-',
+  'B+',
+  'B-',
+  'AB+',
+  'AB-',
+  'O+',
+  'O-',
+];
+
+const occupationOptions = [
+  'Student',
+  'Alumni',
+  'Service Holder',
+  'Business',
+  'Teacher',
+  'Banker',
+  'Doctor',
+  'Engineer',
+  'Lawyer',
+  'Freelancer',
+  'Unemployed',
+  'Other',
+];
+
+const degreeOptions = [
+  'Secondary',
+  'Higher Secondary',
+  'Bachelor',
+  'Masters',
+  'BBA',
+  'MBA',
+  'BA',
+  'MA',
+  'BSS',
+  'MSS',
+  'BSc',
+  'MSc',
+  'LLB',
+  'LLM',
+  'PhD',
+  'Other',
+];
+
+const emptyQualification = {
+  degreeName: '',
+  institutionName: '',
+  passingYear: '',
+  subjectDepartment: '',
+  academicDegreeName: '',
+};
+
+const initialForm = {
   fullName: '',
+  nickName: '',
+  dateOfBirth: '',
+  gender: '',
+  bloodGroup: '',
+
   email: '',
   password: '',
   confirmPassword: '',
   contactNumber: '',
-  pdpoConsent: false,
+  facebookProfileLink: '',
 
   profilePhotoFile: null,
 
-  academicSession: '',
+  universityHallName: '',
+  firstYearAdmissionSession: '',
+  universitySubject: '',
+
+  academicQualifications: [
+    {
+      ...emptyQualification,
+      degreeName: 'Bachelor',
+    },
+  ],
+
+  unionPouroshovaName: '',
+  wardVillageName: '',
+  paraMohollaName: '',
+
   presentAddress: '',
-  permanentAddress: '',
 
-  rollNumber: '',
-  departmentName: '',
-  currentSemester: '',
+  occupation: 'Student',
+  professionalDetails: '',
 
-  registrationNo: '',
-  graduationYear: '',
-  hall: '',
-  currentCompany: '',
-  designation: '',
   universityDocumentFile: null,
+  lifeStory: '',
+
+  pdpoConsent: false,
 };
 
 export default function RegistrationPage() {
@@ -34,13 +138,41 @@ export default function RegistrationPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [status, setStatus] = useState({ type: '', message: '' });
 
-  const isStudent = form.role === 'student';
-  const isAlumni = form.role === 'alumni';
-
-  const title = useMemo(
-    () => (isStudent ? 'Student Registration' : 'Alumni Registration'),
-    [isStudent]
+  const isStudentOccupation = useMemo(
+    () => form.occupation?.toLowerCase() === 'student',
+    [form.occupation]
   );
+
+  useEffect(() => {
+    if (isStudentOccupation && form.professionalDetails) {
+      updateField('professionalDetails', '');
+    }
+
+    if (isStudentOccupation) {
+      setForm((current) => ({
+        ...current,
+        academicQualifications: current.academicQualifications.map((item) => ({
+          ...item,
+          passingYear:
+            item.degreeName === 'Bachelor' ||
+            item.degreeName === 'Masters' ||
+            item.degreeName === 'BBA' ||
+            item.degreeName === 'MBA' ||
+            item.degreeName === 'BA' ||
+            item.degreeName === 'MA' ||
+            item.degreeName === 'BSS' ||
+            item.degreeName === 'MSS' ||
+            item.degreeName === 'BSc' ||
+            item.degreeName === 'MSc' ||
+            item.degreeName === 'LLB' ||
+            item.degreeName === 'LLM'
+              ? item.passingYear || 'current student'
+              : item.passingYear,
+        })),
+      }));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isStudentOccupation]);
 
   function updateField(name, value) {
     setForm((current) => ({
@@ -49,34 +181,64 @@ export default function RegistrationPage() {
     }));
   }
 
-  function handleRoleChange(nextRole) {
-    setStatus({ type: '', message: '' });
+  function updateQualification(index, name, value) {
+    setForm((current) => {
+      const nextQualifications = current.academicQualifications.map(
+        (item, itemIndex) => {
+          if (itemIndex !== index) return item;
 
+          return {
+            ...item,
+            [name]: value,
+          };
+        }
+      );
+
+      return {
+        ...current,
+        academicQualifications: nextQualifications,
+      };
+    });
+  }
+
+  function addQualification() {
     setForm((current) => ({
-      ...initialForm,
-      role: nextRole,
-      fullName: current.fullName,
-      email: current.email,
-      password: current.password,
-      confirmPassword: current.confirmPassword,
-      contactNumber: current.contactNumber,
-      pdpoConsent: current.pdpoConsent,
-      profilePhotoFile: current.profilePhotoFile,
-      academicSession: current.academicSession,
-      presentAddress: current.presentAddress,
-      permanentAddress: current.permanentAddress,
-      departmentName: current.departmentName,
+      ...current,
+      academicQualifications: [
+        ...current.academicQualifications,
+        { ...emptyQualification },
+      ],
     }));
   }
 
-  async function handleRegistrationSubmit(event) {
+  function removeQualification(index) {
+    setForm((current) => {
+      if (current.academicQualifications.length === 1) {
+        return current;
+      }
+
+      return {
+        ...current,
+        academicQualifications: current.academicQualifications.filter(
+          (_item, itemIndex) => itemIndex !== index
+        ),
+      };
+    });
+  }
+
+  async function handleSubmit(event) {
     event.preventDefault();
 
     setIsSubmitting(true);
     setStatus({ type: '', message: '' });
 
     try {
-      const result = await registerAssociationUser(form);
+      const finalForm = {
+        ...form,
+        professionalDetails: isStudentOccupation ? '' : form.professionalDetails,
+      };
+
+      const result = await registerAssociationUser(finalForm);
 
       setStatus({
         type: 'success',
@@ -96,94 +258,99 @@ export default function RegistrationPage() {
 
   return (
     <main className="min-h-screen bg-slate-50 px-4 py-6 sm:px-6 lg:px-8">
-      <section className="mx-auto grid max-w-7xl grid-cols-1 gap-6 lg:grid-cols-[0.9fr_1.4fr] lg:items-start">
+      <section className="mx-auto grid max-w-7xl grid-cols-1 gap-6 lg:grid-cols-[0.85fr_1.5fr] lg:items-start">
         <aside className="rounded-3xl bg-slate-950 p-6 text-white shadow-soft md:p-8 lg:sticky lg:top-8">
           <p className="text-sm font-semibold uppercase tracking-[0.25em] text-emerald-300">
             Association Portal
           </p>
 
           <h1 className="mt-4 text-3xl font-bold leading-tight md:text-4xl">
-            Secure Student-Alumni Registration
+            Member Registration
           </h1>
 
           <p className="mt-4 text-sm leading-6 text-slate-300 md:text-base">
-            Students are verified against roster. Alumni submit any university
-            document for admin approval. Everyone must upload a profile photo.
+            Fill the single member form. Admin approval is required before your
+            profile becomes visible in public directory.
           </p>
 
           <div className="mt-8 grid grid-cols-1 gap-3">
-            <InfoCard label="Student" value="Roster-based verification" />
-            <InfoCard label="Alumni" value="University document review" />
+            <InfoCard label="Single Form" value="No separate Student/Alumni tab" />
+            <InfoCard
+              label="Occupation Logic"
+              value="Student হলে professional details disabled"
+            />
             <InfoCard
               label="Public View"
-              value="Photo, name, department, session"
+              value="Photo, name, subject, session, occupation"
+            />
+            <InfoCard
+              label="Admin Approval"
+              value="Registration and profile update need approval"
             />
           </div>
         </aside>
 
         <section className="rounded-3xl bg-white p-4 shadow-soft sm:p-6 md:p-8">
-          <div className="flex flex-col gap-4 border-b border-slate-200 pb-5 md:flex-row md:items-center md:justify-between">
-            <div>
-              <h2 className="text-2xl font-bold text-slate-950">{title}</h2>
-              <p className="mt-1 text-sm text-slate-500">
-                Fill all required information.
-              </p>
-            </div>
+          <div className="border-b border-slate-200 pb-5">
+            <h2 className="text-2xl font-bold text-slate-950">
+              Registration Form
+            </h2>
 
-            <div className="grid grid-cols-2 rounded-2xl bg-slate-100 p-1">
-              <button
-                type="button"
-                onClick={() => handleRoleChange('student')}
-                className={`min-h-12 rounded-xl px-4 text-sm font-semibold ${
-                  isStudent
-                    ? 'bg-white text-slate-950 shadow'
-                    : 'text-slate-500'
-                }`}
-              >
-                Student
-              </button>
-
-              <button
-                type="button"
-                onClick={() => handleRoleChange('alumni')}
-                className={`min-h-12 rounded-xl px-4 text-sm font-semibold ${
-                  isAlumni
-                    ? 'bg-white text-slate-950 shadow'
-                    : 'text-slate-500'
-                }`}
-              >
-                Alumni
-              </button>
-            </div>
+            <p className="mt-1 text-sm text-slate-500">
+              Fields are based on the member information sheet.
+            </p>
           </div>
 
           {status.message ? (
             <StatusBox type={status.type} message={status.message} />
           ) : null}
 
-          <form onSubmit={handleRegistrationSubmit} className="mt-6 space-y-6">
-            <FormSection title="Account Information">
+          <form onSubmit={handleSubmit} className="mt-6 space-y-6">
+            <FormSection title="Basic Information">
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <TextInput
-                  label="Full Name"
+                  label="Full Name (In English as NID)"
                   name="fullName"
                   value={form.fullName}
                   onChange={updateField}
-                  placeholder="Your full name"
                   required
                 />
 
                 <TextInput
-                  label="Email Address"
-                  name="email"
-                  type="email"
-                  value={form.email}
+                  label="Nick Name"
+                  name="nickName"
+                  value={form.nickName}
                   onChange={updateField}
-                  required
                 />
 
                 <TextInput
-                  label="Contact Number"
+                  label="Date of Birth"
+                  name="dateOfBirth"
+                  type="date"
+                  value={form.dateOfBirth}
+                  onChange={updateField}
+                />
+
+                <SelectInput
+                  label="Gender"
+                  name="gender"
+                  value={form.gender}
+                  onChange={updateField}
+                  options={genderOptions}
+                  placeholder="Select gender"
+                />
+
+                <SelectInput
+                  label="Blood Group"
+                  name="bloodGroup"
+                  value={form.bloodGroup}
+                  onChange={updateField}
+                  options={bloodGroupOptions}
+                  placeholder="Select blood group"
+                />
+
+                <TextInput
+                  label="Mobile Number"
                   name="contactNumber"
                   type="tel"
                   value={form.contactNumber}
@@ -193,12 +360,20 @@ export default function RegistrationPage() {
                 />
 
                 <TextInput
-                  label="Department Name"
-                  name="departmentName"
-                  value={form.departmentName}
+                  label="Email"
+                  name="email"
+                  type="email"
+                  value={form.email}
                   onChange={updateField}
-                  placeholder="cse"
                   required
+                />
+
+                <TextInput
+                  label="Facebook Profile Link (If any)"
+                  name="facebookProfileLink"
+                  value={form.facebookProfileLink}
+                  onChange={updateField}
+                  placeholder="https://facebook.com/..."
                 />
 
                 <FileInput
@@ -229,115 +404,208 @@ export default function RegistrationPage() {
               </div>
             </FormSection>
 
-            <FormSection title="Address & Session">
+            <FormSection title="University Information">
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                <TextInput
-                  label="Academic Session"
-                  name="academicSession"
-                  value={form.academicSession}
+                <SelectInput
+                  label="University Hall Name"
+                  name="universityHallName"
+                  value={form.universityHallName}
                   onChange={updateField}
-                  placeholder="2020-21"
+                  options={hallOptions}
+                  placeholder="Select hall"
                   required
                 />
 
                 <TextInput
-                  label="Present Address"
-                  name="presentAddress"
-                  value={form.presentAddress}
+                  label="University First Year Admission Session"
+                  name="firstYearAdmissionSession"
+                  value={form.firstYearAdmissionSession}
                   onChange={updateField}
-                  placeholder="Current address"
+                  placeholder="2022-23"
                   required
                 />
 
                 <TextInput
-                  label="Permanent Address"
-                  name="permanentAddress"
-                  value={form.permanentAddress}
+                  label="University Subject / Department"
+                  name="universitySubject"
+                  value={form.universitySubject}
                   onChange={updateField}
-                  placeholder="Permanent address"
+                  placeholder="Software Engineering"
+                  required
+                />
+
+                <FileInput
+                  label="University Document"
+                  name="universityDocumentFile"
+                  accept="application/pdf,image/jpeg,image/png,image/webp"
+                  onChange={updateField}
                   required
                 />
               </div>
             </FormSection>
 
-            {isStudent ? (
-              <FormSection title="Student Information">
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                  <TextInput
-                    label="Roll Number"
-                    name="rollNumber"
-                    value={form.rollNumber}
-                    onChange={updateField}
-                    required
-                  />
+            <FormSection title="Academic Qualification">
+              <div className="space-y-4">
+                {form.academicQualifications.map((qualification, index) => (
+                  <div
+                    key={index}
+                    className="rounded-2xl border border-slate-200 bg-slate-50 p-4"
+                  >
+                    <div className="mb-4 flex items-center justify-between gap-3">
+                      <h4 className="text-sm font-bold text-slate-900">
+                        Qualification {index + 1}
+                      </h4>
 
-                  <TextInput
-                    label="Current Semester"
-                    name="currentSemester"
-                    type="number"
-                    min="1"
-                    max="12"
-                    value={form.currentSemester}
-                    onChange={updateField}
-                    required
-                  />
-                </div>
-              </FormSection>
-            ) : null}
+                      <button
+                        type="button"
+                        onClick={() => removeQualification(index)}
+                        disabled={form.academicQualifications.length === 1}
+                        className="rounded-xl border border-red-200 px-3 py-2 text-xs font-bold text-red-600 disabled:cursor-not-allowed disabled:opacity-40"
+                      >
+                        Remove
+                      </button>
+                    </div>
 
-            {isAlumni ? (
-              <FormSection title="Alumni Information">
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                  <TextInput
-                    label="Registration Number"
-                    name="registrationNo"
-                    value={form.registrationNo}
-                    onChange={updateField}
-                    required
-                  />
+                    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                      <SelectInput
+                        label="Degree Name"
+                        name="degreeName"
+                        value={qualification.degreeName}
+                        onChange={(name, value) =>
+                          updateQualification(index, name, value)
+                        }
+                        options={degreeOptions}
+                        placeholder="Select degree"
+                      />
 
-                  <TextInput
-                    label="Graduation Year"
-                    name="graduationYear"
-                    type="number"
-                    value={form.graduationYear}
-                    onChange={updateField}
-                    required
-                  />
+                      <TextInput
+                        label="Institution Name"
+                        name="institutionName"
+                        value={qualification.institutionName}
+                        onChange={(name, value) =>
+                          updateQualification(index, name, value)
+                        }
+                        placeholder="University of Dhaka"
+                      />
 
-                  <TextInput
-                    label="Hall"
-                    name="hall"
-                    value={form.hall}
-                    onChange={updateField}
-                    placeholder="Fazlul Huq Muslim Hall"
-                    required
-                  />
+                      <TextInput
+                        label="Passing Year"
+                        name="passingYear"
+                        value={qualification.passingYear}
+                        onChange={(name, value) =>
+                          updateQualification(index, name, value)
+                        }
+                        placeholder={
+                          isStudentOccupation ? 'current student' : '2024'
+                        }
+                      />
 
-                  <TextInput
-                    label="Current Company"
-                    name="currentCompany"
-                    value={form.currentCompany}
-                    onChange={updateField}
-                  />
+                      <TextInput
+                        label="Subject / Department"
+                        name="subjectDepartment"
+                        value={qualification.subjectDepartment}
+                        onChange={(name, value) =>
+                          updateQualification(index, name, value)
+                        }
+                        placeholder="Marketing"
+                      />
 
-                  <TextInput
-                    label="Designation"
-                    name="designation"
-                    value={form.designation}
-                    onChange={updateField}
-                  />
+                      <TextInput
+                        label="Academic Degree Name"
+                        name="academicDegreeName"
+                        value={qualification.academicDegreeName}
+                        onChange={(name, value) =>
+                          updateQualification(index, name, value)
+                        }
+                        placeholder="BBA / MBA / SSC / HSC"
+                      />
+                    </div>
+                  </div>
+                ))}
 
-                  <FileInput
-                    label="Any University Document"
-                    name="universityDocumentFile"
-                    accept="application/pdf,image/jpeg,image/png,image/webp"
-                    onChange={updateField}
-                    required
-                  />
-                </div>
-              </FormSection>
-            ) : null}
+                <button
+                  type="button"
+                  onClick={addQualification}
+                  className="min-h-12 rounded-2xl border border-emerald-300 bg-emerald-50 px-5 text-sm font-bold text-emerald-700 hover:bg-emerald-100"
+                >
+                  + Add Qualification
+                </button>
+              </div>
+            </FormSection>
+
+            <FormSection title="Address in Abhaynagar">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+                <SelectInput
+                  label="Union / Pouroshova Name"
+                  name="unionPouroshovaName"
+                  value={form.unionPouroshovaName}
+                  onChange={updateField}
+                  options={unionOptions}
+                  placeholder="Select union/pouroshova"
+                  required
+                />
+
+                <TextInput
+                  label="Ward / Village Name"
+                  name="wardVillageName"
+                  value={form.wardVillageName}
+                  onChange={updateField}
+                />
+
+                <TextInput
+                  label="Para / Moholla Name"
+                  name="paraMohollaName"
+                  value={form.paraMohollaName}
+                  onChange={updateField}
+                />
+              </div>
+            </FormSection>
+
+            <FormSection title="Present Address">
+              <TextArea
+                label="Present Address"
+                name="presentAddress"
+                value={form.presentAddress}
+                onChange={updateField}
+                required
+              />
+            </FormSection>
+
+            <FormSection title="Occupation">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <SelectInput
+                  label="Occupation"
+                  name="occupation"
+                  value={form.occupation}
+                  onChange={updateField}
+                  options={occupationOptions}
+                  required
+                />
+
+                <TextArea
+                  label="Professional Details"
+                  name="professionalDetails"
+                  value={form.professionalDetails}
+                  onChange={updateField}
+                  disabled={isStudentOccupation}
+                  placeholder={
+                    isStudentOccupation
+                      ? 'Disabled for students'
+                      : 'Write job/professional details'
+                  }
+                />
+              </div>
+            </FormSection>
+
+            <FormSection title="Memories and Stories">
+              <TextArea
+                label="Please Share Your Valuable Memories and Stories from Life"
+                name="lifeStory"
+                value={form.lifeStory}
+                onChange={updateField}
+                rows={5}
+              />
+            </FormSection>
 
             <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
               <label className="flex cursor-pointer items-start gap-3">
@@ -353,8 +621,7 @@ export default function RegistrationPage() {
 
                 <span className="text-sm leading-6 text-slate-700">
                   I agree that the portal may process my personal data for
-                  registration, verification, directory, career and mentorship
-                  services.
+                  registration, verification, directory and association services.
                 </span>
               </label>
             </div>
@@ -428,8 +695,7 @@ function TextInput({
   type = 'text',
   required = false,
   placeholder = '',
-  min,
-  max,
+  disabled = false,
 }) {
   return (
     <label className="block">
@@ -441,14 +707,79 @@ function TextInput({
       <input
         name={name}
         type={type}
-        value={value}
+        value={value || ''}
         required={required}
+        disabled={disabled}
         placeholder={placeholder}
-        min={min}
-        max={max}
+        onChange={(event) => onChange(name, event.target.value)}
+        className="min-h-12 w-full rounded-2xl border border-slate-300 bg-white px-4 text-sm outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400"
+      />
+    </label>
+  );
+}
+
+function TextArea({
+  label,
+  name,
+  value,
+  onChange,
+  required = false,
+  placeholder = '',
+  disabled = false,
+  rows = 4,
+}) {
+  return (
+    <label className="block">
+      <span className="mb-1.5 block text-sm font-semibold text-slate-700">
+        {label}
+        {required ? <span className="text-red-500"> *</span> : null}
+      </span>
+
+      <textarea
+        name={name}
+        rows={rows}
+        value={value || ''}
+        required={required}
+        disabled={disabled}
+        placeholder={placeholder}
+        onChange={(event) => onChange(name, event.target.value)}
+        className="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400"
+      />
+    </label>
+  );
+}
+
+function SelectInput({
+  label,
+  name,
+  value,
+  onChange,
+  options,
+  required = false,
+  placeholder = '',
+}) {
+  return (
+    <label className="block">
+      <span className="mb-1.5 block text-sm font-semibold text-slate-700">
+        {label}
+        {required ? <span className="text-red-500"> *</span> : null}
+      </span>
+
+      <select
+        name={name}
+        value={value || ''}
+        required={required}
         onChange={(event) => onChange(name, event.target.value)}
         className="min-h-12 w-full rounded-2xl border border-slate-300 bg-white px-4 text-sm outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100"
-      />
+      >
+        {placeholder ? <option value="">{placeholder}</option> : null}
+
+        {options.map((item) => (
+          <option key={item} value={item}>
+            {item}
+          </option>
+        ))}
+      </select>
     </label>
   );
 }
