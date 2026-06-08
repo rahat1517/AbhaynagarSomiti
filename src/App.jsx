@@ -412,7 +412,7 @@ function NavLinks({
         </>
       ) : null}
 
-      <NavItem to="/privacy" className={itemClass} onClick={onNavigate}>
+      {/* <NavItem to="/privacy" className={itemClass} onClick={onNavigate}>
         Privacy
       </NavItem>
 
@@ -422,7 +422,7 @@ function NavLinks({
         onClick={onNavigate}
       >
         Visibility
-      </NavItem>
+      </NavItem> */}
 
       {isAdmin ? (
         <>

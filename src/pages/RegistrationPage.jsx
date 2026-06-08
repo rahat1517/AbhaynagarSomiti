@@ -413,14 +413,22 @@ export default function RegistrationPage() {
                   value={form.nickName}
                   onChange={updateField}
                 />
+                
+              <TextInput
+                label="Birth Month"
+                name="birthMonth"
+                value={form.birthMonth}
+                onChange={updateField}
+                placeholder="06"
+              />
 
-                <TextInput
-                  label="Date of Birth"
-                  name="dateOfBirth"
-                  value={form.dateOfBirth}
-                  onChange={updateField}
-                  placeholder="MM-DD, e.g. 06-09"
-                />
+              <TextInput
+                label="Birth Day"
+                name="birthDay"
+                value={form.birthDay}
+                onChange={updateField}
+                placeholder="09"
+              />
 
                 <SelectInput
                   label="Gender"
