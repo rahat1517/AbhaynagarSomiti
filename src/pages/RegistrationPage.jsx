@@ -551,11 +551,11 @@ export default function RegistrationPage() {
                     />
 
                     <TextInput
-                      label="Passing Year"
+                      label="Passing Year / Current Year"
                       name="bachelorPassingYear"
                       value={form.bachelorPassingYear}
                       onChange={updateField}
-                      placeholder="2026"
+                      placeholder="2026 or 1st Year"
                       required
                     />
                   </div>
