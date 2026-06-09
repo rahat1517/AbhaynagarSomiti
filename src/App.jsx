@@ -206,7 +206,7 @@ function AppLayout() {
             onClick={closeMobileMenu}
             className="text-sm font-bold text-slate-950"
           >
-            Abhaynagar Somiti
+            Dhabi Abhaynagar Poribar
           </Link>
 
           <div className="hidden items-center gap-1 md:flex">

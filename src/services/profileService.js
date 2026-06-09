@@ -161,10 +161,10 @@ export async function requestMyUniversityDocumentUpdate(file) {
     throw new Error('Authentication required.');
   }
 
-  const documentPath = await uploadUniversityDocument({
-    userId: user.id,
-    file,
-  });
+  // const documentPath = await uploadUniversityDocument({
+  //   userId: user.id,
+  //   file,
+  // });
 
   const { data, error } = await supabase.rpc('request_member_profile_update', {
     p_requested_data: {

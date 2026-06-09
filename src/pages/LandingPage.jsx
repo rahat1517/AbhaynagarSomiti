@@ -87,27 +87,72 @@ export default function LandingPage() {
 
   return (
     <main className="min-h-screen bg-slate-50 text-slate-900">
-      <section className="px-4 py-5 sm:px-6 sm:py-8 lg:px-8">
+      <section className="px-4 pb-12 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl">
+          <section className="overflow-hidden rounded-[1.75rem] border border-slate-200 bg-white shadow-soft">
+            <div className="relative overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-emerald-950 p-5 text-white sm:p-8 lg:p-10">
+              <div className="absolute right-0 top-0 h-full w-1/2 bg-[radial-gradient(circle_at_top_right,rgba(16,185,129,0.24),transparent_45%)]" />
+
+              <div className="relative max-w-4xl">
+                <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-emerald-300 sm:text-xs sm:tracking-[0.35em]">
+                  About Dhabi Abhaynagar Poribar
+                </p>
+
+                <h2 className="mt-4 text-2xl font-black leading-tight sm:text-4xl lg:text-5xl">
+                  Dhabi Abhaynagar Poribar - Student and Alumni Community
+                </h2>
+
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 gap-4 p-4 sm:gap-6 sm:p-7 lg:grid-cols-[1.15fr_0.85fr] lg:p-10">
+              <div className="rounded-[1.5rem] border border-slate-200 bg-slate-50 p-5 sm:p-7">
+                <p className="text-sm font-bold text-emerald-700">
+                  ঢাকা বিশ্ববিদ্যালয় সংশ্লিষ্ট সামাজিক সংগঠন
+                </p>
+
+                <h3 className="mt-3 text-2xl font-black leading-tight text-slate-950 sm:text-3xl">
+                  ঢাবি অভয়নগর পরিবার
+                </h3>
+
+                <p className="mt-3 text-base font-semibold leading-8 text-slate-700 sm:text-lg">
+                  অভয়নগরের সন্তান, ঢাকা বিশ্ববিদ্যালয়ের শিক্ষার্থী একসাথে
+                  এগিয়ে চলার প্রতিশ্রুতি।
+                </p>
+
+                <p className="mt-5 text-sm leading-7 text-slate-600 sm:text-base sm:leading-8">
+                  ঢাবি অভয়নগর পরিবার হলো অভয়নগরের বাসিন্দা যারা ঢাকা
+                  বিশ্ববিদ্যালয়ে অধ্যয়নরত আছেন বা ছিলেন এমন সকল প্রাক্তন ও
+                  বর্তমান শিক্ষার্থীদের নিয়ে গঠিত একটি সামাজিক ও সহযোগিতামূলক
+                  সংগঠন। আমাদের এই প্ল্যাটফর্মটি মূলত শিক্ষার্থীদের সাথে এলাকার
+                  মানুষের যোগাযোগের একটি কার্যকর মাধ্যম।
+                </p>
+              </div>
+
+              <div className="rounded-[1.5rem] border border-emerald-100 bg-emerald-50 p-5 sm:p-7">
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-600 text-xl font-black text-white shadow-sm">
+                  স্বপ্ন
+                </div>
+
+                <h3 className="mt-4 text-2xl font-black text-slate-950">
+                  আমাদের স্বপ্ন
+                </h3>
+
+                <p className="mt-4 text-sm leading-7 text-slate-700 sm:text-base sm:leading-8">
+                  অভয়নগরের প্রতিটি শিক্ষার্থী যেন ঢাকা বিশ্ববিদ্যালয়ে নিরাপদ,
+                  সুন্দর এবং সফল জীবন গড়তে পারে এবং ভবিষ্যতে নিজের এলাকা ও
+                  দেশের জন্য অবদান রাখতে সক্ষম হয়।
+                </p>
+              </div>
+            </div>
+          </section>
+          <section className="px-4 py-5 sm:px-6 sm:py-8 lg:px-8">
         <div className="mx-auto grid max-w-7xl grid-cols-1 gap-5 lg:grid-cols-[0.95fr_1.05fr] lg:items-stretch">
           <div className="relative overflow-hidden rounded-[1.75rem] bg-slate-950 p-5 text-white shadow-soft sm:p-8 lg:p-9">
             <div className="absolute -right-16 -top-16 h-44 w-44 rounded-full bg-emerald-500/20 blur-2xl" />
             <div className="absolute -bottom-20 -left-20 h-52 w-52 rounded-full bg-cyan-500/10 blur-3xl" />
 
             <div className="relative">
-              <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-emerald-300 sm:text-xs sm:tracking-[0.35em]">
-                Student Alumni Association
-              </p>
-
-              <h1 className="mt-4 max-w-2xl text-3xl font-black leading-tight sm:text-4xl lg:text-5xl">
-                Connect Current Students and Alumni by Session
-              </h1>
-
-              <p className="mt-4 max-w-xl text-sm leading-7 text-slate-300 sm:text-base">
-                Public visitors can see verified members by name, department,
-                session and occupation only. Full details are available after
-                login according to privacy rules.
-              </p>
-
               <div className="mt-6 grid grid-cols-2 gap-3">
                 <SummaryCard label="Current Students" value={studentCount} />
                 <SummaryCard label="Alumni" value={alumniCount} />
@@ -202,72 +247,6 @@ export default function LandingPage() {
           </form>
         </div>
       </section>
-
-      <section className="px-4 pb-12 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-7xl">
-          <section className="overflow-hidden rounded-[1.75rem] border border-slate-200 bg-white shadow-soft">
-            <div className="relative overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-emerald-950 p-5 text-white sm:p-8 lg:p-10">
-              <div className="absolute right-0 top-0 h-full w-1/2 bg-[radial-gradient(circle_at_top_right,rgba(16,185,129,0.24),transparent_45%)]" />
-
-              <div className="relative max-w-4xl">
-                <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-emerald-300 sm:text-xs sm:tracking-[0.35em]">
-                  About Dhabi Abhaynagar Poribar
-                </p>
-
-                <h2 className="mt-4 text-2xl font-black leading-tight sm:text-4xl lg:text-5xl">
-                  DU Abhaynagar Poribar and Student Alumni Community
-                </h2>
-
-                <p className="mt-4 max-w-3xl text-sm leading-7 text-slate-300 sm:text-base">
-                  Dhabi Abhaynagar Poribar helps Abhaynagar students, alumni,
-                  and verified community members stay connected through a secure
-                  online directory, profile system, privacy controls, and career
-                  networking features.
-                </p>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 gap-4 p-4 sm:gap-6 sm:p-7 lg:grid-cols-[1.15fr_0.85fr] lg:p-10">
-              <div className="rounded-[1.5rem] border border-slate-200 bg-slate-50 p-5 sm:p-7">
-                <p className="text-sm font-bold text-emerald-700">
-                  ঢাকা বিশ্ববিদ্যালয় সংশ্লিষ্ট সামাজিক সংগঠন
-                </p>
-
-                <h3 className="mt-3 text-2xl font-black leading-tight text-slate-950 sm:text-3xl">
-                  ঢাবি অভয়নগর পরিবার
-                </h3>
-
-                <p className="mt-3 text-base font-semibold leading-8 text-slate-700 sm:text-lg">
-                  অভয়নগরের সন্তান — ঢাকা বিশ্ববিদ্যালয়ের শিক্ষার্থী। একসাথে
-                  এগিয়ে চলার প্রতিশ্রুতি।
-                </p>
-
-                <p className="mt-5 text-sm leading-7 text-slate-600 sm:text-base sm:leading-8">
-                  ঢাবি অভয়নগর পরিবার হলো অভয়নগরের বাসিন্দা যারা ঢাকা
-                  বিশ্ববিদ্যালয়ে অধ্যয়নরত আছেন বা ছিলেন — এমন সকল প্রাক্তন ও
-                  বর্তমান শিক্ষার্থীদের নিয়ে গঠিত একটি সামাজিক ও সহযোগিতামূলক
-                  সংগঠন। আমাদের এই প্ল্যাটফর্মটি মূলত শিক্ষার্থীদের সাথে এলাকার
-                  মানুষের যোগাযোগের একটি কার্যকর মাধ্যম।
-                </p>
-              </div>
-
-              <div className="rounded-[1.5rem] border border-emerald-100 bg-emerald-50 p-5 sm:p-7">
-                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-600 text-xl font-black text-white shadow-sm">
-                  স্ব
-                </div>
-
-                <h3 className="mt-4 text-2xl font-black text-slate-950">
-                  আমাদের স্বপ্ন
-                </h3>
-
-                <p className="mt-4 text-sm leading-7 text-slate-700 sm:text-base sm:leading-8">
-                  অভয়নগরের প্রতিটি শিক্ষার্থী যেন ঢাকা বিশ্ববিদ্যালয়ে নিরাপদ,
-                  সুন্দর এবং সফল জীবন গড়তে পারে এবং ভবিষ্যতে নিজের এলাকা ও
-                  দেশের জন্য অবদান রাখতে সক্ষম হয়।
-                </p>
-              </div>
-            </div>
-          </section>
 
           <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
             <div>

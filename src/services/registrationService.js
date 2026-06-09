@@ -1,80 +1,19 @@
 import { supabase } from '../lib/supabaseClient';
+import {
+  signInWithEmailPassword,
+  signUpWithEmailPassword,
+} from './authService';
+import {
+  uploadProfilePhoto,
+  uploadUniversityDocument,
+} from './verificationService';
 
-const PROFILE_PHOTO_BUCKET = 'profile-photos';
-
-function cleanText(value) {
-  if (value === undefined || value === null) return null;
-
-  const trimmed = String(value).trim();
-  return trimmed.length > 0 ? trimmed : null;
+function normalizeEmail(email) {
+  return String(email || '').trim().toLowerCase();
 }
 
-function getFileExtension(fileName = '') {
-  const parts = fileName.split('.');
-  return parts.length > 1 ? parts.pop().toLowerCase() : '';
-}
-
-async function uploadProfilePhoto({ userId, file }) {
-  if (!userId) {
-    throw new Error('User ID is required.');
-  }
-
-  if (!file) {
-    return null;
-  }
-
-  const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
-
-  if (!allowedTypes.includes(file.type)) {
-    throw new Error('Only JPG, PNG, or WEBP profile photo is allowed.');
-  }
-
-  if (file.size > 5 * 1024 * 1024) {
-    throw new Error('Profile photo must be 5MB or smaller.');
-  }
-
-  const timestamp = Date.now();
-  const extension = getFileExtension(file.name) || 'jpg';
-  const safeFileName = `profile-${timestamp}.${extension}`;
-  const storagePath = `${userId}/${safeFileName}`;
-
-  const { data, error } = await supabase.storage
-    .from(PROFILE_PHOTO_BUCKET)
-    .upload(storagePath, file, {
-      contentType: file.type,
-      cacheControl: '3600',
-      upsert: true,
-    });
-
-  if (error) {
-    console.error('uploadProfilePhoto error:', error);
-    throw new Error(error.message);
-  }
-
-  const { data: publicUrlData } = supabase.storage
-    .from(PROFILE_PHOTO_BUCKET)
-    .getPublicUrl(data.path);
-
-  return publicUrlData.publicUrl;
-}
-
-/**
- * University Document disabled.
- * এগুলো রাখা হয়েছে যেন old import থাকলেও error না দেয়।
- */
-export async function uploadUniversityDocument() {
-  return null;
-}
-
-export async function getSignedUniversityDocumentUrl() {
-  return null;
-}
-
-export async function requestMyUniversityDocumentUpdate() {
-  return {
-    success: true,
-    message: 'University document update is disabled.',
-  };
+function isStudentOccupation(occupation) {
+  return String(occupation || '').trim().toLowerCase() === 'student';
 }
 
 function validateRegistrationForm(form) {
@@ -176,111 +115,55 @@ export async function registerAssociationUser(form) {
     throw new Error('User registration failed. Please try again.');
   }
 
-  let profilePhotoUrl = null;
-
-  if (form.profilePhotoFile) {
-    profilePhotoUrl = await uploadProfilePhoto({
-      userId,
-      file: form.profilePhotoFile,
-    });
-  }
-
-  const isStudent =
-    cleanText(form.occupation)?.toLowerCase() === 'student' ||
-    !cleanText(form.occupation);
-
-  const profilePayload = {
-    id: userId,
+  const activeUser = await ensureActiveSession({
     email,
+    password: form.password,
+  });
 
-    // IMPORTANT:
-    // role এখানে set করা হচ্ছে না।
-    // কারণ profiles.role enum app_role হতে পারে, যেখানে 'member' valid না।
-    // Admin verification SQL non-admin user ধরে pending list দেখাবে।
+  const profilePhotoUrl = await uploadProfilePhoto({
+    userId: activeUser.id,
+    file: form.profilePhotoFile,
+  });
 
-    full_name: cleanText(form.fullName),
-    nick_name: cleanText(form.nickName),
+  const documentPath = await uploadUniversityDocument({
+    userId: activeUser.id,
+    file: form.universityDocumentFile,
+  });
 
-    date_of_birth: dateOfBirth,
-    birth_month: form.birthMonth,
-    birth_day: form.birthDay,
+  const studentOccupation = isStudentOccupation(form.occupation);
 
-    gender: cleanText(form.gender),
-    blood_group: cleanText(form.bloodGroup),
+  const { data, error } = await supabase.rpc('create_member_registration', {
+    p_email: email,
+    p_full_name: form.fullName,
+    p_profile_photo_url: profilePhotoUrl,
 
-    contact_number: cleanText(form.contactNumber),
-    facebook_profile_link: cleanText(form.facebookProfileLink),
-    profile_photo_url: profilePhotoUrl,
+    p_nick_name: form.nickName || '',
+    p_date_of_birth: form.dateOfBirth || null,
+    p_gender: form.gender || '',
+    p_blood_group: form.bloodGroup || '',
+
+    p_contact_number: form.contactNumber,
+    p_facebook_profile_link: form.facebookProfileLink || '',
 
     university_hall_name: cleanText(form.universityHallName),
     first_year_admission_session: cleanText(form.firstYearAdmissionSession),
     university_subject: cleanText(form.universitySubject),
 
-    // University document disabled
-    university_document_url: null,
-
-    ssc_institution_name: cleanText(form.sscInstitutionName),
-    ssc_group: cleanText(form.sscGroup),
-    ssc_passing_year: cleanText(form.sscPassingYear),
-    ssc_gpa: cleanText(form.sscGpa),
-
-    hsc_institution_name: cleanText(form.hscInstitutionName),
-    hsc_group: cleanText(form.hscGroup),
-    hsc_passing_year: cleanText(form.hscPassingYear),
-    hsc_gpa: cleanText(form.hscGpa),
-
-    union_pouroshova_name: cleanText(form.unionPouroshovaName),
-    ward_village_name: cleanText(form.wardVillageName),
-    para_moholla_name: cleanText(form.paraMohollaName),
+    p_union_pouroshova_name: form.unionPouroshovaName,
+    p_ward_village_name: form.wardVillageName || '',
+    p_para_moholla_name: form.paraMohollaName || '',
 
     present_address: cleanText(form.presentAddress),
 
-    occupation: cleanText(form.occupation) || 'Student',
-    professional_details: isStudent ? null : cleanText(form.professionalDetails),
+    p_occupation: form.occupation,
+    p_professional_details: studentOccupation ? '' : form.professionalDetails,
 
-    life_story: cleanText(form.lifeStory),
+    p_university_document_url: documentPath,
+    p_academic_qualifications: mapAcademicQualifications(form),
 
-    pdpo_consent: Boolean(form.pdpoConsent),
-    pdpo_consent_timestamp: new Date().toISOString(),
-
-    verification_status: 'pending',
-    is_approved: false,
-  };
-
-  const { data: profileData, error: profileError } = await supabase
-    .from('profiles')
-    .upsert(profilePayload, {
-      onConflict: 'id',
-    })
-    .select()
-    .single();
-
-  if (profileError) {
-    console.error('profile registration error:', profileError);
-    throw new Error(profileError.message);
-  }
-
-  const degreeRows = (form.degreeQualifications || [])
-    .filter((item) => {
-      return (
-        cleanText(item.degreeName) ||
-        cleanText(item.institutionName) ||
-        cleanText(item.subjectDepartment) ||
-        cleanText(item.passingYear)
-      );
-    })
-    .map((item) => ({
-      profile_id: userId,
-      degree_name: cleanText(item.degreeName),
-      institution_name: cleanText(item.institutionName),
-      subject_department: cleanText(item.subjectDepartment),
-      passing_year: cleanText(item.passingYear),
-    }));
-
-  const { error: deleteDegreeError } = await supabase
-    .from('member_degree_qualifications')
-    .delete()
-    .eq('profile_id', userId);
+    p_life_story: form.lifeStory || '',
+    p_pdpo_consent: form.pdpoConsent,
+  });
 
   if (deleteDegreeError) {
     console.error('delete old degree qualifications error:', deleteDegreeError);

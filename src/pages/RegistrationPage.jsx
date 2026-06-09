@@ -376,40 +376,7 @@ export default function RegistrationPage() {
             </p>
           </div>
 
-          <div className="space-y-4 p-5 sm:p-7 lg:p-8">
-            <div className="rounded-[1.5rem] border border-white/10 bg-white/5 p-5 backdrop-blur">
-              <p className="text-xs font-bold uppercase tracking-[0.28em] text-emerald-300">
-                Member Registration
-              </p>
-
-              <h2 className="mt-3 text-2xl font-black leading-tight">
-                Join the verified community
-              </h2>
-
-              <p className="mt-3 text-sm leading-6 text-slate-300">
-                Please complete the registration form to join the association
-                portal. All submissions will be reviewed and approved by the
-                admin before being published in the public directory.
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 gap-3 text-sm text-slate-300 sm:grid-cols-3 xl:grid-cols-1">
-              <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-                <p className="font-bold text-white">Step 01</p>
-                <p className="mt-1">Submit your member information.</p>
-              </div>
-
-              <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-                <p className="font-bold text-white">Step 02</p>
-                <p className="mt-1">Admin verifies your profile details.</p>
-              </div>
-
-              <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-                <p className="font-bold text-white">Step 03</p>
-                <p className="mt-1">Approved profile appears in the directory.</p>
-              </div>
-            </div>
-          </div>
+  
         </aside>
 
         <section className="overflow-hidden rounded-[1.75rem] border border-slate-200 bg-white shadow-soft">
