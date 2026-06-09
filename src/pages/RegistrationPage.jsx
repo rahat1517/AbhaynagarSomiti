@@ -567,24 +567,10 @@ export default function RegistrationPage() {
                 </div>
 
                 <div className="rounded-2xl border border-slate-200 bg-white p-3 sm:p-4">
-                  <div className="mb-4">
-                    <h4 className="text-sm font-bold text-slate-900 sm:text-base">
-                      Higher Degree Information
-                    </h4>
-
-                    <p className="mt-1 text-xs leading-5 text-slate-500 sm:text-sm">
-                      Higher degree is optional. Add Masters, MPhil, PhD, DBA or
-                      other higher qualification if applicable.
-                    </p>
-                  </div>
+                  
 
                   <div className="space-y-4">
-                    {form.higherDegreeQualifications.length === 0 ? (
-                      <p className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-4 text-sm text-slate-500">
-                        No higher degree added yet. Click Add Higher Degree if
-                        you want to add one.
-                      </p>
-                    ) : null}
+                    
 
                     {form.higherDegreeQualifications.map((qualification, index) => (
                       <div
@@ -593,7 +579,7 @@ export default function RegistrationPage() {
                       >
                         <div className="mb-4 flex items-center justify-between gap-3">
                           <h5 className="text-sm font-bold text-slate-900 sm:text-base">
-                            Higher Degree {index + 1}
+                            Degree {index + 1}
                           </h5>
 
                           <button
@@ -614,7 +600,7 @@ export default function RegistrationPage() {
                               updateHigherDegreeQualification(index, name, value)
                             }
                             options={higherDegreeOptions}
-                            placeholder="Select higher degree"
+                            placeholder="Select Degree"
                           />
 
                           <TextInput
@@ -624,7 +610,7 @@ export default function RegistrationPage() {
                             onChange={(name, value) =>
                               updateHigherDegreeQualification(index, name, value)
                             }
-                            placeholder="University of Dhaka"
+                            placeholder="University of Oxford"
                           />
 
                           <TextInput
@@ -634,7 +620,7 @@ export default function RegistrationPage() {
                             onChange={(name, value) =>
                               updateHigherDegreeQualification(index, name, value)
                             }
-                            placeholder="Software Engineering"
+                            placeholder="Computer Science"
                           />
 
                           <TextInput
