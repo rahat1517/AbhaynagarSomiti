@@ -1,12 +1,13 @@
 import { supabase } from '../lib/supabaseClient';
 import {
-  signInWithEmailPassword,
-  signUpWithEmailPassword,
-} from './authService';
-import {
   uploadProfilePhoto,
   uploadUniversityDocument,
 } from './verificationService';
+
+function cleanText(value) {
+  if (value === undefined || value === null) return '';
+  return String(value).trim();
+}
 
 function normalizeEmail(email) {
   return String(email || '').trim().toLowerCase();
@@ -94,15 +95,54 @@ function validateRegistrationForm(form) {
   }
 }
 
+function mapAcademicQualifications(form) {
+  return [
+    {
+      level: 'SSC',
+      institution_name: cleanText(form.sscInstitutionName),
+      group_name: cleanText(form.sscGroup),
+      passing_year: cleanText(form.sscPassingYear),
+    },
+    {
+      level: 'HSC',
+      institution_name: cleanText(form.hscInstitutionName),
+      group_name: cleanText(form.hscGroup),
+      passing_year: cleanText(form.hscPassingYear),
+    },
+  ];
+}
+
+async function ensureActiveSession({ email, password }) {
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email,
+    password,
+  });
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  if (!data?.user?.id) {
+    throw new Error('User session could not be created.');
+  }
+
+  return data.user;
+}
+
 export async function registerAssociationUser(form) {
   validateRegistrationForm(form);
 
-  const email = cleanText(form.email);
+  const email = normalizeEmail(form.email);
   const dateOfBirth = `${form.birthMonth}-${form.birthDay}`;
 
   const { data: authData, error: authError } = await supabase.auth.signUp({
     email,
     password: form.password,
+    options: {
+      data: {
+        full_name: cleanText(form.fullName),
+      },
+    },
   });
 
   if (authError) {
@@ -134,57 +174,48 @@ export async function registerAssociationUser(form) {
 
   const { data, error } = await supabase.rpc('create_member_registration', {
     p_email: email,
-    p_full_name: form.fullName,
+    p_full_name: cleanText(form.fullName),
     p_profile_photo_url: profilePhotoUrl,
 
-    p_nick_name: form.nickName || '',
-    p_date_of_birth: form.dateOfBirth || null,
-    p_gender: form.gender || '',
-    p_blood_group: form.bloodGroup || '',
+    p_nick_name: cleanText(form.nickName),
+    p_date_of_birth: dateOfBirth,
+    p_gender: cleanText(form.gender),
+    p_blood_group: cleanText(form.bloodGroup),
 
-    p_contact_number: form.contactNumber,
-    p_facebook_profile_link: form.facebookProfileLink || '',
+    p_contact_number: cleanText(form.contactNumber),
+    p_facebook_profile_link: cleanText(form.facebookProfileLink),
 
-    university_hall_name: cleanText(form.universityHallName),
-    first_year_admission_session: cleanText(form.firstYearAdmissionSession),
-    university_subject: cleanText(form.universitySubject),
+    p_university_hall_name: cleanText(form.universityHallName),
+    p_first_year_admission_session: cleanText(form.firstYearAdmissionSession),
+    p_university_subject: cleanText(form.universitySubject),
 
-    p_union_pouroshova_name: form.unionPouroshovaName,
-    p_ward_village_name: form.wardVillageName || '',
-    p_para_moholla_name: form.paraMohollaName || '',
+    p_union_pouroshova_name: cleanText(form.unionPouroshovaName),
+    p_ward_village_name: cleanText(form.wardVillageName),
+    p_para_moholla_name: cleanText(form.paraMohollaName),
 
-    present_address: cleanText(form.presentAddress),
+    p_present_address: cleanText(form.presentAddress),
 
-    p_occupation: form.occupation,
-    p_professional_details: studentOccupation ? '' : form.professionalDetails,
+    p_occupation: cleanText(form.occupation),
+    p_professional_details: studentOccupation
+      ? ''
+      : cleanText(form.professionalDetails),
 
     p_university_document_url: documentPath,
     p_academic_qualifications: mapAcademicQualifications(form),
 
-    p_life_story: form.lifeStory || '',
-    p_pdpo_consent: form.pdpoConsent,
+    p_life_story: cleanText(form.lifeStory),
+    p_pdpo_consent: Boolean(form.pdpoConsent),
   });
 
-  if (deleteDegreeError) {
-    console.error('delete old degree qualifications error:', deleteDegreeError);
-    throw new Error(deleteDegreeError.message);
-  }
-
-  if (degreeRows.length > 0) {
-    const { error: degreeError } = await supabase
-      .from('member_degree_qualifications')
-      .insert(degreeRows);
-
-    if (degreeError) {
-      console.error('degree qualification insert error:', degreeError);
-      throw new Error(degreeError.message);
-    }
+  if (error) {
+    console.error('create_member_registration error:', error);
+    throw new Error(error.message);
   }
 
   return {
     success: true,
     message:
       'Registration submitted successfully. Please wait for admin approval.',
-    member: profileData,
+    memberRegistrationId: data,
   };
 }

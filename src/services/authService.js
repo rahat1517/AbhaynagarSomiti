@@ -82,7 +82,6 @@ export async function signInWithEmail(email, password) {
   let profile = await getProfileByUserId(user.id);
 
   if (!profile) {
-    console.warn('Auth user exists but profile row is missing.');
     profile = await createMissingProfile(user);
   }
 
