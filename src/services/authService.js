@@ -120,12 +120,15 @@ export async function signUpWithEmail(email, password, fullName = '') {
 
   const user = authData?.user;
 
+  let profile = null;
+
   if (user?.id) {
-    await createMissingProfile(user);
+    profile = await createMissingProfile(user);
   }
 
   return {
     user,
+    profile,
     session: authData.session,
   };
 }
@@ -193,3 +196,6 @@ export async function sendMagicLink(email) {
 
   return true;
 }
+
+export const signInWithEmailPassword = signInWithEmail;
+export const signUpWithEmailPassword = signUpWithEmail;
