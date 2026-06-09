@@ -1,12 +1,22 @@
 import { supabase } from '../lib/supabaseClient';
 
-export async function signUpWithEmailPassword({ email, password }) {
-  const normalizedEmail = String(email || '').trim().toLowerCase();
+function cleanEmail(email) {
+  return String(email || '').trim().toLowerCase();
+}
 
-  const { data, error } = await supabase.auth.signUp({
-    email: normalizedEmail,
-    password,
-  });
+function cleanText(value) {
+  if (value === undefined || value === null) return '';
+  return String(value).trim();
+}
+
+async function getProfileByUserId(userId) {
+  if (!userId) return null;
+
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('id', userId)
+    .maybeSingle();
 
   if (error) {
     throw new Error(error.message);
@@ -15,19 +25,109 @@ export async function signUpWithEmailPassword({ email, password }) {
   return data;
 }
 
-export async function signInWithEmailPassword({ email, password }) {
-  const normalizedEmail = String(email || '').trim().toLowerCase();
+async function createMissingProfile(user) {
+  if (!user?.id) {
+    throw new Error('User information is missing.');
+  }
 
-  const { data, error } = await supabase.auth.signInWithPassword({
-    email: normalizedEmail,
-    password,
-  });
+  const payload = {
+    id: user.id,
+    email: cleanEmail(user.email),
+    role: 'user',
+    full_name: cleanText(user.user_metadata?.full_name),
+  };
+
+  const { data, error } = await supabase
+    .from('profiles')
+    .upsert(payload, {
+      onConflict: 'id',
+    })
+    .select('*')
+    .maybeSingle();
 
   if (error) {
     throw new Error(error.message);
   }
 
   return data;
+}
+
+export async function signInWithEmail(email, password) {
+  const finalEmail = cleanEmail(email);
+
+  if (!finalEmail) {
+    throw new Error('Email is required.');
+  }
+
+  if (!password) {
+    throw new Error('Password is required.');
+  }
+
+  const { data: authData, error: authError } =
+    await supabase.auth.signInWithPassword({
+      email: finalEmail,
+      password,
+    });
+
+  if (authError) {
+    throw new Error(authError.message);
+  }
+
+  const user = authData?.user;
+
+  if (!user?.id) {
+    throw new Error('Login failed. User not found.');
+  }
+
+  let profile = await getProfileByUserId(user.id);
+
+  if (!profile) {
+    console.warn('Auth user exists but profile row is missing.');
+    profile = await createMissingProfile(user);
+  }
+
+  return {
+    user,
+    profile,
+    session: authData.session,
+  };
+}
+
+export async function signUpWithEmail(email, password, fullName = '') {
+  const finalEmail = cleanEmail(email);
+
+  if (!finalEmail) {
+    throw new Error('Email is required.');
+  }
+
+  if (!password) {
+    throw new Error('Password is required.');
+  }
+
+  const { data: authData, error: authError } = await supabase.auth.signUp({
+    email: finalEmail,
+    password,
+    options: {
+      data: {
+        full_name: cleanText(fullName),
+      },
+    },
+  });
+
+  if (authError) {
+    throw new Error(authError.message);
+  }
+
+  const user = authData?.user;
+
+  if (user?.id) {
+    await createMissingProfile(user);
+  }
+
+  return {
+    user,
+    session: authData.session,
+  };
 }
 
 export async function signOut() {
@@ -36,9 +136,11 @@ export async function signOut() {
   if (error) {
     throw new Error(error.message);
   }
+
+  return true;
 }
 
-export async function getCurrentSession() {
+export async function getSession() {
   const { data, error } = await supabase.auth.getSession();
 
   if (error) {
@@ -56,4 +158,38 @@ export async function getCurrentUser() {
   }
 
   return data.user;
+}
+
+export async function getCurrentProfile() {
+  const user = await getCurrentUser();
+
+  if (!user?.id) {
+    return null;
+  }
+
+  let profile = await getProfileByUserId(user.id);
+
+  if (!profile) {
+    profile = await createMissingProfile(user);
+  }
+
+  return profile;
+}
+
+export async function sendMagicLink(email) {
+  const finalEmail = cleanEmail(email);
+
+  if (!finalEmail) {
+    throw new Error('Email is required.');
+  }
+
+  const { error } = await supabase.auth.signInWithOtp({
+    email: finalEmail,
+  });
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return true;
 }
