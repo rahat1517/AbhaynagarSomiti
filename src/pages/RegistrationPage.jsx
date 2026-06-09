@@ -36,6 +36,7 @@ const unionOptions = [
   'Subharara Union',
   'Siddhipasha Union',
   'Baghutia Union',
+  'Noapara Paurashava',
   'Other',
 ];
 
@@ -79,7 +80,6 @@ const departmentOptions = [
   'Faculty of Medicine',
   'Faculty of Education',
   'Faculty of Postgraduate Medical Sciences & Research',
-
   'Institute of Education and Research',
   'Institute of Statistical Research and Training',
   'Institute of Business Administration',
@@ -93,7 +93,6 @@ const departmentOptions = [
   'Institute of Leather Engineering and Technology',
   'Confucius Institute',
   'Bangabandhu Sheikh Mujib Research Institute for Peace and Liberty',
-
   'Department of Accounting',
   'Department of Anthropology',
   'Department of Applied Chemistry & Chemical Engineering',
@@ -241,12 +240,7 @@ const initialForm = {
   hscPassingYear: '',
   hscGpa: '',
 
-  degreeQualifications: [
-    {
-      ...emptyDegreeQualification,
-      degreeName: 'Bachelor',
-    },
-  ],
+  degreeQualifications: [],
 
   unionPouroshovaName: '',
   wardVillageName: '',
@@ -316,18 +310,12 @@ export default function RegistrationPage() {
   }
 
   function removeDegreeQualification(index) {
-    setForm((current) => {
-      if (current.degreeQualifications.length === 1) {
-        return current;
-      }
-
-      return {
-        ...current,
-        degreeQualifications: current.degreeQualifications.filter(
-          (_item, itemIndex) => itemIndex !== index
-        ),
-      };
-    });
+    setForm((current) => ({
+      ...current,
+      degreeQualifications: current.degreeQualifications.filter(
+        (_item, itemIndex) => itemIndex !== index
+      ),
+    }));
   }
 
   async function handleSubmit(event) {
@@ -370,31 +358,73 @@ export default function RegistrationPage() {
   }
 
   return (
-    <main className="min-h-screen bg-slate-50 px-3 py-3 text-slate-900 sm:px-6 sm:py-6 lg:px-8">
-      <section className="mx-auto grid w-full max-w-7xl grid-cols-1 gap-4 lg:grid-cols-[0.85fr_1.5fr] lg:items-start lg:gap-6">
-        <aside className="rounded-2xl bg-slate-950 p-4 text-white shadow-soft sm:rounded-3xl sm:p-6 md:p-8 lg:sticky lg:top-8">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-300 sm:text-sm sm:tracking-[0.25em]">
-            Association Portal
-          </p>
+    <main className="min-h-screen bg-slate-50 px-4 py-5 text-slate-900 sm:px-6 sm:py-8 lg:px-8">
+      <section className="mx-auto grid w-full max-w-7xl grid-cols-1 gap-5 xl:grid-cols-[0.82fr_1.45fr] xl:items-start xl:gap-7">
+        <aside className="overflow-hidden rounded-[1.75rem] bg-slate-950 text-white shadow-soft xl:sticky xl:top-24">
+          <div className="relative overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-emerald-950 p-5 sm:p-7 lg:p-8">
+            <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-emerald-300 sm:text-xs sm:tracking-[0.3em]">
+              Registration
+            </p>
 
-          <h1 className="mt-3 text-2xl font-bold leading-tight sm:mt-4 sm:text-3xl md:text-4xl">
-            Member Registration
-          </h1>
+            <h1 className="mt-3 text-3xl font-black leading-tight sm:mt-4 sm:text-4xl">
+              Association Portal
+            </h1>
 
-          <p className="mt-3 text-sm leading-6 text-slate-300 sm:mt-4 md:text-base">
-            Fill the single member form. Admin approval is required before your
-            profile becomes visible in public directory.
-          </p>
+            <p className="mt-4 text-sm leading-6 text-slate-300 md:text-base">
+              Fill the single member form. Admin approval is required before
+              your profile becomes visible in the public directory.
+            </p>
+          </div>
+
+          <div className="space-y-4 p-5 sm:p-7 lg:p-8">
+            <div className="rounded-[1.5rem] border border-white/10 bg-white/5 p-5 backdrop-blur">
+              <p className="text-xs font-bold uppercase tracking-[0.28em] text-emerald-300">
+                Member Registration
+              </p>
+
+              <h2 className="mt-3 text-2xl font-black leading-tight">
+                Join the verified community
+              </h2>
+
+              <p className="mt-3 text-sm leading-6 text-slate-300">
+                Please complete the registration form to join the association
+                portal. All submissions will be reviewed and approved by the
+                admin before being published in the public directory.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 gap-3 text-sm text-slate-300 sm:grid-cols-3 xl:grid-cols-1">
+              <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+                <p className="font-bold text-white">Step 01</p>
+                <p className="mt-1">Submit your member information.</p>
+              </div>
+
+              <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+                <p className="font-bold text-white">Step 02</p>
+                <p className="mt-1">Admin verifies your profile details.</p>
+              </div>
+
+              <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+                <p className="font-bold text-white">Step 03</p>
+                <p className="mt-1">Approved profile appears in the directory.</p>
+              </div>
+            </div>
+          </div>
         </aside>
 
-        <section className="rounded-2xl bg-white p-3 shadow-soft sm:rounded-3xl sm:p-6 md:p-8">
-          <div className="border-b border-slate-200 pb-4 sm:pb-5">
-            <h2 className="text-xl font-bold text-slate-950 sm:text-2xl">
-              Registration Form
+        <section className="overflow-hidden rounded-[1.75rem] border border-slate-200 bg-white shadow-soft">
+          <div className="border-b border-slate-200 bg-gradient-to-r from-white to-emerald-50/60 p-5 sm:p-7 lg:p-8">
+            <p className="text-xs font-bold uppercase tracking-[0.25em] text-emerald-600">
+              Member Registration Form
+            </p>
+
+            <h2 className="mt-2 text-xl font-black text-slate-950 sm:text-2xl">
+              Submit your information for admin approval
             </h2>
 
-            <p className="mt-1 text-xs text-slate-500 sm:text-sm">
-              Fields are based on the member information sheet.
+            <p className="mt-2 text-xs leading-6 text-slate-500 sm:text-sm">
+              Complete the required fields carefully. Your profile will be
+              published only after verification by the admin team.
             </p>
           </div>
 
@@ -404,7 +434,7 @@ export default function RegistrationPage() {
 
           <form
             onSubmit={handleSubmit}
-            className="mt-4 space-y-4 sm:mt-6 sm:space-y-6"
+            className="space-y-4 p-4 sm:space-y-6 sm:p-6 lg:p-8"
           >
             <FormSection title="Basic Information">
               <div className="grid grid-cols-1 gap-3 sm:gap-4 md:grid-cols-2">
@@ -635,6 +665,13 @@ export default function RegistrationPage() {
                   </div>
 
                   <div className="space-y-4">
+                    {form.degreeQualifications.length === 0 ? (
+                      <p className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-4 text-sm text-slate-500">
+                        Higher degree is optional. Click Add Degree if you want
+                        to add one.
+                      </p>
+                    ) : null}
+
                     {form.degreeQualifications.map((qualification, index) => (
                       <div
                         key={index}
@@ -648,8 +685,7 @@ export default function RegistrationPage() {
                           <button
                             type="button"
                             onClick={() => removeDegreeQualification(index)}
-                            disabled={form.degreeQualifications.length === 1}
-                            className="rounded-xl border border-red-200 px-3 py-2 text-xs font-bold text-red-600 disabled:cursor-not-allowed disabled:opacity-40"
+                            className="rounded-xl border border-red-200 px-3 py-2 text-xs font-bold text-red-600"
                           >
                             Remove
                           </button>
@@ -665,7 +701,6 @@ export default function RegistrationPage() {
                             }
                             options={degreeOptions}
                             placeholder="Select degree"
-                            required
                           />
 
                           <TextInput
@@ -806,7 +841,7 @@ export default function RegistrationPage() {
               </label>
             </div>
 
-            <div className="sticky bottom-0 z-20 -mx-3 flex flex-col-reverse gap-3 border-t border-slate-200 bg-white/95 px-3 py-3 backdrop-blur sm:static sm:mx-0 sm:flex-row sm:justify-end sm:bg-transparent sm:px-0 sm:pt-5">
+            <div className="sticky bottom-0 z-20 -mx-4 flex flex-col-reverse gap-3 border-t border-slate-200 bg-white/95 px-4 py-3 backdrop-blur sm:static sm:mx-0 sm:flex-row sm:justify-end sm:bg-transparent sm:px-0 sm:pt-5">
               <button
                 type="button"
                 onClick={() => {
@@ -956,932 +991,6 @@ function MonthDayInput({
         </p>
       ) : null}
     </div>
-  );
-}
-
-function TextInput({
-  label,
-  name,
-  value,
-  onChange,
-  type = 'text',
-  required = false,
-  placeholder = '',
-  disabled = false,
-}) {
-  return (
-    <label className="block">
-      <span className="mb-1.5 block text-xs font-semibold text-slate-700 sm:text-sm">
-        {label}
-        {required ? <span className="text-red-500"> *</span> : null}
-      </span>
-
-      <input
-        name={name}
-        type={type}
-        value={value || ''}
-        required={required}
-        disabled={disabled}
-        placeholder={placeholder}
-        onChange={(event) => onChange(name, event.target.value)}
-        className="min-h-11 w-full rounded-xl border border-slate-300 bg-white px-3 text-sm outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400 sm:min-h-12 sm:rounded-2xl sm:px-4"
-      />
-    </label>
-  );
-}
-
-function TextArea({
-  label,
-  name,
-  value,
-  onChange,
-  required = false,
-  placeholder = '',
-  disabled = false,
-  rows = 4,
-}) {
-  return (
-    <label className="block">
-      <span className="mb-1.5 block text-xs font-semibold text-slate-700 sm:text-sm">
-        {label}
-        {required ? <span className="text-red-500"> *</span> : null}
-      </span>
-
-      <textarea
-        name={name}
-        rows={rows}
-        value={value || ''}
-        required={required}
-        disabled={disabled}
-        placeholder={placeholder}
-        onChange={(event) => onChange(name, event.target.value)}
-        className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400 sm:rounded-2xl sm:px-4 sm:py-3"
-      />
-    </label>
-  );
-}
-
-function SelectInput({
-  label,
-  name,
-  value,
-  onChange,
-  options,
-  required = false,
-  placeholder = '',
-}) {
-  return (
-    <label className="block">
-      <span className="mb-1.5 block text-xs font-semibold text-slate-700 sm:text-sm">
-        {label}
-        {required ? <span className="text-red-500"> *</span> : null}
-      </span>
-
-      <select
-        name={name}
-        value={value || ''}
-        required={required}
-        onChange={(event) => onChange(name, event.target.value)}
-        className="min-h-11 w-full rounded-xl border border-slate-300 bg-white px-3 text-sm outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 sm:min-h-12 sm:rounded-2xl sm:px-4"
-      >
-        {placeholder ? <option value="">{placeholder}</option> : null}
-
-        {options.map((item) => (
-          <option key={item} value={item}>
-            {item}
-          </option>
-        ))}
-      </select>
-    </label>
-  );
-}
-
-function FileInput({ label, name, onChange, accept, required = false }) {
-  return (
-    <label className="block">
-      <span className="mb-1.5 block text-xs font-semibold text-slate-700 sm:text-sm">
-        {label}
-        {required ? <span className="text-red-500"> *</span> : null}
-      </span>
-
-      <input
-        name={name}
-        type="file"
-        accept={accept}
-        required={required}
-        onChange={(event) => onChange(name, event.target.files?.[0] || null)}
-        className="block min-h-11 w-full rounded-xl border border-slate-300 bg-white text-xs file:mr-3 file:min-h-11 file:border-0 file:bg-slate-900 file:px-3 file:text-xs file:font-semibold file:text-white sm:min-h-12 sm:rounded-2xl sm:text-sm sm:file:mr-4 sm:file:min-h-12 sm:file:px-4 sm:file:text-sm"
-      />
-    </label>
-  );
-}  'Subharara Union',
-  'Siddhipasha Union',
-  'Baghutia Union',
-  'Noapara Paurashava',
-  'Other',
-];
-
-const genderOptions = ['Male', 'Female'];
-
-const bloodGroupOptions = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
-
-const occupationOptions = [
-  'Student',
-  'Teacher',
-  'Doctor',
-  'Engineer',
-  'Lawyer',
-  'Banker',
-  'Business',
-  'Service Holder',
-  'Government Employee',
-  'Private Employee',
-  'Freelancer',
-  'Entrepreneur',
-  'Farmer',
-  'Journalist',
-  'Researcher',
-  'Housewife',
-  'Retired',
-  'Unemployed',
-  'Other',
-];
-
-const departmentOptions = [
-  'Faculty of Arts',
-  'Faculty of Sciences',
-  'Faculty of Law',
-  'Faculty of Business Studies',
-  'Faculty of Social Sciences',
-  'Faculty of Biological Sciences',
-  'Faculty of Pharmacy',
-  'Faculty of Earth & Environmental Sciences',
-  'Faculty of Engineering & Technology',
-  'Faculty of Fine Arts',
-  'Faculty of Medicine',
-  'Faculty of Education',
-  'Faculty of Postgraduate Medical Sciences & Research',
-
-  'Institute of Education and Research',
-  'Institute of Statistical Research and Training',
-  'Institute of Business Administration',
-  'Institute of Nutrition and Food Science',
-  'Institute of Social Welfare and Research',
-  'Institute of Modern Languages',
-  'Institute of Health Economics',
-  'Institute of Information Technology',
-  'Institute of Energy',
-  'Institute of Disaster Management and Vulnerability Studies',
-  'Institute of Leather Engineering and Technology',
-  'Confucius Institute',
-  'Bangabandhu Sheikh Mujib Research Institute for Peace and Liberty',
-
-  'Department of Accounting',
-  'Department of Anthropology',
-  'Department of Applied Chemistry & Chemical Engineering',
-  'Department of Applied Mathematics',
-  'Department of Arabic',
-  'Department of Art History',
-  'Department of Bangla',
-  'Department of Banking and Insurance',
-  'Department of Biochemistry and Molecular Biology',
-  'Department of Biomedical Physics & Technology',
-  'Department of Botany',
-  'Department of Ceramic',
-  'Department of Chemistry',
-  'Department of Clinical Pharmacy and Pharmacology',
-  'Department of Clinical Psychology',
-  'Department of Communication Disorders',
-  'Department of Computer Science and Engineering',
-  'Department of Craft',
-  'Department of Criminology',
-  'Department of Dance',
-  'Department of Development Studies',
-  'Department of Disaster Science and Climate Resilience',
-  'Department of Drawing and Painting',
-  'Department of Economics',
-  'Department of Educational and Counselling Psychology',
-  'Department of Electrical and Electronic Engineering',
-  'Department of English',
-  'Department of Finance',
-  'Department of Fisheries',
-  'Department of Genetic Engineering and Biotechnology',
-  'Department of Geography & Environment',
-  'Department of Geology',
-  'Department of Graphic Design',
-  'Department of History',
-  'Department of Information Science and Library Management',
-  'Department of International Business',
-  'Department of International Relations',
-  'Department of Islamic History & Culture',
-  'Department of Islamic Studies',
-  'Department of Japanese Studies',
-  'Department of Law',
-  'Department of Linguistics',
-  'Department of Management',
-  'Department of Management Information Systems (MIS)',
-  'Department of Marketing',
-  'Department of Mass Communication & Journalism',
-  'Department of Mathematics',
-  'Department of Meteorology',
-  'Department of Microbiology',
-  'Department of Music',
-  'Department of Nuclear Engineering',
-  'Department of Oceanography',
-  'Department of Organization Strategy and Leadership',
-  'Department of Oriental Art',
-  'Department of Pali and Buddhist Studies',
-  'Department of Peace and Conflict Studies',
-  'Department of Persian Language and Literature',
-  'Department of Pharmaceutical Chemistry',
-  'Department of Pharmaceutical Technology',
-  'Department of Pharmacy',
-  'Department of Philosophy',
-  'Department of Physics',
-  'Department of Political Science',
-  'Department of Population Sciences',
-  'Department of Printing and Publication Studies',
-  'Department of Printmaking',
-  'Department of Psychology',
-  'Department of Public Administration',
-  'Department of Public Health',
-  'Department of Robotics and Mechatronics Engineering',
-  'Department of Sanskrit',
-  'Department of Sculpture',
-  'Department of Sociology',
-  'Department of Soil, Water & Environment',
-  'Department of Statistics',
-  'Department of Television, Film and Photography',
-  'Department of Theatre and Performance Studies',
-  'Department of Theoretical and Computational Chemistry',
-  'Department of Theoretical Physics',
-  'Department of Tourism and Hospitality Management',
-  'Department of Urdu',
-  'Department of Women and Gender Studies',
-  'Department of World Religions and Culture',
-  'Department of Zoology',
-  'Other',
-];
-
-const degreeOptions = [
-  'Bachelor',
-  'Masters',
-  'MBA',
-  'MSc',
-  'MA',
-  'MSS',
-  'MCom',
-  'LLM',
-  'MEd',
-  'MPharm',
-  'MPH',
-  'MEng',
-  'MPhil',
-  'PhD',
-  'Postgraduate Diploma',
-  'Professional Certification',
-  'Other',
-];
-
-const emptyDegreeQualification = {
-  degreeName: '',
-  institutionName: '',
-  passingYear: '',
-  subjectDepartment: '',
-};
-
-const initialForm = {
-  fullName: '',
-  nickName: '',
-  dateOfBirth: '',
-  gender: '',
-  bloodGroup: '',
-
-  email: '',
-  password: '',
-  confirmPassword: '',
-  contactNumber: '',
-  facebookProfileLink: '',
-
-  profilePhotoFile: null,
-
-  universityHallName: '',
-  firstYearAdmissionSession: '',
-  universitySubject: '',
-
-  sscInstitutionName: '',
-  sscGroup: '',
-  sscPassingYear: '',
-  sscGpa: '',
-
-  hscInstitutionName: '',
-  hscGroup: '',
-  hscPassingYear: '',
-  hscGpa: '',
-
-  degreeQualifications: [
-    {
-      ...emptyDegreeQualification,
-      degreeName: 'Bachelor',
-    },
-  ],
-
-  unionPouroshovaName: '',
-  wardVillageName: '',
-  paraMohollaName: '',
-
-  presentAddress: '',
-
-  occupation: 'Student',
-  professionalDetails: '',
-
-  universityDocumentFile: null,
-  lifeStory: '',
-
-  pdpoConsent: false,
-};
-
-export default function RegistrationPage() {
-  const [form, setForm] = useState(initialForm);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [status, setStatus] = useState({ type: '', message: '' });
-
-  const isStudentOccupation = useMemo(
-    () => form.occupation?.toLowerCase() === 'student',
-    [form.occupation]
-  );
-
-  useEffect(() => {
-    if (isStudentOccupation && form.professionalDetails) {
-      updateField('professionalDetails', '');
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isStudentOccupation]);
-
-  function updateField(name, value) {
-    setForm((current) => ({
-      ...current,
-      [name]: value,
-    }));
-  }
-
-  function updateDegreeQualification(index, name, value) {
-    setForm((current) => {
-      const nextQualifications = current.degreeQualifications.map(
-        (item, itemIndex) => {
-          if (itemIndex !== index) return item;
-
-          return {
-            ...item,
-            [name]: value,
-          };
-        }
-      );
-
-      return {
-        ...current,
-        degreeQualifications: nextQualifications,
-      };
-    });
-  }
-
-  function addDegreeQualification() {
-    setForm((current) => ({
-      ...current,
-      degreeQualifications: [
-        ...current.degreeQualifications,
-        { ...emptyDegreeQualification },
-      ],
-    }));
-  }
-
-  function removeDegreeQualification(index) {
-    setForm((current) => {
-      if (current.degreeQualifications.length === 1) {
-        return current;
-      }
-
-      return {
-        ...current,
-        degreeQualifications: current.degreeQualifications.filter(
-          (_item, itemIndex) => itemIndex !== index
-        ),
-      };
-    });
-  }
-
-  async function handleSubmit(event) {
-    event.preventDefault();
-
-    setIsSubmitting(true);
-    setStatus({ type: '', message: '' });
-
-    try {
-      const finalForm = {
-        ...form,
-        professionalDetails: isStudentOccupation ? '' : form.professionalDetails,
-      };
-
-      const result = await registerAssociationUser(finalForm);
-
-      setStatus({
-        type: 'success',
-        message: result.message,
-      });
-
-      setForm(initialForm);
-    } catch (error) {
-      setStatus({
-        type: 'error',
-        message: error.message || 'Registration failed.',
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
-  }
-
-  return (
-    <main className="min-h-screen bg-slate-50 px-3 py-3 text-slate-900 sm:px-6 sm:py-6 lg:px-8">
-      <section className="mx-auto grid w-full max-w-7xl grid-cols-1 gap-4 lg:grid-cols-[0.85fr_1.5fr] lg:items-start lg:gap-6">
-        <aside className="rounded-2xl bg-slate-950 p-4 text-white shadow-soft sm:rounded-3xl sm:p-6 md:p-8 lg:sticky lg:top-8">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-300 sm:text-sm sm:tracking-[0.25em]">
-            Association Portal
-          </p>
-
-          <h1 className="mt-3 text-2xl font-bold leading-tight sm:mt-4 sm:text-3xl md:text-4xl">
-            Member Registration
-          </h1>
-
-          <p className="mt-3 text-sm leading-6 text-slate-300 sm:mt-4 md:text-base">
-            Fill the single member form. Admin approval is required before your
-            profile becomes visible in public directory.
-          </p>
-        </aside>
-
-        <section className="rounded-2xl bg-white p-3 shadow-soft sm:rounded-3xl sm:p-6 md:p-8">
-          <div className="border-b border-slate-200 pb-4 sm:pb-5">
-            <h2 className="text-xl font-bold text-slate-950 sm:text-2xl">
-              Registration Form
-            </h2>
-
-            <p className="mt-1 text-xs text-slate-500 sm:text-sm">
-              Fields are based on the member information sheet.
-            </p>
-          </div>
-
-          {status.message ? (
-            <StatusBox type={status.type} message={status.message} />
-          ) : null}
-
-          <form
-            onSubmit={handleSubmit}
-            className="mt-4 space-y-4 sm:mt-6 sm:space-y-6"
-          >
-            <FormSection title="Basic Information">
-              <div className="grid grid-cols-1 gap-3 sm:gap-4 md:grid-cols-2">
-                <TextInput
-                  label="Full Name (In English as NID)"
-                  name="fullName"
-                  value={form.fullName}
-                  onChange={updateField}
-                  required
-                />
-
-                <TextInput
-                  label="Nick Name"
-                  name="nickName"
-                  value={form.nickName}
-                  onChange={updateField}
-                />
-                
-              <TextInput
-                label="Birth Month"
-                name="birthMonth"
-                value={form.birthMonth}
-                onChange={updateField}
-                placeholder="06"
-              />
-
-              <TextInput
-                label="Birth Day"
-                name="birthDay"
-                value={form.birthDay}
-                onChange={updateField}
-                placeholder="09"
-              />
-
-                <SelectInput
-                  label="Gender"
-                  name="gender"
-                  value={form.gender}
-                  onChange={updateField}
-                  options={genderOptions}
-                  placeholder="Select gender"
-                />
-
-                <SelectInput
-                  label="Blood Group"
-                  name="bloodGroup"
-                  value={form.bloodGroup}
-                  onChange={updateField}
-                  options={bloodGroupOptions}
-                  placeholder="Select blood group"
-                />
-
-                <TextInput
-                  label="Mobile Number (Personal WhatsApp Number)"
-                  name="contactNumber"
-                  type="tel"
-                  value={form.contactNumber}
-                  onChange={updateField}
-                  placeholder="01XXXXXXXXX"
-                  required
-                />
-
-                <TextInput
-                  label="Email"
-                  name="email"
-                  type="email"
-                  value={form.email}
-                  onChange={updateField}
-                  required
-                />
-
-                <TextInput
-                  label="Facebook Profile Link (If any)"
-                  name="facebookProfileLink"
-                  value={form.facebookProfileLink}
-                  onChange={updateField}
-                  placeholder="https://facebook.com/..."
-                />
-
-                <FileInput
-                  label="Profile Photo"
-                  name="profilePhotoFile"
-                  accept="image/jpeg,image/png,image/webp"
-                  onChange={updateField}
-                  required
-                />
-
-                <TextInput
-                  label="Password"
-                  name="password"
-                  type="password"
-                  value={form.password}
-                  onChange={updateField}
-                  required
-                />
-
-                <TextInput
-                  label="Confirm Password"
-                  name="confirmPassword"
-                  type="password"
-                  value={form.confirmPassword}
-                  onChange={updateField}
-                  required
-                />
-              </div>
-            </FormSection>
-
-            <FormSection title="University Information">
-              <div className="grid grid-cols-1 gap-3 sm:gap-4 md:grid-cols-2">
-                <SelectInput
-                  label="Hall Name"
-                  name="universityHallName"
-                  value={form.universityHallName}
-                  onChange={updateField}
-                  options={hallOptions}
-                  placeholder="Select hall"
-                  required
-                />
-
-                <TextInput
-                  label="First Year Admission Session"
-                  name="firstYearAdmissionSession"
-                  value={form.firstYearAdmissionSession}
-                  onChange={updateField}
-                  placeholder="2022-23"
-                  required
-                />
-
-                <SelectInput
-                  label="Subject / Department"
-                  name="universitySubject"
-                  value={form.universitySubject}
-                  onChange={updateField}
-                  options={departmentOptions}
-                  placeholder="Select Subject / Department"
-                  required
-                />
-
-               
-              </div>
-            </FormSection>
-
-            <FormSection title="Academic Qualification">
-              <div className="space-y-4 sm:space-y-5">
-                <div className="rounded-2xl border border-slate-200 bg-slate-50 p-3 sm:p-4">
-                  <h4 className="mb-3 text-sm font-bold text-slate-900 sm:mb-4">
-                    SSC Information
-                  </h4>
-
-                  <div className="grid grid-cols-1 gap-3 sm:gap-4 md:grid-cols-2 xl:grid-cols-4">
-                    <TextInput
-                      label="Institute Name"
-                      name="sscInstitutionName"
-                      value={form.sscInstitutionName}
-                      onChange={updateField}
-                      placeholder="Pairahat High School"
-                      required
-                    />
-
-                    <TextInput
-                      label="Group"
-                      name="sscGroup"
-                      value={form.sscGroup}
-                      onChange={updateField}
-                      placeholder="Science / Commerce / Arts"
-                      required
-                    />
-
-                    <TextInput
-                      label="Passing Year"
-                      name="sscPassingYear"
-                      value={form.sscPassingYear}
-                      onChange={updateField}
-                      placeholder="2020"
-                      required
-                    />
-
-                   
-                  </div>
-                </div>
-
-                <div className="rounded-2xl border border-slate-200 bg-slate-50 p-3 sm:p-4">
-                  <h4 className="mb-3 text-sm font-bold text-slate-900 sm:mb-4">
-                    HSC Information
-                  </h4>
-
-                  <div className="grid grid-cols-1 gap-3 sm:gap-4 md:grid-cols-2 xl:grid-cols-4">
-                    <TextInput
-                      label="Institute Name"
-                      name="hscInstitutionName"
-                      value={form.hscInstitutionName}
-                      onChange={updateField}
-                      placeholder="Pairahat United College"
-                      required
-                    />
-
-                    <TextInput
-                      label="Group"
-                      name="hscGroup"
-                      value={form.hscGroup}
-                      onChange={updateField}
-                      placeholder="Science / Commerce / Arts"
-                      required
-                    />
-
-                    <TextInput
-                      label="Passing Year"
-                      name="hscPassingYear"
-                      value={form.hscPassingYear}
-                      onChange={updateField}
-                      placeholder="2022"
-                      required
-                    />
-
-                  
-                  </div>
-                </div>
-
-                <div className="rounded-2xl border border-slate-200 bg-white p-3 sm:p-4">
-                  <div className="mb-4">
-                    <h4 className="text-sm font-bold text-slate-900 sm:text-base">
-                      Higher Degree
-                    </h4>
-                  </div>
-
-                  <div className="space-y-4">
-                    {form.degreeQualifications.map((qualification, index) => (
-                      <div
-                        key={index}
-                        className="rounded-2xl border border-slate-200 bg-slate-50 p-3 sm:p-4"
-                      >
-                        <div className="mb-4 flex items-center justify-between gap-3">
-                          <h5 className="text-sm font-bold text-slate-900 sm:text-base">
-                            Degree {index + 1}
-                          </h5>
-
-                          <button
-                            type="button"
-                            onClick={() => removeDegreeQualification(index)}
-                            disabled={form.degreeQualifications.length === 1}
-                            className="rounded-xl border border-red-200 px-3 py-2 text-xs font-bold text-red-600 disabled:cursor-not-allowed disabled:opacity-40"
-                          >
-                            Remove
-                          </button>
-                        </div>
-
-                        <div className="grid grid-cols-1 gap-3 sm:gap-4 md:grid-cols-2">
-                          <SelectInput
-                            label="Degree Name"
-                            name="degreeName"
-                            value={qualification.degreeName}
-                            onChange={(name, value) =>
-                              updateDegreeQualification(index, name, value)
-                            }
-                            options={degreeOptions}
-                            placeholder="Select degree"
-                            required
-                          />
-
-                          <TextInput
-                            label="Institution Name"
-                            name="institutionName"
-                            value={qualification.institutionName}
-                            onChange={(name, value) =>
-                              updateDegreeQualification(index, name, value)
-                            }
-                            placeholder="University of Dhaka"
-                          />
-
-                          <TextInput
-                            label="Subject / Department"
-                            name="subjectDepartment"
-                            value={qualification.subjectDepartment}
-                            onChange={(name, value) =>
-                              updateDegreeQualification(index, name, value)
-                            }
-                            placeholder="Marketing / Software Engineering"
-                          />
-
-                          <TextInput
-                            label="Passing Year"
-                            name="passingYear"
-                            value={qualification.passingYear}
-                            onChange={(name, value) =>
-                              updateDegreeQualification(index, name, value)
-                            }
-                            placeholder="2024"
-                          />
-                        </div>
-                      </div>
-                    ))}
-
-                    <button
-                      type="button"
-                      onClick={addDegreeQualification}
-                      className="min-h-11 rounded-xl border border-emerald-300 bg-emerald-50 px-4 text-sm font-bold text-emerald-700 hover:bg-emerald-100 sm:min-h-12 sm:rounded-2xl sm:px-5"
-                    >
-                      + Add Degree
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </FormSection>
-
-            <FormSection title="Address in Abhaynagar">
-              <div className="grid grid-cols-1 gap-3 sm:gap-4 md:grid-cols-3">
-                <SelectInput
-                  label="Union / Pouroshova Name"
-                  name="unionPouroshovaName"
-                  value={form.unionPouroshovaName}
-                  onChange={updateField}
-                  options={unionOptions}
-                  placeholder="Select union/pouroshova"
-                  required
-                />
-
-                <TextInput
-                  label="Ward / Village Name"
-                  name="wardVillageName"
-                  value={form.wardVillageName}
-                  onChange={updateField}
-                />
-
-                <TextInput
-                  label="Para / Moholla Name"
-                  name="paraMohollaName"
-                  value={form.paraMohollaName}
-                  onChange={updateField}
-                />
-              </div>
-            </FormSection>
-
-            <FormSection title="Present Address">
-              <TextArea
-                label="Present Address"
-                name="presentAddress"
-                value={form.presentAddress}
-                onChange={updateField}
-                required
-              />
-            </FormSection>
-
-            <FormSection title="Occupation">
-              <div className="grid grid-cols-1 gap-3 sm:gap-4 md:grid-cols-2">
-                <SelectInput
-                  label="Occupation"
-                  name="occupation"
-                  value={form.occupation}
-                  onChange={updateField}
-                  options={occupationOptions}
-                  required
-                />
-
-                <TextArea
-                  label="Professional Details"
-                  name="professionalDetails"
-                  value={form.professionalDetails}
-                  onChange={updateField}
-                  disabled={isStudentOccupation}
-                  placeholder={
-                    isStudentOccupation
-                      ? 'Disabled for students'
-                      : 'Write job/professional details'
-                  }
-                />
-              </div>
-            </FormSection>
-
-            <FormSection title="Memories and Stories">
-              <TextArea
-                label="Please Share Your Valuable Memories and Stories from Life"
-                name="lifeStory"
-                value={form.lifeStory}
-                onChange={updateField}
-                rows={5}
-              />
-            </FormSection>
-
-            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-3 sm:p-4">
-              <label className="flex cursor-pointer items-start gap-3">
-                <input
-                  type="checkbox"
-                  checked={form.pdpoConsent}
-                  onChange={(event) =>
-                    updateField('pdpoConsent', event.target.checked)
-                  }
-                  className="mt-1 h-5 w-5 rounded border-slate-300 text-emerald-600"
-                  required
-                />
-
-                <span className="text-sm leading-6 text-slate-700">
-                  I agree that the portal may process my personal data for
-                  registration, verification, directory and association services.
-                </span>
-              </label>
-            </div>
-
-            <div className="sticky bottom-0 z-20 -mx-3 flex flex-col-reverse gap-3 border-t border-slate-200 bg-white/95 px-3 py-3 backdrop-blur sm:static sm:mx-0 sm:flex-row sm:justify-end sm:bg-transparent sm:px-0 sm:pt-5">
-              <button
-                type="button"
-                onClick={() => {
-                  setForm(initialForm);
-                  setStatus({ type: '', message: '' });
-                }}
-                className="min-h-11 rounded-xl border border-slate-300 px-4 text-sm font-semibold text-slate-700 sm:min-h-12 sm:rounded-2xl sm:px-5"
-              >
-                Reset
-              </button>
-
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="min-h-11 rounded-xl bg-emerald-600 px-4 text-sm font-bold text-white disabled:bg-emerald-300 sm:min-h-12 sm:rounded-2xl sm:px-6"
-              >
-                {isSubmitting ? 'Submitting...' : 'Submit Registration'}
-              </button>
-            </div>
-          </form>
-        </section>
-      </section>
-    </main>
-  );
-}
-
-function StatusBox({ type, message }) {
-  return (
-    <div
-      className={`mt-5 rounded-2xl border p-4 text-sm font-medium ${
-        type === 'success'
-          ? 'border-emerald-200 bg-emerald-50 text-emerald-800'
-          : 'border-red-200 bg-red-50 text-red-700'
-      }`}
-    >
-      {message}
-    </div>
-  );
-}
-
-function FormSection({ title, children }) {
-  return (
-    <section className="rounded-2xl border border-slate-200 p-3 sm:p-4 md:p-5">
-      <h3 className="mb-3 text-sm font-bold text-slate-900 sm:mb-4 sm:text-base">
-        {title}
-      </h3>
-      {children}
-    </section>
   );
 }
 
