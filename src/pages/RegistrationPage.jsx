@@ -500,11 +500,6 @@ export default function RegistrationPage() {
                     <h4 className="text-sm font-bold text-slate-900 sm:text-base">
                       Bachelor / Honours Information
                     </h4>
-
-                    <p className="text-xs leading-5 text-slate-500 sm:text-sm">
-                      This section is required. Hall Name and Session will be
-                      saved from this section.
-                    </p>
                   </div>
 
                   <div className="grid grid-cols-1 gap-3 sm:gap-4 md:grid-cols-2 xl:grid-cols-3">
