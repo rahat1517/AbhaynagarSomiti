@@ -256,16 +256,6 @@ export default function RegistrationPage() {
         </aside>
 
         <section className="overflow-hidden rounded-[1.75rem] border border-slate-200 bg-white shadow-soft">
-          <div className="border-b border-slate-200 bg-gradient-to-r from-white to-emerald-50/60 p-5 sm:p-7 lg:p-8">
-            <p className="text-xs font-bold uppercase tracking-[0.25em] text-emerald-600">
-              Member Registration Form
-            </p>
-
-            <h2 className="mt-2 text-xl font-black text-slate-950 sm:text-2xl">
-              Submit your information for admin approval
-            </h2>
-
-          </div>
 
           {status.message ? (
             <StatusBox type={status.type} message={status.message} />
