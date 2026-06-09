@@ -16,7 +16,6 @@ const hallOptions = [
   'Muktijoddha Ziaur Rahman Hall',
   'Sheikh Mujibur Rahman Hall',
   'Bangladesh-Kuwait Maitree Hall',
-  'Sir P.J. Hartog International Hall',
   'Bangamata Sheikh Fazilatunnesa Mujib Hall',
   'Amar Ekushey Hall',
   'Kabi Sufia Kamal Hall',
@@ -66,138 +65,20 @@ const occupationOptions = [
   'Other',
 ];
 
-const departmentOptions = [
-  'Faculty of Arts',
-  'Faculty of Sciences',
-  'Faculty of Law',
-  'Faculty of Business Studies',
-  'Faculty of Social Sciences',
-  'Faculty of Biological Sciences',
-  'Faculty of Pharmacy',
-  'Faculty of Earth & Environmental Sciences',
-  'Faculty of Engineering & Technology',
-  'Faculty of Fine Arts',
-  'Faculty of Medicine',
-  'Faculty of Education',
-  'Faculty of Postgraduate Medical Sciences & Research',
-  'Institute of Education and Research',
-  'Institute of Statistical Research and Training',
-  'Institute of Business Administration',
-  'Institute of Nutrition and Food Science',
-  'Institute of Social Welfare and Research',
-  'Institute of Modern Languages',
-  'Institute of Health Economics',
-  'Institute of Information Technology',
-  'Institute of Energy',
-  'Institute of Disaster Management and Vulnerability Studies',
-  'Institute of Leather Engineering and Technology',
-  'Confucius Institute',
-  'Bangabandhu Sheikh Mujib Research Institute for Peace and Liberty',
-  'Department of Accounting',
-  'Department of Anthropology',
-  'Department of Applied Chemistry & Chemical Engineering',
-  'Department of Applied Mathematics',
-  'Department of Arabic',
-  'Department of Art History',
-  'Department of Bangla',
-  'Department of Banking and Insurance',
-  'Department of Biochemistry and Molecular Biology',
-  'Department of Biomedical Physics & Technology',
-  'Department of Botany',
-  'Department of Ceramic',
-  'Department of Chemistry',
-  'Department of Clinical Pharmacy and Pharmacology',
-  'Department of Clinical Psychology',
-  'Department of Communication Disorders',
-  'Department of Computer Science and Engineering',
-  'Department of Craft',
-  'Department of Criminology',
-  'Department of Dance',
-  'Department of Development Studies',
-  'Department of Disaster Science and Climate Resilience',
-  'Department of Drawing and Painting',
-  'Department of Economics',
-  'Department of Educational and Counselling Psychology',
-  'Department of Electrical and Electronic Engineering',
-  'Department of English',
-  'Department of Finance',
-  'Department of Fisheries',
-  'Department of Genetic Engineering and Biotechnology',
-  'Department of Geography & Environment',
-  'Department of Geology',
-  'Department of Graphic Design',
-  'Department of History',
-  'Department of Information Science and Library Management',
-  'Department of International Business',
-  'Department of International Relations',
-  'Department of Islamic History & Culture',
-  'Department of Islamic Studies',
-  'Department of Japanese Studies',
-  'Department of Law',
-  'Department of Linguistics',
-  'Department of Management',
-  'Department of Management Information Systems (MIS)',
-  'Department of Marketing',
-  'Department of Mass Communication & Journalism',
-  'Department of Mathematics',
-  'Department of Meteorology',
-  'Department of Microbiology',
-  'Department of Music',
-  'Department of Nuclear Engineering',
-  'Department of Oceanography',
-  'Department of Organization Strategy and Leadership',
-  'Department of Oriental Art',
-  'Department of Pali and Buddhist Studies',
-  'Department of Peace and Conflict Studies',
-  'Department of Persian Language and Literature',
-  'Department of Pharmaceutical Chemistry',
-  'Department of Pharmaceutical Technology',
-  'Department of Pharmacy',
-  'Department of Philosophy',
-  'Department of Physics',
-  'Department of Political Science',
-  'Department of Population Sciences',
-  'Department of Printing and Publication Studies',
-  'Department of Printmaking',
-  'Department of Psychology',
-  'Department of Public Administration',
-  'Department of Public Health',
-  'Department of Robotics and Mechatronics Engineering',
-  'Department of Sanskrit',
-  'Department of Sculpture',
-  'Department of Sociology',
-  'Department of Soil, Water & Environment',
-  'Department of Statistics',
-  'Department of Television, Film and Photography',
-  'Department of Theatre and Performance Studies',
-  'Department of Theoretical and Computational Chemistry',
-  'Department of Theoretical Physics',
-  'Department of Tourism and Hospitality Management',
-  'Department of Urdu',
-  'Department of Women and Gender Studies',
-  'Department of World Religions and Culture',
-  'Department of Zoology',
-  'Other',
-];
-
 const degreeOptions = [
-  'Bachelor',
-  'Masters',
-  'MBA',
+  'BSc',
   'MSc',
+  'BBA',
+  'MBA',
+  'BA',
   'MA',
+  'BSS',
   'MSS',
-  'MCom',
+  'LLB',
   'LLM',
-  'MEd',
-  'MPharm',
-  'MPH',
-  'MEng',
   'MPhil',
   'PhD',
-  'Postgraduate Diploma',
-  'Professional Certification',
-  'Other',
+  'DBA',
 ];
 
 const emptyDegreeQualification = {
@@ -228,17 +109,14 @@ const initialForm = {
 
   universityHallName: '',
   firstYearAdmissionSession: '',
-  universitySubject: '',
 
   sscInstitutionName: '',
   sscGroup: '',
   sscPassingYear: '',
-  sscGpa: '',
 
   hscInstitutionName: '',
   hscGroup: '',
   hscPassingYear: '',
-  hscGpa: '',
 
   degreeQualifications: [],
 
@@ -269,7 +147,6 @@ export default function RegistrationPage() {
     if (isStudentOccupation && form.professionalDetails) {
       updateField('professionalDetails', '');
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isStudentOccupation]);
 
   function updateField(name, value) {
@@ -376,7 +253,6 @@ export default function RegistrationPage() {
             </p>
           </div>
 
-  
         </aside>
 
         <section className="overflow-hidden rounded-[1.75rem] border border-slate-200 bg-white shadow-soft">
@@ -389,10 +265,6 @@ export default function RegistrationPage() {
               Submit your information for admin approval
             </h2>
 
-            <p className="mt-2 text-xs leading-6 text-slate-500 sm:text-sm">
-              Complete the required fields carefully. Your profile will be
-              published only after verification by the admin team.
-            </p>
           </div>
 
           {status.message ? (
@@ -503,39 +375,6 @@ export default function RegistrationPage() {
               </div>
             </FormSection>
 
-            <FormSection title="University Information">
-              <div className="grid grid-cols-1 gap-3 sm:gap-4 md:grid-cols-2">
-                <SelectInput
-                  label="University Hall"
-                  name="universityHallName"
-                  value={form.universityHallName}
-                  onChange={updateField}
-                  options={hallOptions}
-                  placeholder="Select hall"
-                  required
-                />
-
-                <TextInput
-                  label="First Year Admission Session"
-                  name="firstYearAdmissionSession"
-                  value={form.firstYearAdmissionSession}
-                  onChange={updateField}
-                  placeholder="2022-23"
-                  required
-                />
-
-                <SelectInput
-                  label="Subject / Department"
-                  name="universitySubject"
-                  value={form.universitySubject}
-                  onChange={updateField}
-                  options={departmentOptions}
-                  placeholder="Select Subject / Department"
-                  required
-                />
-              </div>
-            </FormSection>
-
             <FormSection title="Academic Qualification">
               <div className="space-y-4 sm:space-y-5">
                 <div className="rounded-2xl border border-slate-200 bg-slate-50 p-3 sm:p-4">
@@ -543,7 +382,7 @@ export default function RegistrationPage() {
                     SSC Information
                   </h4>
 
-                  <div className="grid grid-cols-1 gap-3 sm:gap-4 md:grid-cols-2 xl:grid-cols-4">
+                  <div className="grid grid-cols-1 gap-3 sm:gap-4 md:grid-cols-2 xl:grid-cols-3">
                     <TextInput
                       label="Institute Name"
                       name="sscInstitutionName"
@@ -570,14 +409,6 @@ export default function RegistrationPage() {
                       placeholder="2020"
                       required
                     />
-
-                    <TextInput
-                      label="GPA / Division"
-                      name="sscGpa"
-                      value={form.sscGpa}
-                      onChange={updateField}
-                      placeholder="5.00 / First Division"
-                    />
                   </div>
                 </div>
 
@@ -586,7 +417,7 @@ export default function RegistrationPage() {
                     HSC Information
                   </h4>
 
-                  <div className="grid grid-cols-1 gap-3 sm:gap-4 md:grid-cols-2 xl:grid-cols-4">
+                  <div className="grid grid-cols-1 gap-3 sm:gap-4 md:grid-cols-2 xl:grid-cols-3">
                     <TextInput
                       label="Institute Name"
                       name="hscInstitutionName"
@@ -613,22 +444,35 @@ export default function RegistrationPage() {
                       placeholder="2022"
                       required
                     />
-
-                    <TextInput
-                      label="GPA / Division"
-                      name="hscGpa"
-                      value={form.hscGpa}
-                      onChange={updateField}
-                      placeholder="5.00 / First Division"
-                    />
                   </div>
                 </div>
 
                 <div className="rounded-2xl border border-slate-200 bg-white p-3 sm:p-4">
                   <div className="mb-4">
                     <h4 className="text-sm font-bold text-slate-900 sm:text-base">
-                      Higher Degree
+                      Higher Degree Information
                     </h4>
+                  </div>
+
+                  <div className="mb-5 grid grid-cols-1 gap-3 sm:gap-4 md:grid-cols-2">
+                    <SelectInput
+                      label="Hall Name"
+                      name="universityHallName"
+                      value={form.universityHallName}
+                      onChange={updateField}
+                      options={hallOptions}
+                      placeholder="Select hall"
+                      required
+                    />
+
+                    <TextInput
+                      label="Session"
+                      name="firstYearAdmissionSession"
+                      value={form.firstYearAdmissionSession}
+                      onChange={updateField}
+                      placeholder="2022-23"
+                      required
+                    />
                   </div>
 
                   <div className="space-y-4">
@@ -681,13 +525,13 @@ export default function RegistrationPage() {
                           />
 
                           <TextInput
-                            label="Subject / Department"
+                            label="Department/Faculty"
                             name="subjectDepartment"
                             value={qualification.subjectDepartment}
                             onChange={(name, value) =>
                               updateDegreeQualification(index, name, value)
                             }
-                            placeholder="Marketing / Software Engineering"
+                            placeholder="Software Engineering"
                           />
 
                           <TextInput
@@ -838,7 +682,7 @@ export default function RegistrationPage() {
 function StatusBox({ type, message }) {
   return (
     <div
-      className={`mt-5 rounded-2xl border p-4 text-sm font-medium ${
+      className={`mx-4 mt-5 rounded-2xl border p-4 text-sm font-medium sm:mx-6 lg:mx-8 ${
         type === 'success'
           ? 'border-emerald-200 bg-emerald-50 text-emerald-800'
           : 'border-red-200 bg-red-50 text-red-700'
