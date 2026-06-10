@@ -17,32 +17,34 @@ function matchText(source, keyword) {
   return normalizeText(source).includes(normalizeText(keyword));
 }
 
-function getMemberRole(row) {
-  const role = normalizeText(row.role);
-  const occupation = normalizeText(row.occupation);
-  const memberType = normalizeText(row.member_type);
+export function resolveMemberType(memberType) {
+  const normalized = normalizeText(memberType);
 
-  if (memberType === 'student') return 'student';
-  if (memberType === 'alumni') return 'alumni';
+  if (normalized === 'student') return 'student';
+  if (normalized === 'alumni') return 'alumni';
 
-  if (occupation === 'student' || occupation === 'current student') {
-    return 'student';
-  }
-
-  if (role === 'student') return 'student';
-  if (role === 'alumni') return 'alumni';
-
-  return occupation && occupation !== 'student' ? 'alumni' : 'student';
+  return 'member';
 }
 
-function mapPublicMemberRow(row) {
-  const role = getMemberRole(row);
+export function getMemberTypeLabel(memberType) {
+  const resolved = resolveMemberType(memberType);
+
+  if (resolved === 'student') return 'Current Student';
+  if (resolved === 'alumni') return 'Alumni';
+
+  return 'Member';
+}
+
+export function mapProfileRow(row) {
+  const memberType = resolveMemberType(row.member_type);
 
   return {
     ...row,
 
     profile_id: row.profile_id || row.id,
-    role,
+    member_type: memberType,
+    member_type_label: getMemberTypeLabel(memberType),
+    directory_role: memberType,
 
     full_name: row.full_name,
     profile_photo_url: row.profile_photo_url,
@@ -59,12 +61,14 @@ function mapPublicMemberRow(row) {
       row.session ||
       '',
 
+    academic_year: row.academic_year || '',
+
     hall:
       row.hall ||
       row.university_hall_name ||
       '',
 
-    occupation: row.occupation || (role === 'student' ? 'Student' : 'Alumni'),
+    occupation: row.occupation || '',
     professional_details: row.professional_details || row.current_company || '',
     current_company: row.current_company || row.professional_details || '',
     designation: row.designation || row.occupation || '',
@@ -84,7 +88,7 @@ function applyClientFilters(rows, filters = {}) {
   const graduationYear = emptyToNull(filters.graduationYear);
 
   return rows.filter((item) => {
-    if (role && item.role !== role) return false;
+    if (role && item.member_type !== role) return false;
 
     if (departmentName && !matchText(item.department_name, departmentName)) {
       return false;
@@ -94,7 +98,11 @@ function applyClientFilters(rows, filters = {}) {
       return false;
     }
 
-    if (graduationYear && !matchText(item.academic_session, graduationYear)) {
+    if (
+      graduationYear &&
+      !matchText(item.academic_year, graduationYear) &&
+      !matchText(item.academic_session, graduationYear)
+    ) {
       return false;
     }
 
@@ -143,7 +151,7 @@ export async function searchDirectoryProfiles({
     throw new Error(error.message);
   }
 
-  const mappedRows = (data || []).map(mapPublicMemberRow);
+  const mappedRows = (data || []).map(mapProfileRow);
   const filteredRows = applyClientFilters(mappedRows, filters);
 
   if (!cursor?.profile_id) {
@@ -179,7 +187,7 @@ export async function getDirectoryProfileDetails(profileId) {
     throw new Error('Profile details not found.');
   }
 
-  return mapPublicMemberRow(data);
+  return mapProfileRow(data);
 }
 
 export async function updateMyVisibilityPreferences({

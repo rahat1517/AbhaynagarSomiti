@@ -75,138 +75,114 @@ const occupationOptions = [
   'Other',
 ];
 
-const departmentOptions = [
-  'Faculty of Arts',
-  'Faculty of Sciences',
-  'Faculty of Law',
-  'Faculty of Business Studies',
-  'Faculty of Social Sciences',
-  'Faculty of Biological Sciences',
-  'Faculty of Pharmacy',
-  'Faculty of Earth & Environmental Sciences',
-  'Faculty of Engineering & Technology',
-  'Faculty of Fine Arts',
-  'Faculty of Medicine',
-  'Faculty of Education',
-  'Faculty of Postgraduate Medical Sciences & Research',
-  'Institute of Education and Research',
-  'Institute of Statistical Research and Training',
-  'Institute of Business Administration',
-  'Institute of Nutrition and Food Science',
-  'Institute of Social Welfare and Research',
-  'Institute of Modern Languages',
-  'Institute of Health Economics',
-  'Institute of Information Technology',
-  'Institute of Energy',
-  'Institute of Disaster Management and Vulnerability Studies',
-  'Institute of Leather Engineering and Technology',
-  'Confucius Institute',
-  'Bangabandhu Sheikh Mujib Research Institute for Peace and Liberty',
-  'Department of Accounting',
-  'Department of Anthropology',
-  'Department of Applied Chemistry & Chemical Engineering',
-  'Department of Applied Mathematics',
-  'Department of Arabic',
-  'Department of Art History',
-  'Department of Bangla',
-  'Department of Banking and Insurance',
-  'Department of Biochemistry and Molecular Biology',
-  'Department of Biomedical Physics & Technology',
-  'Department of Botany',
-  'Department of Ceramic',
-  'Department of Chemistry',
-  'Department of Clinical Pharmacy and Pharmacology',
-  'Department of Clinical Psychology',
-  'Department of Communication Disorders',
-  'Department of Computer Science and Engineering',
-  'Department of Craft',
-  'Department of Criminology',
-  'Department of Dance',
-  'Department of Development Studies',
-  'Department of Disaster Science and Climate Resilience',
-  'Department of Drawing and Painting',
-  'Department of Economics',
-  'Department of Educational and Counselling Psychology',
-  'Department of Electrical and Electronic Engineering',
-  'Department of English',
-  'Department of Finance',
-  'Department of Fisheries',
-  'Department of Genetic Engineering and Biotechnology',
-  'Department of Geography & Environment',
-  'Department of Geology',
-  'Department of Graphic Design',
-  'Department of History',
-  'Department of Information Science and Library Management',
-  'Department of International Business',
-  'Department of International Relations',
-  'Department of Islamic History & Culture',
-  'Department of Islamic Studies',
-  'Department of Japanese Studies',
-  'Department of Law',
-  'Department of Linguistics',
-  'Department of Management',
-  'Department of Management Information Systems (MIS)',
-  'Department of Marketing',
-  'Department of Mass Communication & Journalism',
-  'Department of Mathematics',
-  'Department of Meteorology',
-  'Department of Microbiology',
-  'Department of Music',
-  'Department of Nuclear Engineering',
-  'Department of Oceanography',
-  'Department of Organization Strategy and Leadership',
-  'Department of Oriental Art',
-  'Department of Pali and Buddhist Studies',
-  'Department of Peace and Conflict Studies',
-  'Department of Persian Language and Literature',
-  'Department of Pharmaceutical Chemistry',
-  'Department of Pharmaceutical Technology',
-  'Department of Pharmacy',
-  'Department of Philosophy',
-  'Department of Physics',
-  'Department of Political Science',
-  'Department of Population Sciences',
-  'Department of Printing and Publication Studies',
-  'Department of Printmaking',
-  'Department of Psychology',
-  'Department of Public Administration',
-  'Department of Public Health',
-  'Department of Robotics and Mechatronics Engineering',
-  'Department of Sanskrit',
-  'Department of Sculpture',
-  'Department of Sociology',
-  'Department of Soil, Water & Environment',
-  'Department of Statistics',
-  'Department of Television, Film and Photography',
-  'Department of Theatre and Performance Studies',
-  'Department of Theoretical and Computational Chemistry',
-  'Department of Theoretical Physics',
-  'Department of Tourism and Hospitality Management',
-  'Department of Urdu',
-  'Department of Women and Gender Studies',
-  'Department of World Religions and Culture',
-  'Department of Zoology',
-  'Other',
+const subjectOptions = [
+  'Accounting',
+  'Anthropology',
+  'Applied Chemistry & Chemical Engineering',
+  'Applied Mathematics',
+  'Arabic',
+  'Art History',
+  'Bangla',
+  'Banking and Insurance',
+  'Biochemistry and Molecular Biology',
+  'Biomedical Physics & Technology',
+  'Botany',
+  'Ceramic',
+  'Chemistry',
+  'Clinical Pharmacy and Pharmacology',
+  'Clinical Psychology',
+  'Communication Disorders',
+  'Computer Science and Engineering',
+  'Craft',
+  'Criminology',
+  'Dance',
+  'Development Studies',
+  'Disaster Science and Climate Resilience',
+  'Drawing and Painting',
+  'Economics',
+  'Educational and Counselling Psychology',
+  'Electrical and Electronic Engineering',
+  'English',
+  'Finance',
+  'Fisheries',
+  'Genetic Engineering and Biotechnology',
+  'Geography & Environment',
+  'Geology',
+  'Graphic Design',
+  'History',
+  'Information Science and Library Management',
+  'International Business',
+  'International Relations',
+  'Islamic History & Culture',
+  'Islamic Studies',
+  'Japanese Studies',
+  'Law',
+  'Linguistics',
+  'Management',
+  'Management Information Systems (MIS)',
+  'Marketing',
+  'Mass Communication & Journalism',
+  'Mathematics',
+  'Meteorology',
+  'Microbiology',
+  'Music',
+  'Nuclear Engineering',
+  'Oceanography',
+  'Organization Strategy and Leadership',
+  'Oriental Art',
+  'Pali and Buddhist Studies',
+  'Peace and Conflict Studies',
+  'Persian Language and Literature',
+  'Pharmaceutical Chemistry',
+  'Pharmaceutical Technology',
+  'Pharmacy',
+  'Philosophy',
+  'Physics',
+  'Political Science',
+  'Population Sciences',
+  'Printing and Publication Studies',
+  'Printmaking',
+  'Psychology',
+  'Public Administration',
+  'Public Health',
+  'Robotics and Mechatronics Engineering',
+  'Sanskrit',
+  'Sculpture',
+  'Software Engineering',
+  'Sociology',
+  'Soil, Water & Environment',
+  'Statistics',
+  'Television, Film and Photography',
+  'Theatre and Performance Studies',
+  'Theoretical and Computational Chemistry',
+  'Theoretical Physics',
+  'Tourism and Hospitality Management',
+  'Urdu',
+  'Women and Gender Studies',
+  'World Religions and Culture',
+  'Zoology',
 ];
 
 const degreeOptions = [
-  'Bachelor',
-  'Masters',
+  'BSc',
+  'BBA',
   'MBA',
   'MSc',
+  'BA',
   'MA',
+  'BSS',
   'MSS',
-  'MCom',
+  'LLB',
   'LLM',
-  'MEd',
+  'BPharm',
   'MPharm',
-  'MPH',
-  'MEng',
   'MPhil',
   'PhD',
-  'Postgraduate Diploma',
-  'Professional Certification',
-  'Other',
+];
+
+const memberTypeOptions = [
+  { label: 'Current Student', value: 'student' },
+  { label: 'Alumni', value: 'alumni' },
 ];
 
 const emptyDegreeQualification = {
@@ -235,19 +211,20 @@ const initialForm = {
 
   profilePhotoFile: null,
 
+  universityDegree: '',
+  memberType: '',
   universityHallName: '',
   firstYearAdmissionSession: '',
   universitySubject: '',
+  academicYear: '',
 
   sscInstitutionName: '',
   sscGroup: '',
   sscPassingYear: '',
-  sscGpa: '',
 
   hscInstitutionName: '',
   hscGroup: '',
   hscPassingYear: '',
-  hscGpa: '',
 
   degreeQualifications: [],
 
@@ -402,16 +379,6 @@ export default function RegistrationPage() {
         </aside>
 
         <section className="rounded-2xl bg-white p-3 shadow-soft sm:rounded-3xl sm:p-6 md:p-8">
-          <div className="border-b border-slate-200 pb-4 sm:pb-5">
-            <h2 className="text-xl font-bold text-slate-950 sm:text-2xl">
-              Registration Form
-            </h2>
-
-            <p className="mt-1 text-xs text-slate-500 sm:text-sm">
-              Fields are based on the member information sheet.
-            </p>
-          </div>
-
           {status.message ? (
             <StatusBox type={status.type} message={status.message} />
           ) : null}
@@ -520,39 +487,6 @@ export default function RegistrationPage() {
               </div>
             </FormSection>
 
-            <FormSection title="University Information">
-              <div className="grid grid-cols-1 gap-3 sm:gap-4 md:grid-cols-2">
-                <SelectInput
-                  label="University Hall"
-                  name="universityHallName"
-                  value={form.universityHallName}
-                  onChange={updateField}
-                  options={hallOptions}
-                  placeholder="Select hall"
-                  required
-                />
-
-                <TextInput
-                  label="First Year Admission Session"
-                  name="firstYearAdmissionSession"
-                  value={form.firstYearAdmissionSession}
-                  onChange={updateField}
-                  placeholder="2022-23"
-                  required
-                />
-
-                <SelectInput
-                  label="Subject / Department"
-                  name="universitySubject"
-                  value={form.universitySubject}
-                  onChange={updateField}
-                  options={departmentOptions}
-                  placeholder="Select Subject / Department"
-                  required
-                />
-              </div>
-            </FormSection>
-
             <FormSection title="Academic Qualification">
               <div className="space-y-4 sm:space-y-5">
                 <div className="rounded-2xl border border-slate-200 bg-slate-50 p-3 sm:p-4">
@@ -560,7 +494,7 @@ export default function RegistrationPage() {
                     SSC Information
                   </h4>
 
-                  <div className="grid grid-cols-1 gap-3 sm:gap-4 md:grid-cols-2 xl:grid-cols-4">
+                  <div className="grid grid-cols-1 gap-3 sm:gap-4 md:grid-cols-3">
                     <TextInput
                       label="Institute Name"
                       name="sscInstitutionName"
@@ -587,14 +521,6 @@ export default function RegistrationPage() {
                       placeholder="2020"
                       required
                     />
-
-                    <TextInput
-                      label="GPA / Division"
-                      name="sscGpa"
-                      value={form.sscGpa}
-                      onChange={updateField}
-                      placeholder="5.00 / First Division"
-                    />
                   </div>
                 </div>
 
@@ -603,7 +529,7 @@ export default function RegistrationPage() {
                     HSC Information
                   </h4>
 
-                  <div className="grid grid-cols-1 gap-3 sm:gap-4 md:grid-cols-2 xl:grid-cols-4">
+                  <div className="grid grid-cols-1 gap-3 sm:gap-4 md:grid-cols-3">
                     <TextInput
                       label="Institute Name"
                       name="hscInstitutionName"
@@ -630,13 +556,71 @@ export default function RegistrationPage() {
                       placeholder="2022"
                       required
                     />
+                  </div>
+                </div>
+
+                <div className="rounded-2xl border border-emerald-100 bg-emerald-50/70 p-3 sm:p-4">
+                  <h4 className="mb-3 text-sm font-black text-emerald-950 sm:mb-4 sm:text-base">
+                    University Information
+                  </h4>
+
+                  <div className="grid grid-cols-1 gap-3 sm:gap-4 md:grid-cols-2">
+                    <SelectInput
+                      label="Degree"
+                      name="universityDegree"
+                      value={form.universityDegree}
+                      onChange={updateField}
+                      options={degreeOptions}
+                      placeholder="Select degree"
+                      required
+                    />
+
+                    <SelectInput
+                      label="Hall Name"
+                      name="universityHallName"
+                      value={form.universityHallName}
+                      onChange={updateField}
+                      options={hallOptions}
+                      placeholder="Select hall"
+                      required
+                    />
 
                     <TextInput
-                      label="GPA / Division"
-                      name="hscGpa"
-                      value={form.hscGpa}
+                      label="Admission Session"
+                      name="firstYearAdmissionSession"
+                      value={form.firstYearAdmissionSession}
                       onChange={updateField}
-                      placeholder="5.00 / First Division"
+                      placeholder="2022-23"
+                      required
+                    />
+
+                    <SelectInput
+                      label="Subject / Department"
+                      name="universitySubject"
+                      value={form.universitySubject}
+                      onChange={updateField}
+                      options={subjectOptions}
+                      placeholder="Select subject / department"
+                      required
+                    />
+
+                    <SelectInput
+                      label="Member Type"
+                      name="memberType"
+                      value={form.memberType}
+                      onChange={updateField}
+                      options={memberTypeOptions}
+                      placeholder="Select member type"
+                      required
+                    />
+
+                    <TextInput
+                      label="Passing Year / Current Year"
+                      name="academicYear"
+                      value={form.academicYear}
+                      onChange={updateField}
+                      placeholder="2026 / 1st Year / 2nd Year"
+                      required
                     />
                   </div>
                 </div>
@@ -694,7 +678,7 @@ export default function RegistrationPage() {
                             onChange={(name, value) =>
                               updateDegreeQualification(index, name, value)
                             }
-                            placeholder="University of Dhaka"
+                            placeholder="University / Institution name"
                           />
 
                           <TextInput
@@ -704,17 +688,17 @@ export default function RegistrationPage() {
                             onChange={(name, value) =>
                               updateDegreeQualification(index, name, value)
                             }
-                            placeholder="Marketing / Software Engineering"
+                            placeholder="Subject / Department"
                           />
 
                           <TextInput
-                            label="Passing Year"
+                            label="Passing Year / Current Year"
                             name="passingYear"
                             value={qualification.passingYear}
                             onChange={(name, value) =>
                               updateDegreeQualification(index, name, value)
                             }
-                            placeholder="2024"
+                            placeholder="2026 / 1st Year / 2nd Year / Running"
                           />
                         </div>
                       </div>
@@ -771,20 +755,6 @@ export default function RegistrationPage() {
             </FormSection>
 
             <FormSection title="Professional Information">
-              <div className="mb-4 rounded-2xl border border-emerald-100 bg-emerald-50/80 p-4">
-                <div className="flex items-start gap-3">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-emerald-600 text-sm font-black text-white">
-                    PI
-                  </div>
-
-                  <div>
-                   
-
-                  
-                  </div>
-                </div>
-              </div>
-
               <div className="grid grid-cols-1 gap-3 sm:gap-4 md:grid-cols-2">
                 <SelectInput
                   label="Occupation"
@@ -1134,11 +1104,16 @@ function SelectInput({
       >
         {placeholder ? <option value="">{placeholder}</option> : null}
 
-        {options.map((item) => (
-          <option key={item} value={item}>
-            {item}
-          </option>
-        ))}
+        {options.map((item) => {
+          const optionValue = typeof item === 'object' ? item.value : item;
+          const optionLabel = typeof item === 'object' ? item.label : item;
+
+          return (
+            <option key={optionValue} value={optionValue}>
+              {optionLabel}
+            </option>
+          );
+        })}
       </select>
     </label>
   );

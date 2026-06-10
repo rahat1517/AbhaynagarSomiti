@@ -4,6 +4,7 @@ import {
   Link,
   Route,
   Routes,
+  useLocation,
   useNavigate,
 } from 'react-router-dom';
 
@@ -148,7 +149,7 @@ function AppLayout() {
 
     const { data, error } = await supabase
       .from('profiles')
-      .select('id, email, role, is_verified')
+      .select('id, email, role, is_verified, verification_status, full_name')
       .eq('id', userId)
       .maybeSingle();
 
@@ -199,17 +200,17 @@ function AppLayout() {
 
   return (
     <>
-      <nav className="sticky top-0 z-50 border-b border-slate-200 bg-white px-4 py-3">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-3">
+      <nav className="sticky top-0 z-50 border-b border-slate-200 bg-white/95 backdrop-blur">
+        <div className="mx-auto flex max-w-7xl items-center gap-3 px-4 py-3">
           <Link
-            to="/"
+            to={isAdmin ? '/admin/members' : '/'}
             onClick={closeMobileMenu}
-            className="text-sm font-bold text-slate-950"
+            className="shrink-0 text-sm font-bold text-slate-950 sm:text-base"
           >
             Dhabi Abhaynagar Poribar
           </Link>
 
-          <div className="hidden items-center gap-1 md:flex">
+          <div className="hidden min-w-0 flex-1 items-center justify-end gap-1 md:flex">
             <NavLinks
               hasAuthSession={hasAuthSession}
               isLoggedIn={isLoggedIn}
@@ -223,26 +224,43 @@ function AppLayout() {
             />
           </div>
 
-          <button
-            type="button"
-            onClick={() => setMobileMenuOpen((current) => !current)}
-            className="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-slate-200 bg-white text-slate-900 md:hidden"
-            aria-label="Open menu"
-          >
-            {mobileMenuOpen ? (
-              <span className="text-2xl leading-none">×</span>
-            ) : (
-              <span className="flex flex-col gap-1.5">
-                <span className="block h-0.5 w-6 rounded-full bg-slate-900" />
-                <span className="block h-0.5 w-6 rounded-full bg-slate-900" />
-                <span className="block h-0.5 w-6 rounded-full bg-slate-900" />
-              </span>
-            )}
-          </button>
+          <div className="ml-auto flex items-center gap-2 md:hidden">
+            {isAdmin && adminNotifications.pendingMembers > 0 ? (
+              <Link
+                to="/admin/members"
+                onClick={closeMobileMenu}
+                className="relative inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-amber-200 bg-amber-50 text-amber-800"
+                aria-label="Member requests"
+              >
+                <span className="text-sm font-bold">!</span>
+                <Badge
+                  count={adminNotifications.pendingMembers}
+                  className="absolute -right-1 -top-1"
+                />
+              </Link>
+            ) : null}
+
+            <button
+              type="button"
+              onClick={() => setMobileMenuOpen((current) => !current)}
+              className="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-slate-200 bg-white text-slate-900"
+              aria-label="Open menu"
+            >
+              {mobileMenuOpen ? (
+                <span className="text-2xl leading-none">×</span>
+              ) : (
+                <span className="flex flex-col gap-1.5">
+                  <span className="block h-0.5 w-6 rounded-full bg-slate-900" />
+                  <span className="block h-0.5 w-6 rounded-full bg-slate-900" />
+                  <span className="block h-0.5 w-6 rounded-full bg-slate-900" />
+                </span>
+              )}
+            </button>
+          </div>
         </div>
 
         {mobileMenuOpen ? (
-          <div className="mt-3 rounded-3xl border border-slate-200 bg-white p-3 shadow-lg md:hidden">
+          <div className="border-t border-slate-200 bg-white px-3 py-3 md:hidden">
             <div className="grid grid-cols-1 gap-2">
               <NavLinks
                 hasAuthSession={hasAuthSession}
@@ -260,26 +278,6 @@ function AppLayout() {
           </div>
         ) : null}
       </nav>
-
-      {isAdmin && adminNotifications.total > 0 ? (
-        <div className="border-b border-amber-200 bg-amber-50 px-4 py-2">
-          <div className="mx-auto flex max-w-7xl flex-col gap-2 text-sm font-semibold text-amber-800 md:flex-row md:items-center md:justify-between">
-            <span>
-              Admin notification: {adminNotifications.pendingMembers} new
-              registration(s), {adminNotifications.pendingUpdates} update
-              request(s).
-            </span>
-
-            <Link
-              to="/admin/members"
-              onClick={closeMobileMenu}
-              className="w-fit rounded-xl bg-amber-600 px-4 py-2 text-xs font-bold text-white hover:bg-amber-700"
-            >
-              Review Now
-            </Link>
-          </div>
-        </div>
-      ) : null}
 
       <Routes>
         <Route path="/" element={<LandingPage />} />
@@ -328,25 +326,35 @@ function NavLinks({
   onNavigate,
   mobile = false,
 }) {
+  const location = useLocation();
+
   const itemClass = mobile
     ? 'min-h-11 w-full rounded-2xl px-4 py-3 text-left text-sm font-semibold text-slate-700 hover:bg-slate-100'
-    : 'min-h-12 whitespace-nowrap rounded-xl px-4 py-3 text-sm font-semibold text-slate-600 hover:bg-slate-100';
+    : 'min-h-11 whitespace-nowrap rounded-xl px-3 py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-100 lg:px-4';
+
+  const activeClass = (path) =>
+    location.pathname === path ? ' bg-emerald-50 text-emerald-700' : '';
 
   if (!hasAuthSession) {
     return (
       <>
-        <NavItem to="/" className={itemClass} onClick={onNavigate}>
+        <NavItem to="/" className={itemClass + activeClass('/')} onClick={onNavigate}>
           Home
         </NavItem>
-
-        <NavItem to="/register" className={itemClass} onClick={onNavigate}>
+        <NavItem
+          to="/register"
+          className={itemClass + activeClass('/register')}
+          onClick={onNavigate}
+        >
           Register
         </NavItem>
-
-        <NavItem to="/login" className={itemClass} onClick={onNavigate}>
+        <NavItem
+          to="/login"
+          className={itemClass + activeClass('/login')}
+          onClick={onNavigate}
+        >
           Login
         </NavItem>
-
         {loadingSession ? (
           <span className="px-3 text-xs font-semibold text-slate-400">
             Loading...
@@ -362,11 +370,9 @@ function NavLinks({
         <NavItem to="/" className={itemClass} onClick={onNavigate}>
           Home
         </NavItem>
-
         <span className="rounded-xl bg-amber-50 px-4 py-3 text-sm font-semibold text-amber-700">
           Profile Missing
         </span>
-
         <button
           type="button"
           onClick={onLogout}
@@ -382,74 +388,92 @@ function NavLinks({
     return null;
   }
 
+  if (isAdmin) {
+    return (
+      <>
+        <NavItem
+          to="/admin/members"
+          className={itemClass + activeClass('/admin/members')}
+          onClick={onNavigate}
+        >
+          <span className="inline-flex items-center gap-2">
+            Member Requests
+            {adminNotifications.pendingMembers > 0 ? (
+              <Badge count={adminNotifications.pendingMembers} />
+            ) : null}
+          </span>
+        </NavItem>
+
+        <NavItem
+          to="/directory"
+          className={itemClass + activeClass('/directory')}
+          onClick={onNavigate}
+        >
+          Directory
+        </NavItem>
+
+        <NavItem
+          to="/profile"
+          className={itemClass + activeClass('/profile')}
+          onClick={onNavigate}
+        >
+          Profile
+        </NavItem>
+
+        <NavItem
+          to="/admin/roster"
+          className={itemClass + activeClass('/admin/roster')}
+          onClick={onNavigate}
+        >
+          Roster
+        </NavItem>
+
+        <button
+          type="button"
+          onClick={onLogout}
+          className={`${itemClass} text-red-600 hover:bg-red-50`}
+        >
+          Logout
+        </button>
+      </>
+    );
+  }
+
   return (
     <>
-      <NavItem to="/" className={itemClass} onClick={onNavigate}>
-        Home
-      </NavItem>
+      {(isVerified || isAdmin) && (
+        <NavItem
+          to="/directory"
+          className={itemClass + activeClass('/directory')}
+          onClick={onNavigate}
+        >
+          Directory
+        </NavItem>
+      )}
 
-      <NavItem to="/profile" className={itemClass} onClick={onNavigate}>
+      <NavItem
+        to="/profile"
+        className={itemClass + activeClass('/profile')}
+        onClick={onNavigate}
+      >
         Profile
       </NavItem>
 
       {isVerified ? (
         <>
-          <NavItem to="/directory" className={itemClass} onClick={onNavigate}>
-            Directory
-          </NavItem>
-
-          <NavItem to="/career/jobs" className={itemClass} onClick={onNavigate}>
+          <NavItem
+            to="/career/jobs"
+            className={itemClass + activeClass('/career/jobs')}
+            onClick={onNavigate}
+          >
             Jobs
           </NavItem>
-
           <NavItem
             to="/career/alumni"
-            className={itemClass}
+            className={itemClass + activeClass('/career/alumni')}
             onClick={onNavigate}
           >
             Alumni Career
-          </NavItem>
-        </>
-      ) : null}
-
-      {/* <NavItem to="/privacy" className={itemClass} onClick={onNavigate}>
-        Privacy
-      </NavItem>
-
-      <NavItem
-        to="/privacy/visibility"
-        className={itemClass}
-        onClick={onNavigate}
-      >
-        Visibility
-      </NavItem> */}
-
-      {isAdmin ? (
-        <>
-          <NavItem to="/admin/members" className={itemClass} onClick={onNavigate}>
-            <span className="inline-flex items-center gap-2">
-              Member Verify
-              {adminNotifications.pendingMembers > 0 ? (
-                <Badge count={adminNotifications.pendingMembers} />
-              ) : null}
-            </span>
-          </NavItem>
-
-          <NavItem
-            to="/admin/member-updates"
-            className={itemClass}
-            onClick={onNavigate}
-          >
-            <span className="inline-flex items-center gap-2">
-              Update Requests
-              {adminNotifications.pendingUpdates > 0 ? (
-                <Badge count={adminNotifications.pendingUpdates} />
-              ) : null}
-            </span>
-          </NavItem>
-
-          <NavItem to="/admin/roster" className={itemClass} onClick={onNavigate}>
-            Roster
           </NavItem>
         </>
       ) : null}
@@ -479,9 +503,11 @@ function NavItem({ to, children, className, onClick }) {
   );
 }
 
-function Badge({ count }) {
+function Badge({ count, className = '' }) {
   return (
-    <span className="inline-flex h-6 min-w-6 items-center justify-center rounded-full bg-red-600 px-2 text-xs font-black text-white">
+    <span
+      className={`inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-red-600 px-1.5 text-[10px] font-black text-white ${className}`}
+    >
       {count > 99 ? '99+' : count}
     </span>
   );

@@ -1,6 +1,10 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { supabase } from '../../lib/supabaseClient';
+import { ProfileDetailsModal } from '../../components/MemberProfileDetails';
 import {
   getDirectoryProfileDetails,
+  getMemberTypeLabel,
   searchDirectoryProfiles,
 } from '../../services/directoryService';
 
@@ -15,6 +19,8 @@ const initialFilters = {
 };
 
 export default function DirectoryPage() {
+  const navigate = useNavigate();
+
   const [filters, setFilters] = useState(initialFilters);
   const [appliedFilters, setAppliedFilters] = useState(initialFilters);
   const [profiles, setProfiles] = useState([]);
@@ -23,6 +29,9 @@ export default function DirectoryPage() {
   const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
   const [isProfileDrawerOpen, setIsProfileDrawerOpen] = useState(false);
 
+  const [authChecked, setAuthChecked] = useState(false);
+  const [viewerProfile, setViewerProfile] = useState(null);
+  const [detailError, setDetailError] = useState('');
   const [loading, setLoading] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
   const [detailLoading, setDetailLoading] = useState(false);
@@ -32,6 +41,37 @@ export default function DirectoryPage() {
 
   const observerRef = useRef(null);
   const lastItemRef = useRef(null);
+
+  useEffect(() => {
+    async function checkAuth() {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      if (!session) {
+        navigate('/login', { replace: true });
+        return;
+      }
+
+      const { data: profile, error } = await supabase
+        .from('profiles')
+        .select('id, role, is_verified, verification_status')
+        .eq('id', session.user.id)
+        .maybeSingle();
+
+      if (error) {
+        console.error('Failed to load viewer profile:', error);
+      }
+
+      setViewerProfile(profile);
+      setAuthChecked(true);
+    }
+
+    checkAuth();
+  }, [navigate]);
+
+  const canViewDirectory =
+    viewerProfile?.role === 'admin' || viewerProfile?.is_verified === true;
 
   const lastCursor = useMemo(() => {
     if (profiles.length === 0) return null;
@@ -85,9 +125,11 @@ export default function DirectoryPage() {
   );
 
   useEffect(() => {
+    if (!authChecked || !canViewDirectory) return;
+
     loadProfiles({ reset: true });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [authChecked, canViewDirectory]);
 
   useEffect(() => {
     if (!lastItemRef.current || !hasMore || loadingMore || loading) return;
@@ -161,124 +203,206 @@ export default function DirectoryPage() {
   async function openProfile(profileId) {
     setDetailLoading(true);
     setSelectedProfile(null);
+    setDetailError('');
     setIsProfileDrawerOpen(true);
-    setStatus({ type: '', message: '' });
 
     try {
       const data = await getDirectoryProfileDetails(profileId);
       setSelectedProfile(data);
     } catch (error) {
-      setStatus({
-        type: 'error',
-        message: error.message || 'Failed to load profile details.',
-      });
+      setDetailError(error.message || 'Failed to load profile details.');
     } finally {
       setDetailLoading(false);
     }
   }
 
+  if (!authChecked) {
+    return (
+      <main className="min-h-screen bg-slate-50 px-3 py-4 sm:px-6 sm:py-6 lg:px-8">
+        <section className="mx-auto max-w-7xl">
+          <PanelMessage message="Checking session..." />
+        </section>
+      </main>
+    );
+  }
+
+  if (!canViewDirectory) {
+    return (
+      <main className="min-h-screen bg-slate-50 px-3 py-4 sm:px-6 sm:py-6 lg:px-8">
+        <section className="mx-auto max-w-3xl rounded-3xl bg-white p-6 shadow-soft sm:p-8">
+          <p className="text-sm font-semibold uppercase tracking-[0.25em] text-amber-600">
+            Awaiting Approval
+          </p>
+          <h1 className="mt-3 text-2xl font-bold text-slate-950">
+            Directory access is pending
+          </h1>
+          <p className="mt-3 text-sm leading-6 text-slate-600">
+            Your registration is under admin review. Once approved, you will be
+            able to browse the member directory here.
+          </p>
+          <Link
+            to="/profile"
+            className="mt-6 inline-flex min-h-11 items-center justify-center rounded-2xl bg-emerald-600 px-5 text-sm font-bold text-white hover:bg-emerald-700"
+          >
+            View My Profile
+          </Link>
+        </section>
+      </main>
+    );
+  }
+
   return (
-    <main className="min-h-screen bg-gradient-to-br from-emerald-50 via-slate-50 to-sky-50">
-      <section className="mx-auto max-w-7xl px-3 py-4 sm:px-6 sm:py-6 lg:px-8">
-        <div className="overflow-hidden rounded-[28px] border border-white/70 bg-white/80 shadow-xl shadow-slate-200/70 backdrop-blur">
-          <div className="bg-gradient-to-r from-slate-950 via-slate-900 to-emerald-900 px-4 py-6 text-white sm:px-6 sm:py-8">
-            <p className="text-[11px] font-bold uppercase tracking-[0.32em] text-emerald-300 sm:text-sm">
-              Directory
+    <main className="min-h-screen bg-slate-50 px-3 py-4 sm:px-6 sm:py-6 lg:px-8">
+      <section className="mx-auto max-w-7xl">
+        <div className="flex flex-col gap-3 border-b border-slate-200 pb-5 md:flex-row md:items-end md:justify-between">
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-[0.25em] text-emerald-600">
+              Member Portal
             </p>
 
-            <div className="mt-3 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-              <div>
-                <h1 className="text-2xl font-black leading-tight sm:text-3xl lg:text-4xl">
-                  Student & Alumni Directory
-                </h1>
+            <h1 className="mt-2 text-3xl font-bold text-slate-950">
+              Member Directory
+            </h1>
 
-                <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-200 sm:text-base">
-                  Search verified students and alumni. Logged-in members can
-                  view full profile details from this page.
+            <p className="mt-2 text-sm text-slate-500">
+              Browse verified members. Click Details to view full profile
+              information.
+            </p>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => loadProfiles({ reset: true })}
+            disabled={loading}
+            className="min-h-12 rounded-2xl border border-slate-300 bg-white px-5 text-sm font-semibold text-slate-700 hover:bg-slate-100 disabled:opacity-50"
+          >
+            Refresh
+          </button>
+        </div>
+
+        <MemberPanelNav />
+
+        {status.message ? (
+          <StatusBox type={status.type} message={status.message} />
+        ) : null}
+
+        <div className="mt-6 grid grid-cols-1 gap-5 lg:grid-cols-[280px_1fr]">
+          <aside className="hidden lg:block">
+            <div className="sticky top-24 rounded-3xl border border-slate-200 bg-white p-5 shadow-soft">
+              <FilterPanel
+                filters={filters}
+                updateFilter={updateFilter}
+                applyFilters={applyFilters}
+                clearFilters={clearFilters}
+              />
+            </div>
+          </aside>
+
+          <div className="rounded-3xl bg-white p-5 shadow-soft">
+            <div className="flex flex-col gap-3 border-b border-slate-200 pb-4 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <h2 className="text-xl font-bold text-slate-950">
+                  Registered Members
+                </h2>
+                <p className="mt-1 text-sm text-slate-500">
+                  {loading
+                    ? 'Loading members...'
+                    : `${profiles.length} member(s) loaded`}
                 </p>
               </div>
 
-              <div className="grid grid-cols-2 gap-3 sm:min-w-64">
-                <MiniStat label="Loaded" value={profiles.length} />
-                <MiniStat label="Status" value={loading ? 'Loading' : 'Ready'} />
-              </div>
-            </div>
-          </div>
-
-          <div className="border-b border-slate-200 bg-white/90 px-4 py-4 sm:px-6">
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <button
                 type="button"
                 onClick={() => setIsFilterDrawerOpen(true)}
-                className="min-h-12 rounded-2xl bg-slate-950 px-5 text-sm font-bold text-white shadow-lg shadow-slate-300/60 transition hover:bg-slate-800 md:hidden"
+                className="min-h-11 rounded-2xl border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-700 hover:bg-slate-100 lg:hidden"
               >
-                Open Filters
+                Filters
               </button>
-
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-end md:ml-auto">
-                <p className="text-sm font-semibold text-slate-500">
-                  {profiles.length} profiles loaded
-                </p>
-
-                <button
-                  type="button"
-                  onClick={() => loadProfiles({ reset: true })}
-                  className="min-h-12 rounded-2xl border border-emerald-200 bg-emerald-50 px-5 text-sm font-bold text-emerald-700 transition hover:bg-emerald-100"
-                >
-                  Refresh
-                </button>
-              </div>
             </div>
-          </div>
 
-          {status.message ? (
-            <div className="px-4 sm:px-6">
-              <StatusBox type={status.type} message={status.message} />
+            {loading ? <PanelMessage message="Loading directory..." /> : null}
+
+            {!loading && !status.message && profiles.length === 0 ? (
+              <PanelMessage message="No members found. Try adjusting your filters." />
+            ) : null}
+
+            <div className="mt-5 hidden overflow-x-auto xl:block">
+              <table className="min-w-full text-left text-sm">
+                <thead>
+                  <tr className="border-b border-slate-200 text-xs font-bold uppercase tracking-wider text-slate-500">
+                    <th className="px-3 py-3">Full Name</th>
+                    <th className="px-3 py-3">Member Type</th>
+                    <th className="px-3 py-3">Academic Year</th>
+                    <th className="px-3 py-3">Subject</th>
+                    <th className="px-3 py-3">Address</th>
+                    <th className="px-3 py-3">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {profiles.map((profile, index) => {
+                    const isLast = index === profiles.length - 1;
+
+                    return (
+                      <tr
+                        key={profile.profile_id}
+                        ref={isLast ? lastItemRef : null}
+                        className="border-b border-slate-100"
+                      >
+                        <td className="px-3 py-4 font-semibold text-slate-900">
+                          {profile.full_name || '-'}
+                        </td>
+                        <td className="px-3 py-4">
+                          {profile.member_type_label || 'Member'}
+                        </td>
+                        <td className="px-3 py-4">
+                          {profile.academic_year || '-'}
+                        </td>
+                        <td className="px-3 py-4">
+                          {profile.university_subject ||
+                            profile.department_name ||
+                            '-'}
+                        </td>
+                        <td className="max-w-xs px-3 py-4 text-slate-600">
+                          {profile.present_address || '-'}
+                        </td>
+                        <td className="px-3 py-4">
+                          <button
+                            type="button"
+                            onClick={() => openProfile(profile.profile_id)}
+                            className="min-h-10 rounded-xl bg-emerald-600 px-4 text-sm font-bold text-white hover:bg-emerald-700"
+                          >
+                            Details
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
             </div>
-          ) : null}
 
-          <div className="grid grid-cols-1 gap-5 p-4 sm:p-6 md:grid-cols-[300px_1fr]">
-            <aside className="hidden md:block">
-              <div className="sticky top-5 rounded-[26px] border border-slate-200 bg-white p-5 shadow-lg shadow-slate-200/70">
-                <FilterPanel
-                  filters={filters}
-                  updateFilter={updateFilter}
-                  applyFilters={applyFilters}
-                  clearFilters={clearFilters}
-                />
-              </div>
-            </aside>
+            <div className="mt-5 grid grid-cols-1 gap-4 xl:hidden">
+              {profiles.map((profile, index) => {
+                const isLast = index === profiles.length - 1;
 
-            <section>
-              {loading ? <PanelMessage message="Loading directory..." /> : null}
+                return (
+                  <ProfileCard
+                    key={profile.profile_id}
+                    profile={profile}
+                    onOpen={() => openProfile(profile.profile_id)}
+                    refProp={isLast ? lastItemRef : null}
+                  />
+                );
+              })}
+            </div>
 
-              {!loading && profiles.length === 0 ? (
-                <PanelMessage message="No matching verified profiles found." />
-              ) : null}
+            {loadingMore ? (
+              <PanelMessage message="Loading more members..." />
+            ) : null}
 
-              <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-                {profiles.map((profile, index) => {
-                  const isLast = index === profiles.length - 1;
-
-                  return (
-                    <ProfileCard
-                      key={profile.profile_id}
-                      profile={profile}
-                      onOpen={() => openProfile(profile.profile_id)}
-                      refProp={isLast ? lastItemRef : null}
-                    />
-                  );
-                })}
-              </div>
-
-              {loadingMore ? (
-                <PanelMessage message="Loading more profiles..." />
-              ) : null}
-
-              {!hasMore && profiles.length > 0 ? (
-                <PanelMessage message="End of directory results." />
-              ) : null}
-            </section>
+            {!hasMore && profiles.length > 0 ? (
+              <PanelMessage message="End of directory results." />
+            ) : null}
           </div>
         </div>
       </section>
@@ -295,24 +419,48 @@ export default function DirectoryPage() {
         />
       </MobileFilterDrawer>
 
-      <ProfileDetailsDrawer
+      <ProfileDetailsModal
         open={isProfileDrawerOpen}
         onClose={() => setIsProfileDrawerOpen(false)}
         loading={detailLoading}
+        error={detailError}
         profile={selectedProfile}
+        title="Member Details"
       />
     </main>
   );
 }
 
-function MiniStat({ label, value }) {
+function MemberPanelNav() {
+  const location = useLocation();
+
+  const items = [
+    { to: '/directory', label: 'Directory' },
+    { to: '/profile', label: 'Profile' },
+    { to: '/career/jobs', label: 'Jobs' },
+    { to: '/career/alumni', label: 'Alumni Career' },
+  ];
+
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/10 p-3 backdrop-blur">
-      <p className="text-[11px] font-bold uppercase tracking-wider text-slate-300">
-        {label}
-      </p>
-      <p className="mt-1 truncate text-sm font-black text-white">{value}</p>
-    </div>
+    <nav className="mt-5 flex flex-wrap gap-2 rounded-2xl border border-slate-200 bg-white p-2 shadow-soft">
+      {items.map((item) => {
+        const isActive = location.pathname === item.to;
+
+        return (
+          <Link
+            key={item.to}
+            to={item.to}
+            className={`min-h-11 whitespace-nowrap rounded-xl px-4 py-2.5 text-sm font-semibold transition ${
+              isActive
+                ? 'bg-emerald-600 text-white'
+                : 'text-slate-600 hover:bg-slate-100'
+            }`}
+          >
+            {item.label}
+          </Link>
+        );
+      })}
+    </nav>
   );
 }
 
@@ -320,10 +468,8 @@ function FilterPanel({ filters, updateFilter, applyFilters, clearFilters }) {
   return (
     <div>
       <div>
-        <h2 className="text-lg font-black text-slate-950">Filters</h2>
-        <p className="mt-1 text-sm text-slate-500">
-          Refine directory results.
-        </p>
+        <h2 className="text-lg font-bold text-slate-950">Filters</h2>
+        <p className="mt-1 text-sm text-slate-500">Refine directory results.</p>
       </div>
 
       <div className="mt-5 space-y-4">
@@ -392,7 +538,7 @@ function FilterPanel({ filters, updateFilter, applyFilters, clearFilters }) {
         <button
           type="button"
           onClick={applyFilters}
-          className="min-h-12 rounded-2xl bg-emerald-600 px-5 text-sm font-black text-white shadow-lg shadow-emerald-200 transition hover:bg-emerald-700"
+          className="min-h-12 rounded-2xl bg-emerald-600 px-5 text-sm font-bold text-white hover:bg-emerald-700"
         >
           Apply Filters
         </button>
@@ -400,7 +546,7 @@ function FilterPanel({ filters, updateFilter, applyFilters, clearFilters }) {
         <button
           type="button"
           onClick={clearFilters}
-          className="min-h-12 rounded-2xl border border-slate-300 bg-white px-5 text-sm font-bold text-slate-700 transition hover:bg-slate-100"
+          className="min-h-12 rounded-2xl border border-slate-300 bg-white px-5 text-sm font-semibold text-slate-700 hover:bg-slate-100"
         >
           Clear
         </button>
@@ -409,16 +555,29 @@ function FilterPanel({ filters, updateFilter, applyFilters, clearFilters }) {
   );
 }
 
+function getMemberTypeBadgeClass(memberType) {
+  if (memberType === 'student') {
+    return 'bg-emerald-50 text-emerald-700';
+  }
+
+  if (memberType === 'alumni') {
+    return 'bg-indigo-50 text-indigo-700';
+  }
+
+  return 'bg-slate-100 text-slate-600';
+}
+
 function ProfileCard({ profile, onOpen, refProp }) {
-  const isStudent = profile.role === 'student';
+  const memberTypeLabel =
+    profile.member_type_label || getMemberTypeLabel(profile.member_type);
 
   return (
     <article
       ref={refProp}
-      className="group rounded-[26px] border border-white bg-white p-4 shadow-lg shadow-slate-200/80 transition hover:-translate-y-1 hover:shadow-xl sm:p-5"
+      className="rounded-3xl border border-slate-200 bg-slate-50 p-4"
     >
       <div className="flex items-start gap-4">
-        <div className="h-16 w-16 shrink-0 overflow-hidden rounded-2xl bg-gradient-to-br from-slate-100 to-emerald-50 ring-1 ring-slate-200 sm:h-20 sm:w-20">
+        <div className="h-20 w-20 shrink-0 overflow-hidden rounded-3xl bg-slate-200">
           {profile.profile_photo_url ? (
             <img
               src={profile.profile_photo_url}
@@ -433,294 +592,50 @@ function ProfileCard({ profile, onOpen, refProp }) {
         </div>
 
         <div className="min-w-0 flex-1">
-          <div className="flex flex-wrap items-center gap-2">
+          <h3 className="break-words text-lg font-black text-slate-950">
+            {profile.full_name || profile.email || 'Unnamed Member'}
+          </h3>
+
+          <div className="mt-2 flex flex-wrap gap-2">
             <span
-              className={`rounded-full px-3 py-1 text-[11px] font-black sm:text-xs ${
-                isStudent
-                  ? 'bg-emerald-100 text-emerald-700'
-                  : 'bg-indigo-100 text-indigo-700'
-              }`}
+              className={`rounded-full px-3 py-1 text-xs font-bold ${getMemberTypeBadgeClass(
+                profile.member_type
+              )}`}
             >
-              {isStudent ? 'Current Student' : 'Alumni'}
+              {memberTypeLabel}
             </span>
 
-            <span className="rounded-full bg-slate-100 px-3 py-1 text-[11px] font-black text-slate-600 sm:text-xs">
+            <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-600">
               Verified
             </span>
           </div>
-
-          <h2 className="mt-3 break-words text-base font-black leading-snug text-slate-950 sm:text-lg">
-            {profile.full_name || profile.email || 'Unnamed Member'}
-          </h2>
         </div>
       </div>
 
-      <div className="mt-5 space-y-3 rounded-2xl bg-slate-50 p-4 text-sm">
-        <InfoLine label="Department" value={profile.department_name} />
-        <InfoLine label="Hall" value={profile.hall} />
-        <InfoLine label="Session" value={profile.academic_session} />
-
-        {!isStudent ? (
-          <>
-            <InfoLine label="Occupation" value={profile.occupation} />
-            <InfoLine
-              label="Professional"
-              value={profile.professional_details}
-            />
-          </>
-        ) : null}
+      <div className="mt-4 grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
+        <InfoItem
+          label="Academic Year"
+          value={profile.academic_year}
+        />
+        <InfoItem
+          label="Subject"
+          value={profile.university_subject || profile.department_name}
+        />
+        <InfoItem label="Hall" value={profile.hall} />
+        <InfoItem
+          label="Address"
+          value={profile.present_address}
+        />
       </div>
 
       <button
         type="button"
         onClick={onOpen}
-        className="mt-5 min-h-12 w-full rounded-2xl bg-gradient-to-r from-slate-950 to-emerald-900 px-5 text-sm font-black text-white shadow-lg shadow-slate-300 transition hover:from-slate-800 hover:to-emerald-800"
+        className="mt-4 min-h-12 w-full rounded-2xl bg-emerald-600 px-5 text-sm font-bold text-white hover:bg-emerald-700"
       >
-        View Details
+        Details
       </button>
     </article>
-  );
-}
-
-function ProfileDetailsDrawer({ open, onClose, loading, profile }) {
-  return (
-    <div
-      className={`fixed inset-0 z-50 transition ${
-        open ? 'pointer-events-auto' : 'pointer-events-none'
-      }`}
-    >
-      <div
-        onClick={onClose}
-        className={`absolute inset-0 bg-slate-950/60 backdrop-blur-sm transition-opacity ${
-          open ? 'opacity-100' : 'opacity-0'
-        }`}
-      />
-
-      <aside
-        className={`absolute bottom-0 right-0 w-full rounded-t-[30px] bg-white shadow-2xl transition-transform duration-300 md:top-0 md:h-full md:max-w-2xl md:rounded-l-[30px] md:rounded-t-none ${
-          open
-            ? 'translate-y-0 md:translate-x-0'
-            : 'translate-y-full md:translate-x-full md:translate-y-0'
-        }`}
-      >
-        <div className="sticky top-0 z-10 flex items-center justify-between border-b border-slate-200 bg-white/95 p-4 backdrop-blur sm:p-5">
-          <div>
-            <h2 className="text-lg font-black text-slate-950">
-              Profile Details
-            </h2>
-
-            <p className="text-sm text-slate-500">
-              Full verified member information
-            </p>
-          </div>
-
-          <button
-            type="button"
-            onClick={onClose}
-            className="min-h-11 rounded-2xl border border-slate-300 px-4 text-sm font-bold text-slate-700 transition hover:bg-slate-100"
-          >
-            Close
-          </button>
-        </div>
-
-        <div className="max-h-[78vh] overflow-y-auto p-4 sm:p-5 md:max-h-[calc(100vh-82px)]">
-          {loading ? (
-            <PanelMessage message="Loading profile details..." />
-          ) : null}
-
-          {!loading && !profile ? (
-            <PanelMessage message="Select a profile to view details." />
-          ) : null}
-
-          {!loading && profile ? (
-            <ProfileDetailsContent profile={profile} />
-          ) : null}
-        </div>
-      </aside>
-    </div>
-  );
-}
-
-function ProfileDetailsContent({ profile }) {
-  const isStudent = profile.role === 'student';
-
-  return (
-    <div>
-      <div className="rounded-[26px] bg-gradient-to-br from-slate-950 to-emerald-900 p-5 text-white">
-        <div className="flex items-start gap-4">
-          <div className="h-20 w-20 shrink-0 overflow-hidden rounded-3xl bg-white/10 ring-2 ring-white/20">
-            {profile.profile_photo_url ? (
-              <img
-                src={profile.profile_photo_url}
-                alt={profile.full_name || 'Member'}
-                className="h-full w-full object-cover"
-              />
-            ) : (
-              <div className="flex h-full w-full items-center justify-center text-2xl font-black text-white/70">
-                {(profile.full_name || '?').charAt(0).toUpperCase()}
-              </div>
-            )}
-          </div>
-
-          <div className="min-w-0 flex-1">
-            <span
-              className={`rounded-full px-3 py-1 text-xs font-black ${
-                isStudent
-                  ? 'bg-emerald-300 text-emerald-950'
-                  : 'bg-indigo-300 text-indigo-950'
-              }`}
-            >
-              {isStudent ? 'Current Student' : 'Alumni'}
-            </span>
-
-            <h3 className="mt-3 break-words text-xl font-black sm:text-2xl">
-              {profile.full_name || profile.email || 'Unnamed Member'}
-            </h3>
-
-            {profile.nick_name ? (
-              <p className="mt-1 text-sm text-slate-200">
-                Nick Name: {profile.nick_name}
-              </p>
-            ) : null}
-
-            <p className="mt-1 text-sm text-slate-300">
-              Joined{' '}
-              {profile.created_at
-                ? new Date(profile.created_at).toLocaleDateString()
-                : '-'}
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <DetailsGroup title="Basic Information">
-        <DetailItem label="Full Name" value={profile.full_name} />
-        <DetailItem label="Nick Name" value={profile.nick_name} />
-        <DetailItem label="Date of Birth" value={profile.date_of_birth} />
-        <DetailItem label="Gender" value={profile.gender} />
-        <DetailItem label="Blood Group" value={profile.blood_group} />
-      </DetailsGroup>
-
-      <DetailsGroup title="Contact Information">
-        <DetailItem label="Email" value={profile.email} />
-        <DetailItem label="Contact Number" value={profile.contact_number} />
-        <DetailItem
-          label="Facebook Profile"
-          value={profile.facebook_profile_link}
-        />
-      </DetailsGroup>
-
-      <DetailsGroup title="University Information">
-        <DetailItem label="Hall Name" value={profile.university_hall_name} />
-        <DetailItem
-          label="First Year Admission Session"
-          value={profile.first_year_admission_session}
-        />
-        <DetailItem
-          label="Subject / Department"
-          value={profile.university_subject || profile.department_name}
-        />
-        <DetailItem
-          label="University Document"
-          value={profile.university_document_url ? 'Uploaded' : 'Not uploaded'}
-        />
-      </DetailsGroup>
-
-      <DetailsGroup title="SSC Information">
-        <DetailItem
-          label="SSC Institute"
-          value={profile.ssc_institution_name}
-        />
-        <DetailItem label="SSC Group" value={profile.ssc_group} />
-        <DetailItem
-          label="SSC Passing Year"
-          value={profile.ssc_passing_year}
-        />
-        <DetailItem label="SSC GPA" value={profile.ssc_gpa} />
-      </DetailsGroup>
-
-      <DetailsGroup title="HSC Information">
-        <DetailItem
-          label="HSC Institute"
-          value={profile.hsc_institution_name}
-        />
-        <DetailItem label="HSC Group" value={profile.hsc_group} />
-        <DetailItem
-          label="HSC Passing Year"
-          value={profile.hsc_passing_year}
-        />
-        <DetailItem label="HSC GPA" value={profile.hsc_gpa} />
-      </DetailsGroup>
-
-      <DetailsGroup title="Address">
-        <DetailItem
-          label="Union / Pouroshova"
-          value={profile.union_pouroshova_name}
-        />
-        <DetailItem
-          label="Ward / Village"
-          value={profile.ward_village_name}
-        />
-        <DetailItem
-          label="Para / Moholla"
-          value={profile.para_moholla_name}
-        />
-        <DetailItem label="Present Address" value={profile.present_address} />
-      </DetailsGroup>
-
-      <DetailsGroup title="Occupation">
-        <DetailItem label="Occupation" value={profile.occupation} />
-        <DetailItem
-          label="Professional Details"
-          value={profile.professional_details}
-        />
-      </DetailsGroup>
-
-      {profile.member_degree_qualifications?.length ? (
-        <DetailsGroup title="Higher Degree">
-          {profile.member_degree_qualifications.map((degree, index) => (
-            <div
-              key={index}
-              className="rounded-2xl border border-emerald-100 bg-emerald-50/70 p-4"
-            >
-              <DetailItem label="Degree" value={degree.degree_name} />
-              <DetailItem
-                label="Institution"
-                value={degree.institution_name}
-              />
-              <DetailItem
-                label="Subject / Department"
-                value={degree.subject_department}
-              />
-              <DetailItem label="Passing Year" value={degree.passing_year} />
-            </div>
-          ))}
-        </DetailsGroup>
-      ) : null}
-
-      {profile.life_story ? (
-        <div className="mt-5 rounded-[26px] border border-slate-200 bg-white p-4 shadow-sm">
-          <h4 className="text-sm font-black text-slate-950">
-            Memories and Stories
-          </h4>
-
-          <p className="mt-3 whitespace-pre-line text-sm leading-6 text-slate-700">
-            {profile.life_story}
-          </p>
-        </div>
-      ) : null}
-
-      
-    </div>
-  );
-}
-
-function DetailsGroup({ title, children }) {
-  return (
-    <div className="mt-5 rounded-[26px] border border-slate-200 bg-white p-4 shadow-sm">
-      <h4 className="text-sm font-black text-slate-950">{title}</h4>
-      <div className="mt-4 grid grid-cols-1 gap-3">{children}</div>
-    </div>
   );
 }
 
@@ -816,7 +731,7 @@ function SelectInput({ label, name, value, onChange, options }) {
 function StatusBox({ type, message }) {
   return (
     <div
-      className={`mt-5 rounded-2xl border p-4 text-sm font-bold ${
+      className={`mt-5 rounded-2xl border p-4 text-sm font-medium ${
         type === 'success'
           ? 'border-emerald-200 bg-emerald-50 text-emerald-800'
           : 'border-red-200 bg-red-50 text-red-700'
@@ -827,25 +742,13 @@ function StatusBox({ type, message }) {
   );
 }
 
-function InfoLine({ label, value }) {
+function InfoItem({ label, value }) {
   return (
-    <div className="flex items-start justify-between gap-4">
-      <span className="shrink-0 text-slate-500">{label}</span>
-      <span className="break-words text-right font-black text-slate-900">
-        {value || '-'}
-      </span>
-    </div>
-  );
-}
-
-function DetailItem({ label, value }) {
-  return (
-    <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-      <p className="text-[11px] font-black uppercase tracking-wider text-slate-400">
+    <div className="rounded-2xl border border-slate-200 bg-white p-3">
+      <p className="text-xs font-bold uppercase tracking-wider text-slate-400">
         {label}
       </p>
-
-      <p className="mt-1 break-words text-sm font-bold leading-6 text-slate-900">
+      <p className="mt-1 break-words text-sm font-bold text-slate-900">
         {value || '-'}
       </p>
     </div>
@@ -854,7 +757,7 @@ function DetailItem({ label, value }) {
 
 function PanelMessage({ message }) {
   return (
-    <div className="mt-4 rounded-[26px] border border-white bg-white p-6 text-sm font-semibold text-slate-500 shadow-lg shadow-slate-200/70">
+    <div className="mt-5 rounded-3xl border border-slate-200 bg-slate-50 p-6 text-sm text-slate-500">
       {message}
     </div>
   );

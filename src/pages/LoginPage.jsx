@@ -56,7 +56,15 @@ export default function LoginPage() {
         throw new Error('Login failed. Please try again.');
       }
 
-      navigate('/');
+      const profile = result.profile;
+
+      if (profile?.role === 'admin') {
+        navigate('/admin/members');
+      } else if (profile?.is_verified === true) {
+        navigate('/directory');
+      } else {
+        navigate('/profile');
+      }
     } catch (error) {
       setStatus({
         type: 'error',

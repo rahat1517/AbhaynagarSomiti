@@ -114,6 +114,16 @@ function validateRegistrationForm(form) {
     throw new Error('Subject / Department is required.');
   }
 
+  const memberType = cleanText(form.memberType)?.toLowerCase();
+
+  if (!memberType || !['student', 'alumni'].includes(memberType)) {
+    throw new Error('Member type is required.');
+  }
+
+  if (!cleanText(form.academicYear)) {
+    throw new Error('Passing Year / Current Year is required.');
+  }
+
   if (!cleanText(form.sscInstitutionName)) {
     throw new Error('SSC institute name is required.');
   }
@@ -185,9 +195,12 @@ export async function registerAssociationUser(form) {
     cleanText(form.occupation)?.toLowerCase() === 'student' ||
     !cleanText(form.occupation);
 
+  const memberType = cleanText(form.memberType).toLowerCase();
+
   const profilePayload = {
     id: userId,
     email,
+    role: 'member',
 
     full_name: cleanText(form.fullName),
     nick_name: cleanText(form.nickName),
@@ -206,6 +219,8 @@ export async function registerAssociationUser(form) {
     university_hall_name: cleanText(form.universityHallName),
     first_year_admission_session: cleanText(form.firstYearAdmissionSession),
     university_subject: cleanText(form.universitySubject),
+    member_type: memberType,
+    academic_year: cleanText(form.academicYear),
 
     // University document disabled
     university_document_url: null,
@@ -213,12 +228,12 @@ export async function registerAssociationUser(form) {
     ssc_institution_name: cleanText(form.sscInstitutionName),
     ssc_group: cleanText(form.sscGroup),
     ssc_passing_year: cleanText(form.sscPassingYear),
-    ssc_gpa: cleanText(form.sscGpa),
+  
 
     hsc_institution_name: cleanText(form.hscInstitutionName),
     hsc_group: cleanText(form.hscGroup),
     hsc_passing_year: cleanText(form.hscPassingYear),
-    hsc_gpa: cleanText(form.hscGpa),
+
 
     union_pouroshova_name: cleanText(form.unionPouroshovaName),
     ward_village_name: cleanText(form.wardVillageName),
@@ -240,6 +255,7 @@ export async function registerAssociationUser(form) {
     pdpo_consent_timestamp: new Date().toISOString(),
 
     verification_status: 'pending',
+    is_verified: false,
     is_approved: false,
   };
 
