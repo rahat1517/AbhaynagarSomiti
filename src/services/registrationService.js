@@ -1,20 +1,76 @@
 import { supabase } from '../lib/supabaseClient';
-import {
-  uploadProfilePhoto,
-  uploadUniversityDocument,
-} from './verificationService';
+
+const PROFILE_PHOTO_BUCKET = 'profile-photos';
 
 function cleanText(value) {
-  if (value === undefined || value === null) return '';
-  return String(value).trim();
+  if (value === undefined || value === null) return null;
+
+  const trimmed = String(value).trim();
+  return trimmed.length > 0 ? trimmed : null;
 }
 
-function normalizeEmail(email) {
-  return String(email || '').trim().toLowerCase();
+function getFileExtension(fileName = '') {
+  const parts = fileName.split('.');
+  return parts.length > 1 ? parts.pop().toLowerCase() : '';
 }
 
-function isStudentOccupation(occupation) {
-  return String(occupation || '').trim().toLowerCase() === 'student';
+async function uploadProfilePhoto({ userId, file }) {
+  if (!userId) {
+    throw new Error('User ID is required.');
+  }
+
+  if (!file) {
+    return null;
+  }
+
+  const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+
+  if (!allowedTypes.includes(file.type)) {
+    throw new Error('Only JPG, PNG, or WEBP profile photo is allowed.');
+  }
+
+  if (file.size > 5 * 1024 * 1024) {
+    throw new Error('Profile photo must be 5MB or smaller.');
+  }
+
+  const timestamp = Date.now();
+  const extension = getFileExtension(file.name) || 'jpg';
+  const safeFileName = `profile-${timestamp}.${extension}`;
+  const storagePath = `${userId}/${safeFileName}`;
+
+  const { data, error } = await supabase.storage
+    .from(PROFILE_PHOTO_BUCKET)
+    .upload(storagePath, file, {
+      contentType: file.type,
+      cacheControl: '3600',
+      upsert: true,
+    });
+
+  if (error) {
+    console.error('uploadProfilePhoto error:', error);
+    throw new Error(error.message);
+  }
+
+  const { data: publicUrlData } = supabase.storage
+    .from(PROFILE_PHOTO_BUCKET)
+    .getPublicUrl(data.path);
+
+  return publicUrlData.publicUrl;
+}
+
+export async function uploadUniversityDocument() {
+  return null;
+}
+
+export async function getSignedUniversityDocumentUrl() {
+  return null;
+}
+
+export async function requestMyUniversityDocumentUpdate() {
+  return {
+    success: true,
+    message: 'University document update is disabled.',
+  };
 }
 
 function validateRegistrationForm(form) {
@@ -95,54 +151,15 @@ function validateRegistrationForm(form) {
   }
 }
 
-function mapAcademicQualifications(form) {
-  return [
-    {
-      level: 'SSC',
-      institution_name: cleanText(form.sscInstitutionName),
-      group_name: cleanText(form.sscGroup),
-      passing_year: cleanText(form.sscPassingYear),
-    },
-    {
-      level: 'HSC',
-      institution_name: cleanText(form.hscInstitutionName),
-      group_name: cleanText(form.hscGroup),
-      passing_year: cleanText(form.hscPassingYear),
-    },
-  ];
-}
-
-async function ensureActiveSession({ email, password }) {
-  const { data, error } = await supabase.auth.signInWithPassword({
-    email,
-    password,
-  });
-
-  if (error) {
-    throw new Error(error.message);
-  }
-
-  if (!data?.user?.id) {
-    throw new Error('User session could not be created.');
-  }
-
-  return data.user;
-}
-
 export async function registerAssociationUser(form) {
   validateRegistrationForm(form);
 
-  const email = normalizeEmail(form.email);
+  const email = cleanText(form.email);
   const dateOfBirth = `${form.birthMonth}-${form.birthDay}`;
 
   const { data: authData, error: authError } = await supabase.auth.signUp({
     email,
     password: form.password,
-    options: {
-      data: {
-        full_name: cleanText(form.fullName),
-      },
-    },
   });
 
   if (authError) {
@@ -155,67 +172,132 @@ export async function registerAssociationUser(form) {
     throw new Error('User registration failed. Please try again.');
   }
 
-  const activeUser = await ensureActiveSession({
+  let profilePhotoUrl = null;
+
+  if (form.profilePhotoFile) {
+    profilePhotoUrl = await uploadProfilePhoto({
+      userId,
+      file: form.profilePhotoFile,
+    });
+  }
+
+  const isStudent =
+    cleanText(form.occupation)?.toLowerCase() === 'student' ||
+    !cleanText(form.occupation);
+
+  const profilePayload = {
+    id: userId,
     email,
-    password: form.password,
-  });
 
-  const profilePhotoUrl = await uploadProfilePhoto({
-    userId: activeUser.id,
-    file: form.profilePhotoFile,
-  });
+    full_name: cleanText(form.fullName),
+    nick_name: cleanText(form.nickName),
 
-  const documentPath = await uploadUniversityDocument({
-    userId: activeUser.id,
-    file: form.universityDocumentFile,
-  });
+    date_of_birth: dateOfBirth,
+    birth_month: form.birthMonth,
+    birth_day: form.birthDay,
 
-  const studentOccupation = isStudentOccupation(form.occupation);
+    gender: cleanText(form.gender),
+    blood_group: cleanText(form.bloodGroup),
 
-  const { data, error } = await supabase.rpc('create_member_registration', {
-    p_email: email,
-    p_full_name: cleanText(form.fullName),
-    p_profile_photo_url: profilePhotoUrl,
+    contact_number: cleanText(form.contactNumber),
+    facebook_profile_link: cleanText(form.facebookProfileLink),
+    profile_photo_url: profilePhotoUrl,
 
-    p_nick_name: cleanText(form.nickName),
-    p_date_of_birth: dateOfBirth,
-    p_gender: cleanText(form.gender),
-    p_blood_group: cleanText(form.bloodGroup),
+    university_hall_name: cleanText(form.universityHallName),
+    first_year_admission_session: cleanText(form.firstYearAdmissionSession),
+    university_subject: cleanText(form.universitySubject),
 
-    p_contact_number: cleanText(form.contactNumber),
-    p_facebook_profile_link: cleanText(form.facebookProfileLink),
+    // University document disabled
+    university_document_url: null,
 
-    p_university_hall_name: cleanText(form.universityHallName),
-    p_first_year_admission_session: cleanText(form.firstYearAdmissionSession),
-    p_university_subject: cleanText(form.universitySubject),
+    ssc_institution_name: cleanText(form.sscInstitutionName),
+    ssc_group: cleanText(form.sscGroup),
+    ssc_passing_year: cleanText(form.sscPassingYear),
+    ssc_gpa: cleanText(form.sscGpa),
 
-    p_union_pouroshova_name: cleanText(form.unionPouroshovaName),
-    p_ward_village_name: cleanText(form.wardVillageName),
-    p_para_moholla_name: cleanText(form.paraMohollaName),
+    hsc_institution_name: cleanText(form.hscInstitutionName),
+    hsc_group: cleanText(form.hscGroup),
+    hsc_passing_year: cleanText(form.hscPassingYear),
+    hsc_gpa: cleanText(form.hscGpa),
 
-    p_present_address: cleanText(form.presentAddress),
+    union_pouroshova_name: cleanText(form.unionPouroshovaName),
+    ward_village_name: cleanText(form.wardVillageName),
+    para_moholla_name: cleanText(form.paraMohollaName),
 
-    p_occupation: cleanText(form.occupation),
-    p_professional_details: studentOccupation
-      ? ''
-      : cleanText(form.professionalDetails),
+    present_address: cleanText(form.presentAddress),
 
-    p_university_document_url: documentPath,
-    p_academic_qualifications: mapAcademicQualifications(form),
+    occupation: cleanText(form.occupation) || 'Student',
+    professional_details: isStudent ? null : cleanText(form.professionalDetails),
+    organization_type: isStudent ? null : cleanText(form.organizationType),
+    organization_name: isStudent ? null : cleanText(form.organizationName),
+    designation: isStudent ? null : cleanText(form.designation),
+    work_section: isStudent ? null : cleanText(form.workSection),
+    organization_address: isStudent ? null : cleanText(form.organizationAddress),
 
-    p_life_story: cleanText(form.lifeStory),
-    p_pdpo_consent: Boolean(form.pdpoConsent),
-  });
+    life_story: cleanText(form.lifeStory),
 
-  if (error) {
-    console.error('create_member_registration error:', error);
-    throw new Error(error.message);
+    pdpo_consent: Boolean(form.pdpoConsent),
+    pdpo_consent_timestamp: new Date().toISOString(),
+
+    verification_status: 'pending',
+    is_approved: false,
+  };
+
+  const { data: profileData, error: profileError } = await supabase
+    .from('profiles')
+    .upsert(profilePayload, {
+      onConflict: 'id',
+    })
+    .select()
+    .single();
+
+  if (profileError) {
+    console.error('profile registration error:', profileError);
+    throw new Error(profileError.message);
+  }
+
+  const degreeRows = (form.degreeQualifications || [])
+    .filter((item) => {
+      return (
+        cleanText(item.degreeName) ||
+        cleanText(item.institutionName) ||
+        cleanText(item.subjectDepartment) ||
+        cleanText(item.passingYear)
+      );
+    })
+    .map((item) => ({
+      profile_id: userId,
+      degree_name: cleanText(item.degreeName),
+      institution_name: cleanText(item.institutionName),
+      subject_department: cleanText(item.subjectDepartment),
+      passing_year: cleanText(item.passingYear),
+    }));
+
+  const { error: deleteDegreeError } = await supabase
+    .from('member_degree_qualifications')
+    .delete()
+    .eq('profile_id', userId);
+
+  if (deleteDegreeError) {
+    console.error('delete old degree qualifications error:', deleteDegreeError);
+    throw new Error(deleteDegreeError.message);
+  }
+
+  if (degreeRows.length > 0) {
+    const { error: degreeError } = await supabase
+      .from('member_degree_qualifications')
+      .insert(degreeRows);
+
+    if (degreeError) {
+      console.error('degree qualification insert error:', degreeError);
+      throw new Error(degreeError.message);
+    }
   }
 
   return {
     success: true,
     message:
       'Registration submitted successfully. Please wait for admin approval.',
-    memberRegistrationId: data,
+    member: profileData,
   };
 }

@@ -16,6 +16,7 @@ const hallOptions = [
   'Muktijoddha Ziaur Rahman Hall',
   'Sheikh Mujibur Rahman Hall',
   'Bangladesh-Kuwait Maitree Hall',
+  'Sir P.J. Hartog International Hall',
   'Bangamata Sheikh Fazilatunnesa Mujib Hall',
   'Amar Ekushey Hall',
   'Kabi Sufia Kamal Hall',
@@ -43,6 +44,15 @@ const genderOptions = ['Male', 'Female'];
 
 const bloodGroupOptions = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
 
+const organizationTypeOptions = [
+  'Govt',
+  'Private',
+  'Business',
+  'NGO',
+  'Freelancer',
+  'Others',
+];
+
 const occupationOptions = [
   'Student',
   'Teacher',
@@ -65,24 +75,145 @@ const occupationOptions = [
   'Other',
 ];
 
-const bachelorDegreeOptions = ['BSc', 'BBA', 'BA', 'BSS', 'LLB'];
-
-const higherDegreeOptions = [
-  'MSc',
-  'MBA',
-  'MA',
-  'MSS',
-  'LLM',
-  'MPhil',
-  'PhD',
-  'DBA',
+const departmentOptions = [
+  'Faculty of Arts',
+  'Faculty of Sciences',
+  'Faculty of Law',
+  'Faculty of Business Studies',
+  'Faculty of Social Sciences',
+  'Faculty of Biological Sciences',
+  'Faculty of Pharmacy',
+  'Faculty of Earth & Environmental Sciences',
+  'Faculty of Engineering & Technology',
+  'Faculty of Fine Arts',
+  'Faculty of Medicine',
+  'Faculty of Education',
+  'Faculty of Postgraduate Medical Sciences & Research',
+  'Institute of Education and Research',
+  'Institute of Statistical Research and Training',
+  'Institute of Business Administration',
+  'Institute of Nutrition and Food Science',
+  'Institute of Social Welfare and Research',
+  'Institute of Modern Languages',
+  'Institute of Health Economics',
+  'Institute of Information Technology',
+  'Institute of Energy',
+  'Institute of Disaster Management and Vulnerability Studies',
+  'Institute of Leather Engineering and Technology',
+  'Confucius Institute',
+  'Bangabandhu Sheikh Mujib Research Institute for Peace and Liberty',
+  'Department of Accounting',
+  'Department of Anthropology',
+  'Department of Applied Chemistry & Chemical Engineering',
+  'Department of Applied Mathematics',
+  'Department of Arabic',
+  'Department of Art History',
+  'Department of Bangla',
+  'Department of Banking and Insurance',
+  'Department of Biochemistry and Molecular Biology',
+  'Department of Biomedical Physics & Technology',
+  'Department of Botany',
+  'Department of Ceramic',
+  'Department of Chemistry',
+  'Department of Clinical Pharmacy and Pharmacology',
+  'Department of Clinical Psychology',
+  'Department of Communication Disorders',
+  'Department of Computer Science and Engineering',
+  'Department of Craft',
+  'Department of Criminology',
+  'Department of Dance',
+  'Department of Development Studies',
+  'Department of Disaster Science and Climate Resilience',
+  'Department of Drawing and Painting',
+  'Department of Economics',
+  'Department of Educational and Counselling Psychology',
+  'Department of Electrical and Electronic Engineering',
+  'Department of English',
+  'Department of Finance',
+  'Department of Fisheries',
+  'Department of Genetic Engineering and Biotechnology',
+  'Department of Geography & Environment',
+  'Department of Geology',
+  'Department of Graphic Design',
+  'Department of History',
+  'Department of Information Science and Library Management',
+  'Department of International Business',
+  'Department of International Relations',
+  'Department of Islamic History & Culture',
+  'Department of Islamic Studies',
+  'Department of Japanese Studies',
+  'Department of Law',
+  'Department of Linguistics',
+  'Department of Management',
+  'Department of Management Information Systems (MIS)',
+  'Department of Marketing',
+  'Department of Mass Communication & Journalism',
+  'Department of Mathematics',
+  'Department of Meteorology',
+  'Department of Microbiology',
+  'Department of Music',
+  'Department of Nuclear Engineering',
+  'Department of Oceanography',
+  'Department of Organization Strategy and Leadership',
+  'Department of Oriental Art',
+  'Department of Pali and Buddhist Studies',
+  'Department of Peace and Conflict Studies',
+  'Department of Persian Language and Literature',
+  'Department of Pharmaceutical Chemistry',
+  'Department of Pharmaceutical Technology',
+  'Department of Pharmacy',
+  'Department of Philosophy',
+  'Department of Physics',
+  'Department of Political Science',
+  'Department of Population Sciences',
+  'Department of Printing and Publication Studies',
+  'Department of Printmaking',
+  'Department of Psychology',
+  'Department of Public Administration',
+  'Department of Public Health',
+  'Department of Robotics and Mechatronics Engineering',
+  'Department of Sanskrit',
+  'Department of Sculpture',
+  'Department of Sociology',
+  'Department of Soil, Water & Environment',
+  'Department of Statistics',
+  'Department of Television, Film and Photography',
+  'Department of Theatre and Performance Studies',
+  'Department of Theoretical and Computational Chemistry',
+  'Department of Theoretical Physics',
+  'Department of Tourism and Hospitality Management',
+  'Department of Urdu',
+  'Department of Women and Gender Studies',
+  'Department of World Religions and Culture',
+  'Department of Zoology',
+  'Other',
 ];
 
-const emptyHigherDegreeQualification = {
+const degreeOptions = [
+  'Bachelor',
+  'Masters',
+  'MBA',
+  'MSc',
+  'MA',
+  'MSS',
+  'MCom',
+  'LLM',
+  'MEd',
+  'MPharm',
+  'MPH',
+  'MEng',
+  'MPhil',
+  'PhD',
+  'Postgraduate Diploma',
+  'Professional Certification',
+  'Other',
+];
+
+const emptyDegreeQualification = {
   degreeName: '',
   institutionName: '',
-  subjectDepartment: '',
   passingYear: '',
+  subjectDepartment: '',
 };
 
 const initialForm = {
@@ -104,25 +235,21 @@ const initialForm = {
 
   profilePhotoFile: null,
 
-  bachelorDegreeName: '',
-  bachelorInstitutionName: 'University of Dhaka',
-  bachelorDepartment: '',
-  bachelorPassingYear: '',
-  bachelorHallName: '',
-  bachelorSession: '',
-
   universityHallName: '',
   firstYearAdmissionSession: '',
+  universitySubject: '',
 
   sscInstitutionName: '',
   sscGroup: '',
   sscPassingYear: '',
+  sscGpa: '',
 
   hscInstitutionName: '',
   hscGroup: '',
   hscPassingYear: '',
+  hscGpa: '',
 
-  higherDegreeQualifications: [],
+  degreeQualifications: [],
 
   unionPouroshovaName: '',
   wardVillageName: '',
@@ -132,6 +259,11 @@ const initialForm = {
 
   occupation: 'Student',
   professionalDetails: '',
+  organizationType: '',
+  organizationName: '',
+  designation: '',
+  workSection: '',
+  organizationAddress: '',
 
   lifeStory: '',
   pdpoConsent: false,
@@ -148,9 +280,17 @@ export default function RegistrationPage() {
   );
 
   useEffect(() => {
-    if (isStudentOccupation && form.professionalDetails) {
-      updateField('professionalDetails', '');
-    }
+    if (!isStudentOccupation) return;
+
+    setForm((current) => ({
+      ...current,
+      professionalDetails: '',
+      organizationType: '',
+      organizationName: '',
+      designation: '',
+      workSection: '',
+      organizationAddress: '',
+    }));
   }, [isStudentOccupation]);
 
   function updateField(name, value) {
@@ -160,9 +300,9 @@ export default function RegistrationPage() {
     }));
   }
 
-  function updateHigherDegreeQualification(index, name, value) {
+  function updateDegreeQualification(index, name, value) {
     setForm((current) => {
-      const nextQualifications = current.higherDegreeQualifications.map(
+      const nextQualifications = current.degreeQualifications.map(
         (item, itemIndex) => {
           if (itemIndex !== index) return item;
 
@@ -175,54 +315,28 @@ export default function RegistrationPage() {
 
       return {
         ...current,
-        higherDegreeQualifications: nextQualifications,
+        degreeQualifications: nextQualifications,
       };
     });
   }
 
-  function addHigherDegreeQualification() {
+  function addDegreeQualification() {
     setForm((current) => ({
       ...current,
-      higherDegreeQualifications: [
-        ...current.higherDegreeQualifications,
-        { ...emptyHigherDegreeQualification },
+      degreeQualifications: [
+        ...current.degreeQualifications,
+        { ...emptyDegreeQualification },
       ],
     }));
   }
 
-  function removeHigherDegreeQualification(index) {
+  function removeDegreeQualification(index) {
     setForm((current) => ({
       ...current,
-      higherDegreeQualifications: current.higherDegreeQualifications.filter(
+      degreeQualifications: current.degreeQualifications.filter(
         (_item, itemIndex) => itemIndex !== index
       ),
     }));
-  }
-
-  function buildDegreeQualifications() {
-    const degreeQualifications = [];
-
-    if (form.bachelorDegreeName) {
-      degreeQualifications.push({
-        degreeName: form.bachelorDegreeName,
-        institutionName: form.bachelorInstitutionName,
-        subjectDepartment: form.bachelorDepartment,
-        passingYear: form.bachelorPassingYear,
-      });
-    }
-
-    form.higherDegreeQualifications.forEach((qualification) => {
-      if (qualification.degreeName) {
-        degreeQualifications.push({
-          degreeName: qualification.degreeName,
-          institutionName: qualification.institutionName,
-          subjectDepartment: qualification.subjectDepartment,
-          passingYear: qualification.passingYear,
-        });
-      }
-    });
-
-    return degreeQualifications;
   }
 
   async function handleSubmit(event) {
@@ -236,30 +350,6 @@ export default function RegistrationPage() {
       return;
     }
 
-    if (!form.bachelorDegreeName) {
-      setStatus({
-        type: 'error',
-        message: 'Bachelor / Honours degree name is required.',
-      });
-      return;
-    }
-
-    if (!form.bachelorHallName || !form.bachelorSession) {
-      setStatus({
-        type: 'error',
-        message: 'Hall Name and Session are required for Bachelor / Honours information.',
-      });
-      return;
-    }
-
-    if (!form.bachelorDepartment || !form.bachelorPassingYear) {
-      setStatus({
-        type: 'error',
-        message: 'Department and Passing Year are required for Bachelor / Honours information.',
-      });
-      return;
-    }
-
     setIsSubmitting(true);
     setStatus({ type: '', message: '' });
 
@@ -267,13 +357,12 @@ export default function RegistrationPage() {
       const finalForm = {
         ...form,
         dateOfBirth: `${form.birthMonth}-${form.birthDay}`,
-
-        universityHallName: form.bachelorHallName,
-        firstYearAdmissionSession: form.bachelorSession,
-
-        degreeQualifications: buildDegreeQualifications(),
-
         professionalDetails: isStudentOccupation ? '' : form.professionalDetails,
+        organizationType: isStudentOccupation ? '' : form.organizationType,
+        organizationName: isStudentOccupation ? '' : form.organizationName,
+        designation: isStudentOccupation ? '' : form.designation,
+        workSection: isStudentOccupation ? '' : form.workSection,
+        organizationAddress: isStudentOccupation ? '' : form.organizationAddress,
       };
 
       const result = await registerAssociationUser(finalForm);
@@ -295,33 +384,41 @@ export default function RegistrationPage() {
   }
 
   return (
-    <main className="min-h-screen bg-slate-50 px-4 py-5 text-slate-900 sm:px-6 sm:py-8 lg:px-8">
-      <section className="mx-auto grid w-full max-w-7xl grid-cols-1 gap-5 xl:grid-cols-[0.82fr_1.45fr] xl:items-start xl:gap-7">
-        <aside className="overflow-hidden rounded-[1.75rem] bg-slate-950 text-white shadow-soft xl:sticky xl:top-24">
-          <div className="relative overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-emerald-950 p-5 sm:p-7 lg:p-8">
-            <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-emerald-300 sm:text-xs sm:tracking-[0.3em]">
-              Registration
-            </p>
+    <main className="min-h-screen bg-slate-50 px-3 py-3 text-slate-900 sm:px-6 sm:py-6 lg:px-8">
+      <section className="mx-auto grid w-full max-w-7xl grid-cols-1 gap-4 lg:grid-cols-[0.85fr_1.5fr] lg:items-start lg:gap-6">
+        <aside className="rounded-2xl bg-slate-950 p-4 text-white shadow-soft sm:rounded-3xl sm:p-6 md:p-8 lg:sticky lg:top-8">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-300 sm:text-sm sm:tracking-[0.25em]">
+            Association Portal
+          </p>
 
-            <h1 className="mt-3 text-3xl font-black leading-tight sm:mt-4 sm:text-4xl">
-              Association Portal
-            </h1>
+          <h1 className="mt-3 text-2xl font-bold leading-tight sm:mt-4 sm:text-3xl md:text-4xl">
+            Member Registration
+          </h1>
 
-            <p className="mt-4 text-sm leading-6 text-slate-300 md:text-base">
-              Fill the single member form. Admin approval is required before
-              your profile becomes visible in the public directory.
-            </p>
-          </div>
+          <p className="mt-3 text-sm leading-6 text-slate-300 sm:mt-4 md:text-base">
+            Fill the single member form. Admin approval is required before your
+            profile becomes visible in public directory.
+          </p>
         </aside>
 
-        <section className="overflow-hidden rounded-[1.75rem] border border-slate-200 bg-white shadow-soft">
+        <section className="rounded-2xl bg-white p-3 shadow-soft sm:rounded-3xl sm:p-6 md:p-8">
+          <div className="border-b border-slate-200 pb-4 sm:pb-5">
+            <h2 className="text-xl font-bold text-slate-950 sm:text-2xl">
+              Registration Form
+            </h2>
+
+            <p className="mt-1 text-xs text-slate-500 sm:text-sm">
+              Fields are based on the member information sheet.
+            </p>
+          </div>
+
           {status.message ? (
             <StatusBox type={status.type} message={status.message} />
           ) : null}
 
           <form
             onSubmit={handleSubmit}
-            className="space-y-4 p-4 sm:space-y-6 sm:p-6 lg:p-8"
+            className="mt-4 space-y-4 sm:mt-6 sm:space-y-6"
           >
             <FormSection title="Basic Information">
               <div className="grid grid-cols-1 gap-3 sm:gap-4 md:grid-cols-2">
@@ -423,6 +520,39 @@ export default function RegistrationPage() {
               </div>
             </FormSection>
 
+            <FormSection title="University Information">
+              <div className="grid grid-cols-1 gap-3 sm:gap-4 md:grid-cols-2">
+                <SelectInput
+                  label="University Hall"
+                  name="universityHallName"
+                  value={form.universityHallName}
+                  onChange={updateField}
+                  options={hallOptions}
+                  placeholder="Select hall"
+                  required
+                />
+
+                <TextInput
+                  label="First Year Admission Session"
+                  name="firstYearAdmissionSession"
+                  value={form.firstYearAdmissionSession}
+                  onChange={updateField}
+                  placeholder="2022-23"
+                  required
+                />
+
+                <SelectInput
+                  label="Subject / Department"
+                  name="universitySubject"
+                  value={form.universitySubject}
+                  onChange={updateField}
+                  options={departmentOptions}
+                  placeholder="Select Subject / Department"
+                  required
+                />
+              </div>
+            </FormSection>
+
             <FormSection title="Academic Qualification">
               <div className="space-y-4 sm:space-y-5">
                 <div className="rounded-2xl border border-slate-200 bg-slate-50 p-3 sm:p-4">
@@ -430,7 +560,7 @@ export default function RegistrationPage() {
                     SSC Information
                   </h4>
 
-                  <div className="grid grid-cols-1 gap-3 sm:gap-4 md:grid-cols-2 xl:grid-cols-3">
+                  <div className="grid grid-cols-1 gap-3 sm:gap-4 md:grid-cols-2 xl:grid-cols-4">
                     <TextInput
                       label="Institute Name"
                       name="sscInstitutionName"
@@ -457,6 +587,14 @@ export default function RegistrationPage() {
                       placeholder="2020"
                       required
                     />
+
+                    <TextInput
+                      label="GPA / Division"
+                      name="sscGpa"
+                      value={form.sscGpa}
+                      onChange={updateField}
+                      placeholder="5.00 / First Division"
+                    />
                   </div>
                 </div>
 
@@ -465,7 +603,7 @@ export default function RegistrationPage() {
                     HSC Information
                   </h4>
 
-                  <div className="grid grid-cols-1 gap-3 sm:gap-4 md:grid-cols-2 xl:grid-cols-3">
+                  <div className="grid grid-cols-1 gap-3 sm:gap-4 md:grid-cols-2 xl:grid-cols-4">
                     <TextInput
                       label="Institute Name"
                       name="hscInstitutionName"
@@ -492,82 +630,33 @@ export default function RegistrationPage() {
                       placeholder="2022"
                       required
                     />
-                  </div>
-                </div>
-
-                <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-3 sm:p-4">
-                  <div className="mb-4 flex flex-col gap-1">
-                    <h4 className="text-sm font-bold text-slate-900 sm:text-base">
-                      Bachelor / Honours Information
-                    </h4>
-                  </div>
-
-                  <div className="grid grid-cols-1 gap-3 sm:gap-4 md:grid-cols-2 xl:grid-cols-3">
-                    <SelectInput
-                      label="Degree Name"
-                      name="bachelorDegreeName"
-                      value={form.bachelorDegreeName}
-                      onChange={updateField}
-                      options={bachelorDegreeOptions}
-                      placeholder="Select bachelor degree"
-                      required
-                    />
 
                     <TextInput
-                      label="Institution Name"
-                      name="bachelorInstitutionName"
-                      value={form.bachelorInstitutionName}
+                      label="GPA / Division"
+                      name="hscGpa"
+                      value={form.hscGpa}
                       onChange={updateField}
-                      placeholder="University of Dhaka"
-                      required
-                    />
-
-                    <TextInput
-                      label="Department"
-                      name="bachelorDepartment"
-                      value={form.bachelorDepartment}
-                      onChange={updateField}
-                      placeholder="Software Engineering"
-                      required
-                    />
-
-                    <SelectInput
-                      label="Hall Name"
-                      name="bachelorHallName"
-                      value={form.bachelorHallName}
-                      onChange={updateField}
-                      options={hallOptions}
-                      placeholder="Select hall"
-                      required
-                    />
-
-                    <TextInput
-                      label="Session"
-                      name="bachelorSession"
-                      value={form.bachelorSession}
-                      onChange={updateField}
-                      placeholder="2022-23"
-                      required
-                    />
-
-                    <TextInput
-                      label="Passing Year / Current Year"
-                      name="bachelorPassingYear"
-                      value={form.bachelorPassingYear}
-                      onChange={updateField}
-                      placeholder="2026 or 1st Year"
-                      required
+                      placeholder="5.00 / First Division"
                     />
                   </div>
                 </div>
 
                 <div className="rounded-2xl border border-slate-200 bg-white p-3 sm:p-4">
-                  
+                  <div className="mb-4">
+                    <h4 className="text-sm font-bold text-slate-900 sm:text-base">
+                      Higher Degree
+                    </h4>
+                  </div>
 
                   <div className="space-y-4">
-                    
+                    {form.degreeQualifications.length === 0 ? (
+                      <p className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-4 text-sm text-slate-500">
+                        Higher degree is optional. Click Add Degree if you want
+                        to add one.
+                      </p>
+                    ) : null}
 
-                    {form.higherDegreeQualifications.map((qualification, index) => (
+                    {form.degreeQualifications.map((qualification, index) => (
                       <div
                         key={index}
                         className="rounded-2xl border border-slate-200 bg-slate-50 p-3 sm:p-4"
@@ -579,7 +668,7 @@ export default function RegistrationPage() {
 
                           <button
                             type="button"
-                            onClick={() => removeHigherDegreeQualification(index)}
+                            onClick={() => removeDegreeQualification(index)}
                             className="rounded-xl border border-red-200 px-3 py-2 text-xs font-bold text-red-600"
                           >
                             Remove
@@ -592,10 +681,10 @@ export default function RegistrationPage() {
                             name="degreeName"
                             value={qualification.degreeName}
                             onChange={(name, value) =>
-                              updateHigherDegreeQualification(index, name, value)
+                              updateDegreeQualification(index, name, value)
                             }
-                            options={higherDegreeOptions}
-                            placeholder="Select Degree"
+                            options={degreeOptions}
+                            placeholder="Select degree"
                           />
 
                           <TextInput
@@ -603,19 +692,19 @@ export default function RegistrationPage() {
                             name="institutionName"
                             value={qualification.institutionName}
                             onChange={(name, value) =>
-                              updateHigherDegreeQualification(index, name, value)
+                              updateDegreeQualification(index, name, value)
                             }
-                            placeholder="University of Oxford"
+                            placeholder="University of Dhaka"
                           />
 
                           <TextInput
-                            label="Department"
+                            label="Subject / Department"
                             name="subjectDepartment"
                             value={qualification.subjectDepartment}
                             onChange={(name, value) =>
-                              updateHigherDegreeQualification(index, name, value)
+                              updateDegreeQualification(index, name, value)
                             }
-                            placeholder="Computer Science"
+                            placeholder="Marketing / Software Engineering"
                           />
 
                           <TextInput
@@ -623,7 +712,7 @@ export default function RegistrationPage() {
                             name="passingYear"
                             value={qualification.passingYear}
                             onChange={(name, value) =>
-                              updateHigherDegreeQualification(index, name, value)
+                              updateDegreeQualification(index, name, value)
                             }
                             placeholder="2024"
                           />
@@ -633,10 +722,10 @@ export default function RegistrationPage() {
 
                     <button
                       type="button"
-                      onClick={addHigherDegreeQualification}
+                      onClick={addDegreeQualification}
                       className="min-h-11 rounded-xl border border-emerald-300 bg-emerald-50 px-4 text-sm font-bold text-emerald-700 hover:bg-emerald-100 sm:min-h-12 sm:rounded-2xl sm:px-5"
                     >
-                      + Add Higher Degree
+                      + Add Degree
                     </button>
                   </div>
                 </div>
@@ -681,7 +770,21 @@ export default function RegistrationPage() {
               />
             </FormSection>
 
-            <FormSection title="Occupation">
+            <FormSection title="Professional Information">
+              <div className="mb-4 rounded-2xl border border-emerald-100 bg-emerald-50/80 p-4">
+                <div className="flex items-start gap-3">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-emerald-600 text-sm font-black text-white">
+                    PI
+                  </div>
+
+                  <div>
+                   
+
+                  
+                  </div>
+                </div>
+              </div>
+
               <div className="grid grid-cols-1 gap-3 sm:gap-4 md:grid-cols-2">
                 <SelectInput
                   label="Occupation"
@@ -692,18 +795,71 @@ export default function RegistrationPage() {
                   required
                 />
 
-                <TextArea
-                  label="Professional Details"
-                  name="professionalDetails"
-                  value={form.professionalDetails}
+                <SelectInput
+                  label="Organization Type"
+                  name="organizationType"
+                  value={form.organizationType}
                   onChange={updateField}
-                  disabled={isStudentOccupation}
+                  options={organizationTypeOptions}
                   placeholder={
                     isStudentOccupation
                       ? 'Disabled for students'
-                      : 'Write job/professional details'
+                      : 'Select organization type'
                   }
+                  disabled={isStudentOccupation}
                 />
+
+                <TextInput
+                  label="Organization Name"
+                  name="organizationName"
+                  value={form.organizationName}
+                  onChange={updateField}
+                  placeholder="Organization / company name"
+                  disabled={isStudentOccupation}
+                />
+
+                <TextInput
+                  label="Designation"
+                  name="designation"
+                  value={form.designation}
+                  onChange={updateField}
+                  placeholder="Your designation"
+                  disabled={isStudentOccupation}
+                />
+
+                <TextInput
+                  label="Work Section"
+                  name="workSection"
+                  value={form.workSection}
+                  onChange={updateField}
+                  placeholder="Department / section"
+                  disabled={isStudentOccupation}
+                />
+
+                <TextArea
+                  label="Organization Address"
+                  name="organizationAddress"
+                  value={form.organizationAddress}
+                  onChange={updateField}
+                  placeholder="Office / organization address"
+                  disabled={isStudentOccupation}
+                  rows={3}
+                />
+
+                <div className="md:col-span-2">
+                  <TextArea
+                    label="Professional Details"
+                    name="professionalDetails"
+                    value={form.professionalDetails}
+                    onChange={updateField}
+                    disabled={isStudentOccupation}
+                    placeholder={
+                      isStudentOccupation
+                        ? 'Disabled for students'
+                        : 'Write short professional details, achievements, or current work summary'
+                    }
+                  />
+                </div>
               </div>
             </FormSection>
 
@@ -736,7 +892,7 @@ export default function RegistrationPage() {
               </label>
             </div>
 
-            <div className="sticky bottom-0 z-20 -mx-4 flex flex-col-reverse gap-3 border-t border-slate-200 bg-white/95 px-4 py-3 backdrop-blur sm:static sm:mx-0 sm:flex-row sm:justify-end sm:bg-transparent sm:px-0 sm:pt-5">
+            <div className="sticky bottom-0 z-20 -mx-3 flex flex-col-reverse gap-3 border-t border-slate-200 bg-white/95 px-3 py-3 backdrop-blur sm:static sm:mx-0 sm:flex-row sm:justify-end sm:bg-transparent sm:px-0 sm:pt-5">
               <button
                 type="button"
                 onClick={() => {
@@ -766,7 +922,7 @@ export default function RegistrationPage() {
 function StatusBox({ type, message }) {
   return (
     <div
-      className={`mx-4 mt-5 rounded-2xl border p-4 text-sm font-medium sm:mx-6 lg:mx-8 ${
+      className={`mt-5 rounded-2xl border p-4 text-sm font-medium ${
         type === 'success'
           ? 'border-emerald-200 bg-emerald-50 text-emerald-800'
           : 'border-red-200 bg-red-50 text-red-700'
@@ -959,6 +1115,7 @@ function SelectInput({
   options,
   required = false,
   placeholder = '',
+  disabled = false,
 }) {
   return (
     <label className="block">
@@ -971,8 +1128,9 @@ function SelectInput({
         name={name}
         value={value || ''}
         required={required}
+        disabled={disabled}
         onChange={(event) => onChange(name, event.target.value)}
-        className="min-h-11 w-full rounded-xl border border-slate-300 bg-white px-3 text-sm outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 sm:min-h-12 sm:rounded-2xl sm:px-4"
+        className="min-h-11 w-full rounded-xl border border-slate-300 bg-white px-3 text-sm outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400 sm:min-h-12 sm:rounded-2xl sm:px-4"
       >
         {placeholder ? <option value="">{placeholder}</option> : null}
 
