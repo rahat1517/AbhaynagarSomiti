@@ -204,7 +204,8 @@ export async function registerAssociationUser(form) {
   const profilePayload = {
     id: userId,
     email,
-    role: 'member',
+    role: 'user',
+member_type: memberType,
 
     full_name: cleanText(form.fullName),
     nick_name: cleanText(form.nickName),
