@@ -78,6 +78,7 @@ const occupationOptions = [
   'Retired Person',
   'Others',
 ];
+
 const subjectOptions = [
   'Accounting',
   'Anthropology',
@@ -349,7 +350,9 @@ export default function RegistrationPage() {
 
       setStatus({
         type: 'success',
-        message: result.message,
+        message:
+          result?.message ||
+          'Registration submitted successfully. Admin approval is required before your profile becomes visible.',
       });
 
       setForm(initialForm);
@@ -382,10 +385,6 @@ export default function RegistrationPage() {
         </aside>
 
         <section className="rounded-2xl bg-white p-3 shadow-soft sm:rounded-3xl sm:p-6 md:p-8">
-          {status.message ? (
-            <StatusBox type={status.type} message={status.message} />
-          ) : null}
-
           <form
             onSubmit={handleSubmit}
             className="mt-4 space-y-4 sm:mt-6 sm:space-y-6"
@@ -865,25 +864,31 @@ export default function RegistrationPage() {
               </label>
             </div>
 
-            <div className="sticky bottom-0 z-20 -mx-3 flex flex-col-reverse gap-3 border-t border-slate-200 bg-white/95 px-3 py-3 backdrop-blur sm:static sm:mx-0 sm:flex-row sm:justify-end sm:bg-transparent sm:px-0 sm:pt-5">
-              <button
-                type="button"
-                onClick={() => {
-                  setForm(initialForm);
-                  setStatus({ type: '', message: '' });
-                }}
-                className="min-h-11 rounded-xl border border-slate-300 px-4 text-sm font-semibold text-slate-700 sm:min-h-12 sm:rounded-2xl sm:px-5"
-              >
-                Reset
-              </button>
+            <div className="sticky bottom-0 z-20 -mx-3 border-t border-slate-200 bg-white/95 px-3 py-3 backdrop-blur sm:static sm:mx-0 sm:bg-transparent sm:px-0 sm:pt-5">
+              <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setForm(initialForm);
+                    setStatus({ type: '', message: '' });
+                  }}
+                  className="min-h-11 rounded-xl border border-slate-300 px-4 text-sm font-semibold text-slate-700 sm:min-h-12 sm:rounded-2xl sm:px-5"
+                >
+                  Reset
+                </button>
 
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="min-h-11 rounded-xl bg-emerald-600 px-4 text-sm font-bold text-white disabled:bg-emerald-300 sm:min-h-12 sm:rounded-2xl sm:px-6"
-              >
-                {isSubmitting ? 'Submitting...' : 'Submit Registration'}
-              </button>
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="min-h-11 rounded-xl bg-emerald-600 px-4 text-sm font-bold text-white disabled:bg-emerald-300 sm:min-h-12 sm:rounded-2xl sm:px-6"
+                >
+                  {isSubmitting ? 'Submitting...' : 'Submit Registration'}
+                </button>
+              </div>
+
+              {status.message ? (
+                <StatusBox type={status.type} message={status.message} />
+              ) : null}
             </div>
           </form>
         </section>
@@ -895,7 +900,7 @@ export default function RegistrationPage() {
 function StatusBox({ type, message }) {
   return (
     <div
-      className={`mt-5 rounded-2xl border p-4 text-sm font-medium ${
+      className={`mt-4 rounded-2xl border px-4 py-3 text-sm font-semibold ${
         type === 'success'
           ? 'border-emerald-200 bg-emerald-50 text-emerald-800'
           : 'border-red-200 bg-red-50 text-red-700'

@@ -102,6 +102,10 @@ function validateRegistrationForm(form) {
     throw new Error('WhatsApp number is required.');
   }
 
+  if (!cleanText(form.universityDegree)) {
+    throw new Error('University degree is required.');
+  }
+
   if (!cleanText(form.universityHallName)) {
     throw new Error('University hall is required.');
   }
@@ -216,24 +220,22 @@ export async function registerAssociationUser(form) {
     facebook_profile_link: cleanText(form.facebookProfileLink),
     profile_photo_url: profilePhotoUrl,
 
+    university_degree: cleanText(form.universityDegree),
     university_hall_name: cleanText(form.universityHallName),
     first_year_admission_session: cleanText(form.firstYearAdmissionSession),
     university_subject: cleanText(form.universitySubject),
     member_type: memberType,
     academic_year: cleanText(form.academicYear),
 
-    // University document disabled
     university_document_url: null,
 
     ssc_institution_name: cleanText(form.sscInstitutionName),
     ssc_group: cleanText(form.sscGroup),
     ssc_passing_year: cleanText(form.sscPassingYear),
-  
 
     hsc_institution_name: cleanText(form.hscInstitutionName),
     hsc_group: cleanText(form.hscGroup),
     hsc_passing_year: cleanText(form.hscPassingYear),
-
 
     union_pouroshova_name: cleanText(form.unionPouroshovaName),
     ward_village_name: cleanText(form.wardVillageName),
@@ -259,6 +261,8 @@ export async function registerAssociationUser(form) {
     is_approved: false,
   };
 
+  console.log('Registration profilePayload:', profilePayload);
+
   const { data: profileData, error: profileError } = await supabase
     .from('profiles')
     .upsert(profilePayload, {
@@ -266,6 +270,9 @@ export async function registerAssociationUser(form) {
     })
     .select()
     .single();
+
+  console.log('Supabase profileData:', profileData);
+  console.log('Supabase profileError:', profileError);
 
   if (profileError) {
     console.error('profile registration error:', profileError);
@@ -288,6 +295,8 @@ export async function registerAssociationUser(form) {
       subject_department: cleanText(item.subjectDepartment),
       passing_year: cleanText(item.passingYear),
     }));
+
+  console.log('Registration degreeRows:', degreeRows);
 
   const { error: deleteDegreeError } = await supabase
     .from('member_degree_qualifications')

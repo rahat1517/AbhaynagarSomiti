@@ -1,101 +1,204 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   getMyProfileDetails,
   requestMyProfilePhotoUpdate,
   requestMyProfileUpdate,
-  requestMyUniversityDocumentUpdate,
 } from '../../services/profileService';
 
 const hallOptions = [
-  'Ruqayyah Hall',
-  'Bangamata Sheikh Fazilatunnesa Mujib Hall',
-  'Shamsun Nahar Hall',
-  'Bangladesh-Kuwait Maitree Hall',
-  'Kabi Sufia Kamal Hall',
-  'Dr. Muhammad Shahidullah Hall',
-  'Fazlul Huq Muslim Hall',
-  'Amar Ekushey Hall',
   'Salimullah Muslim Hall',
+  'Dr. Muhammad Shahidullah Hall',
   'Jagannath Hall',
-  'Shahid Sergeant Zahurul Haque Hall',
+  'Fazlul Huq Muslim Hall',
+  'Shahid Sergeant Zahurul Huq Hall',
+  'Ruqayyah Hall',
   'Surja Sen Hall',
   'Haji Muhammad Mohsin Hall',
+  'Shamsun Nahar Hall',
   'Kabi Jasimuddin Hall',
   'A.F. Rahman Hall',
   'Muktijoddha Ziaur Rahman Hall',
   'Sheikh Mujibur Rahman Hall',
+  'Bangladesh-Kuwait Maitree Hall',
+  'Sir P.J. Hartog International Hall',
+  'Bangamata Sheikh Fazilatunnesa Mujib Hall',
+  'Amar Ekushey Hall',
+  'Kabi Sufia Kamal Hall',
   'Bijoy Ekattor Hall',
+  'Nabab Foyzunnessa Chowdhurani Chhatrinibash',
   'IBA Hostel',
+  'Dr. Qudrat-E-Khuda Hostel',
+  'Shahid Athlet Sultana Kamal Hostel',
   'Other',
 ];
 
 const unionOptions = [
-  'Sreedharpur Union',
   'Prembag Union',
-  'Baghutia Union',
-  'Subha Para Union',
-  'Siddhipasha Union',
-  'Sundoli Union',
-  'Noapara Paurashava',
+  'Sundali Union',
   'Chalishia Union',
   'Payra Union',
+  'Sreedharpur Union',
+  'Subharara Union',
+  'Siddhipasha Union',
+  'Baghutia Union',
+  'Noapara Paurashava',
   'Other',
 ];
 
-const genderOptions = ['Male', 'Female', 'Other'];
+const genderOptions = ['Male', 'Female'];
 
-const bloodGroupOptions = [
-  'A+',
-  'A-',
-  'B+',
-  'B-',
-  'AB+',
-  'AB-',
-  'O+',
-  'O-',
+const bloodGroupOptions = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
+
+const organizationTypeOptions = [
+  'Government Organization',
+  'Semi-Government Organization',
+  'Private Company',
+  'Multinational Company (MNC)',
+  'Non-Governmental Organization (NGO)',
+  'Educational Institution (School/College/University)',
+  'Financial Institution (Bank/Insurance)',
+  'Healthcare Institution (Hospital/Clinic)',
+  'IT / Software Company',
+  'Manufacturing Industry',
+  'Trading / Import-Export Business',
+  'Self-Owned Business',
+  'Others',
 ];
 
 const occupationOptions = [
+  'Government Service Holder',
+  'Private Job Holder',
+  'Businessman / Entrepreneur',
+  'Self-Employed',
+  'Freelancer',
   'Student',
-  'Alumni',
-  'Service Holder',
-  'Business',
-  'Teacher',
-  'Banker',
+  'Teacher / Lecturer',
   'Doctor',
   'Engineer',
+  'Banker',
+  'NGO Worker',
   'Lawyer',
-  'Freelancer',
-  'Unemployed',
-  'Other',
+  'Farmer',
+  'Unemployed / Job Seeker',
+  'Retired Person',
+  'Others',
 ];
 
-const departmentOptions = [
-  'Secondary',
-  'Higher Secondary',
-  'Bachelor',
-  'Masters',
+const subjectOptions = [
+  'Accounting',
+  'Anthropology',
+  'Applied Chemistry & Chemical Engineering',
+  'Applied Mathematics',
+  'Arabic',
+  'Art History',
+  'Bangla',
+  'Banking and Insurance',
+  'Biochemistry and Molecular Biology',
+  'Biomedical Physics & Technology',
+  'Botany',
+  'Ceramic',
+  'Chemistry',
+  'Clinical Pharmacy and Pharmacology',
+  'Clinical Psychology',
+  'Communication Disorders',
+  'Computer Science and Engineering',
+  'Craft',
+  'Criminology',
+  'Dance',
+  'Development Studies',
+  'Disaster Science and Climate Resilience',
+  'Drawing and Painting',
+  'Economics',
+  'Educational and Counselling Psychology',
+  'Electrical and Electronic Engineering',
+  'English',
+  'Finance',
+  'Fisheries',
+  'Genetic Engineering and Biotechnology',
+  'Geography & Environment',
+  'Geology',
+  'Graphic Design',
+  'History',
+  'Information Science and Library Management',
+  'International Business',
+  'International Relations',
+  'Islamic History & Culture',
+  'Islamic Studies',
+  'Japanese Studies',
+  'Law',
+  'Linguistics',
+  'Management',
+  'Management Information Systems (MIS)',
+  'Marketing',
+  'Mass Communication & Journalism',
+  'Mathematics',
+  'Meteorology',
+  'Microbiology',
+  'Music',
+  'Nuclear Engineering',
+  'Oceanography',
+  'Organization Strategy and Leadership',
+  'Oriental Art',
+  'Pali and Buddhist Studies',
+  'Peace and Conflict Studies',
+  'Persian Language and Literature',
+  'Pharmaceutical Chemistry',
+  'Pharmaceutical Technology',
+  'Pharmacy',
+  'Philosophy',
+  'Physics',
+  'Political Science',
+  'Population Sciences',
+  'Printing and Publication Studies',
+  'Printmaking',
+  'Psychology',
+  'Public Administration',
+  'Public Health',
+  'Robotics and Mechatronics Engineering',
+  'Sanskrit',
+  'Sculpture',
+  'Software Engineering',
+  'Sociology',
+  'Soil, Water & Environment',
+  'Statistics',
+  'Television, Film and Photography',
+  'Theatre and Performance Studies',
+  'Theoretical and Computational Chemistry',
+  'Theoretical Physics',
+  'Tourism and Hospitality Management',
+  'Urdu',
+  'Women and Gender Studies',
+  'World Religions and Culture',
+  'Zoology',
+];
+
+const degreeOptions = [
+  'BSc',
   'BBA',
   'MBA',
+  'MSc',
   'BA',
   'MA',
   'BSS',
   'MSS',
-  'BSc',
-  'MSc',
   'LLB',
   'LLM',
+  'BPharm',
+  'MPharm',
+  'MPhil',
   'PhD',
-  'Other',
 ];
 
-const emptyQualification = {
-  degree_name: '',
-  institution_name: '',
-  passing_year: '',
-  subject_department: '',
-  academic_degree_name: '',
-  gpa: '',
+const memberTypeOptions = [
+  { label: 'Current Student', value: 'student' },
+  { label: 'Alumni', value: 'alumni' },
+];
+
+const emptyDegreeQualification = {
+  degreeName: '',
+  institutionName: '',
+  passingYear: '',
+  subjectDepartment: '',
 };
 
 const initialForm = {
@@ -108,11 +211,22 @@ const initialForm = {
   contactNumber: '',
   facebookProfileLink: '',
 
+  universityDegree: '',
+  memberType: '',
   universityHallName: '',
   firstYearAdmissionSession: '',
   universitySubject: '',
+  academicYear: '',
 
-  academicQualifications: [],
+  sscInstitutionName: '',
+  sscGroup: '',
+  sscPassingYear: '',
+
+  hscInstitutionName: '',
+  hscGroup: '',
+  hscPassingYear: '',
+
+  degreeQualifications: [],
 
   unionPouroshovaName: '',
   wardVillageName: '',
@@ -122,6 +236,11 @@ const initialForm = {
 
   occupation: 'Student',
   professionalDetails: '',
+  organizationType: '',
+  organizationName: '',
+  designation: '',
+  workSection: '',
+  organizationAddress: '',
 
   lifeStory: '',
 };
@@ -133,12 +252,13 @@ export default function ProfilePage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [photoUploading, setPhotoUploading] = useState(false);
-  const [documentUploading, setDocumentUploading] = useState(false);
 
   const [status, setStatus] = useState({
     type: '',
     message: '',
   });
+
+  const submitStatusRef = useRef(null);
 
   const isAdmin = profile?.role === 'admin';
 
@@ -152,10 +272,17 @@ export default function ProfilePage() {
   }, []);
 
   useEffect(() => {
-    if (isStudentOccupation && form.professionalDetails) {
-      updateField('professionalDetails', '');
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    if (!isStudentOccupation) return;
+
+    setForm((current) => ({
+      ...current,
+      professionalDetails: '',
+      organizationType: '',
+      organizationName: '',
+      designation: '',
+      workSection: '',
+      organizationAddress: '',
+    }));
   }, [isStudentOccupation]);
 
   async function loadProfile() {
@@ -177,15 +304,33 @@ export default function ProfilePage() {
         contactNumber: data.contact_number || '',
         facebookProfileLink: data.facebook_profile_link || '',
 
+        universityDegree: data.university_degree || '',
+        memberType: data.member_type || '',
         universityHallName: data.university_hall_name || '',
         firstYearAdmissionSession: data.first_year_admission_session || '',
         universitySubject: data.university_subject || '',
+        academicYear: data.academic_year || '',
 
-        academicQualifications:
-          Array.isArray(data.academic_qualifications) &&
-          data.academic_qualifications.length > 0
-            ? data.academic_qualifications
-            : [{ ...emptyQualification }],
+        sscInstitutionName: data.ssc_institution_name || '',
+        sscGroup: data.ssc_group || '',
+        sscPassingYear: data.ssc_passing_year || '',
+
+        hscInstitutionName: data.hsc_institution_name || '',
+        hscGroup: data.hsc_group || '',
+        hscPassingYear: data.hsc_passing_year || '',
+
+        degreeQualifications:
+          Array.isArray(data.degree_qualifications) &&
+          data.degree_qualifications.length > 0
+            ? data.degree_qualifications.map((item) => ({
+                degreeName: item.degreeName || item.degree_name || '',
+                institutionName:
+                  item.institutionName || item.institution_name || '',
+                passingYear: item.passingYear || item.passing_year || '',
+                subjectDepartment:
+                  item.subjectDepartment || item.subject_department || '',
+              }))
+            : [],
 
         unionPouroshovaName: data.union_pouroshova_name || '',
         wardVillageName: data.ward_village_name || '',
@@ -195,6 +340,11 @@ export default function ProfilePage() {
 
         occupation: data.occupation || 'Student',
         professionalDetails: data.professional_details || '',
+        organizationType: data.organization_type || '',
+        organizationName: data.organization_name || '',
+        designation: data.designation || '',
+        workSection: data.work_section || '',
+        organizationAddress: data.organization_address || '',
 
         lifeStory: data.life_story || '',
       });
@@ -217,10 +367,10 @@ export default function ProfilePage() {
     }));
   }
 
-  function updateQualification(index, name, value) {
+  function updateDegreeQualification(index, name, value) {
     setForm((current) => ({
       ...current,
-      academicQualifications: current.academicQualifications.map(
+      degreeQualifications: current.degreeQualifications.map(
         (item, itemIndex) =>
           itemIndex === index
             ? {
@@ -232,27 +382,23 @@ export default function ProfilePage() {
     }));
   }
 
-  function addQualification() {
+  function addDegreeQualification() {
     setForm((current) => ({
       ...current,
-      academicQualifications: [
-        ...current.academicQualifications,
-        { ...emptyQualification },
+      degreeQualifications: [
+        ...current.degreeQualifications,
+        { ...emptyDegreeQualification },
       ],
     }));
   }
 
-  function removeQualification(index) {
-    setForm((current) => {
-      if (current.academicQualifications.length === 1) return current;
-
-      return {
-        ...current,
-        academicQualifications: current.academicQualifications.filter(
-          (_item, itemIndex) => itemIndex !== index
-        ),
-      };
-    });
+  function removeDegreeQualification(index) {
+    setForm((current) => ({
+      ...current,
+      degreeQualifications: current.degreeQualifications.filter(
+        (_item, itemIndex) => itemIndex !== index
+      ),
+    }));
   }
 
   async function handleSubmit(event) {
@@ -265,18 +411,23 @@ export default function ProfilePage() {
       const finalForm = {
         ...form,
         professionalDetails: isStudentOccupation ? '' : form.professionalDetails,
+        organizationType: isStudentOccupation ? '' : form.organizationType,
+        organizationName: isStudentOccupation ? '' : form.organizationName,
+        designation: isStudentOccupation ? '' : form.designation,
+        workSection: isStudentOccupation ? '' : form.workSection,
+        organizationAddress: isStudentOccupation ? '' : form.organizationAddress,
       };
 
       const result = await requestMyProfileUpdate(finalForm);
+
+      await loadProfile();
 
       setStatus({
         type: 'success',
         message:
           result?.message ||
-          'Update request submitted. Admin approval is required.',
+          'Profile update request submitted successfully. Please wait for admin approval.',
       });
-
-      await loadProfile();
     } catch (error) {
       setStatus({
         type: 'error',
@@ -311,34 +462,6 @@ export default function ProfilePage() {
       });
     } finally {
       setPhotoUploading(false);
-      event.target.value = '';
-    }
-  }
-
-  async function handleUniversityDocumentChange(event) {
-    const file = event.target.files?.[0];
-
-    if (!file) return;
-
-    setDocumentUploading(true);
-    setStatus({ type: '', message: '' });
-
-    try {
-      const result = await requestMyUniversityDocumentUpdate(file);
-
-      setStatus({
-        type: 'success',
-        message:
-          result?.message ||
-          'University document update request submitted. Admin approval is required.',
-      });
-    } catch (error) {
-      setStatus({
-        type: 'error',
-        message: error.message || 'Failed to request document update.',
-      });
-    } finally {
-      setDocumentUploading(false);
       event.target.value = '';
     }
   }
@@ -411,7 +534,7 @@ export default function ProfilePage() {
   }
 
   return (
-    <main className="min-h-screen bg-slate-50 px-3 py-4 sm:px-6 sm:py-6 lg:px-8">
+    <main className="min-h-screen bg-slate-50 px-3 py-4 text-slate-900 sm:px-6 sm:py-6 lg:px-8">
       <section className="mx-auto max-w-7xl">
         <div className="flex flex-col gap-3 border-b border-slate-200 pb-5 md:flex-row md:items-end md:justify-between">
           <div>
@@ -424,8 +547,8 @@ export default function ProfilePage() {
             </h1>
 
             <p className="mt-2 text-sm text-slate-500">
-              You can edit all profile information. Changes will be applied only
-              after admin approval.
+              Left side shows your submitted information. Right side is for
+              update request.
             </p>
           </div>
 
@@ -438,62 +561,161 @@ export default function ProfilePage() {
           </button>
         </div>
 
-        {status.message ? (
-          <StatusBox type={status.type} message={status.message} />
-        ) : null}
+        <div className="mt-5 grid grid-cols-1 gap-5 xl:grid-cols-[0.95fr_1.35fr] xl:items-start">
+          <section className="space-y-5 xl:sticky xl:top-5">
+            <section className="rounded-3xl bg-white p-4 shadow-soft sm:p-5 md:p-6">
+              <ProfileHeader
+                profile={profile}
+                onPhotoChange={handlePhotoChange}
+                photoUploading={photoUploading}
+              />
+            </section>
 
-        <div className="profile-mobile-stack mt-5 grid grid-cols-1 gap-4 lg:grid-cols-[0.75fr_1.45fr] lg:gap-6">
-          <section className="rounded-3xl bg-white p-5 shadow-soft md:p-6">
-            <ProfileHeader
-              profile={profile}
-              onPhotoChange={handlePhotoChange}
-              photoUploading={photoUploading}
-            />
+            <section className="rounded-3xl bg-white p-4 shadow-soft sm:p-5 md:p-6">
+              <div className="flex items-center justify-between gap-3">
+                <h2 className="text-xl font-bold text-slate-950">
+                  My Information
+                </h2>
 
-            <div className="mt-5">
-              <label className="inline-flex cursor-pointer items-center rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm font-bold text-slate-700 hover:bg-slate-100">
-                {documentUploading
-                  ? 'Uploading...'
-                  : 'Change University Document'}
-                <input
-                  type="file"
-                  accept="application/pdf,image/jpeg,image/png,image/webp"
-                  onChange={handleUniversityDocumentChange}
-                  className="hidden"
+                <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-700">
+                  {profile.is_verified ? 'Verified' : 'Pending'}
+                </span>
+              </div>
+
+              <ProfileInfoGroup title="Account">
+                <ReadonlyItem label="Email" value={profile.email} />
+                <ReadonlyItem label="Role" value={profile.role} />
+                <ReadonlyItem label="Member Type" value={profile.member_type} />
+                <ReadonlyItem
+                  label="Verified"
+                  value={profile.is_verified ? 'Yes' : 'No'}
                 />
-              </label>
+              </ProfileInfoGroup>
 
-              <p className="mt-2 text-xs text-slate-500">
-                Document update also requires admin approval.
-              </p>
-            </div>
+              <ProfileInfoGroup title="Basic Information">
+                <ReadonlyItem label="Full Name" value={profile.full_name} />
+                <ReadonlyItem label="Nick Name" value={profile.nick_name} />
+                <ReadonlyItem
+                  label="Date of Birth"
+                  value={profile.date_of_birth}
+                />
+                <ReadonlyItem label="Gender" value={profile.gender} />
+                <ReadonlyItem label="Blood Group" value={profile.blood_group} />
+                <ReadonlyItem
+                  label="WhatsApp Number"
+                  value={profile.contact_number}
+                />
+                <ReadonlyItem
+                  label="Facebook"
+                  value={profile.facebook_profile_link}
+                />
+              </ProfileInfoGroup>
 
-            <h2 className="mt-6 text-xl font-bold text-slate-950">
-              Current Information
-            </h2>
+              <ProfileInfoGroup title="University Information">
+                <ReadonlyItem
+                  label="Degree"
+                  value={profile.university_degree}
+                />
+                <ReadonlyItem
+                  label="Hall Name"
+                  value={profile.university_hall_name}
+                />
+                <ReadonlyItem
+                  label="Admission Session"
+                  value={profile.first_year_admission_session}
+                />
+                <ReadonlyItem
+                  label="Subject / Department"
+                  value={profile.university_subject}
+                />
+                <ReadonlyItem
+                  label="Passing Year / Current Year"
+                  value={profile.academic_year}
+                />
+              </ProfileInfoGroup>
 
-            <div className="mt-5 grid grid-cols-1 gap-3">
-              <ReadonlyItem label="Email" value={profile.email} />
-              <ReadonlyItem label="Role" value={profile.role} />
-              <ReadonlyItem
-                label="Verified"
-                value={profile.is_verified ? 'Yes' : 'No'}
-              />
-              <ReadonlyItem
-                label="University Document"
-                value={
-                  profile.university_document_url
-                    ? 'Uploaded'
-                    : 'Not uploaded'
-                }
-              />
-            </div>
+              <ProfileInfoGroup title="SSC Information">
+                <ReadonlyItem
+                  label="Institute Name"
+                  value={profile.ssc_institution_name}
+                />
+                <ReadonlyItem label="Group" value={profile.ssc_group} />
+                <ReadonlyItem
+                  label="Passing Year"
+                  value={profile.ssc_passing_year}
+                />
+              </ProfileInfoGroup>
+
+              <ProfileInfoGroup title="HSC Information">
+                <ReadonlyItem
+                  label="Institute Name"
+                  value={profile.hsc_institution_name}
+                />
+                <ReadonlyItem label="Group" value={profile.hsc_group} />
+                <ReadonlyItem
+                  label="Passing Year"
+                  value={profile.hsc_passing_year}
+                />
+              </ProfileInfoGroup>
+
+              <ProfileInfoGroup title="Address">
+                <ReadonlyItem
+                  label="Union / Pouroshova"
+                  value={profile.union_pouroshova_name}
+                />
+                <ReadonlyItem
+                  label="Ward / Village"
+                  value={profile.ward_village_name}
+                />
+                <ReadonlyItem
+                  label="Para / Moholla"
+                  value={profile.para_moholla_name}
+                />
+                <ReadonlyItem
+                  label="Present Address"
+                  value={profile.present_address}
+                />
+              </ProfileInfoGroup>
+
+              <ProfileInfoGroup title="Professional Information">
+                <ReadonlyItem label="Occupation" value={profile.occupation} />
+                <ReadonlyItem
+                  label="Organization Type"
+                  value={profile.organization_type}
+                />
+                <ReadonlyItem
+                  label="Organization Name"
+                  value={profile.organization_name}
+                />
+                <ReadonlyItem label="Designation" value={profile.designation} />
+                <ReadonlyItem
+                  label="Work Section"
+                  value={profile.work_section}
+                />
+                <ReadonlyItem
+                  label="Organization Address"
+                  value={profile.organization_address}
+                />
+                <ReadonlyItem
+                  label="Professional Details"
+                  value={profile.professional_details}
+                />
+              </ProfileInfoGroup>
+
+              <ProfileInfoGroup title="Memories and Stories">
+                <ReadonlyItem label="Life Story" value={profile.life_story} />
+              </ProfileInfoGroup>
+            </section>
           </section>
 
-          <section className="rounded-3xl bg-white p-5 shadow-soft md:p-6">
+          <section className="rounded-3xl bg-white p-4 shadow-soft sm:p-5 md:p-6">
             <h2 className="text-xl font-bold text-slate-950">
               Editable Information
             </h2>
+
+            <p className="mt-2 text-sm text-slate-500">
+              Update request will be applied only after admin approval.
+            </p>
 
             <form onSubmit={handleSubmit} className="mt-5 space-y-6">
               <FormSection title="Basic Information">
@@ -515,9 +737,10 @@ export default function ProfilePage() {
                   <TextInput
                     label="Date of Birth"
                     name="dateOfBirth"
-                    type="date"
+                    type="text"
                     value={form.dateOfBirth}
                     onChange={updateField}
+                    placeholder="MM-DD"
                   />
 
                   <SelectInput
@@ -539,7 +762,7 @@ export default function ProfilePage() {
                   />
 
                   <TextInput
-                    label="Mobile Number"
+                    label="WhatsApp Number"
                     name="contactNumber"
                     value={form.contactNumber}
                     onChange={updateField}
@@ -551,6 +774,7 @@ export default function ProfilePage() {
                     name="facebookProfileLink"
                     value={form.facebookProfileLink}
                     onChange={updateField}
+                    placeholder="https://facebook.com/..."
                   />
                 </div>
               </FormSection>
@@ -558,7 +782,16 @@ export default function ProfilePage() {
               <FormSection title="University Information">
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                   <SelectInput
-                    label="University Hall Name"
+                    label="Degree"
+                    name="universityDegree"
+                    value={form.universityDegree}
+                    onChange={updateField}
+                    options={degreeOptions}
+                    placeholder="Select degree"
+                  />
+
+                  <SelectInput
+                    label="Hall Name"
                     name="universityHallName"
                     value={form.universityHallName}
                     onChange={updateField}
@@ -567,40 +800,120 @@ export default function ProfilePage() {
                   />
 
                   <TextInput
-                    label="University First Year Admission Session"
+                    label="Admission Session"
                     name="firstYearAdmissionSession"
                     value={form.firstYearAdmissionSession}
                     onChange={updateField}
                     placeholder="2022-23"
                   />
 
-                  <TextInput
-                    label="University Subject / Department"
+                  <SelectInput
+                    label="Subject / Department"
                     name="universitySubject"
                     value={form.universitySubject}
                     onChange={updateField}
-                    placeholder="Software Engineering"
+                    options={subjectOptions}
+                    placeholder="Select subject / department"
+                  />
+
+                  <SelectInput
+                    label="Member Type"
+                    name="memberType"
+                    value={form.memberType}
+                    onChange={updateField}
+                    options={memberTypeOptions}
+                    placeholder="Select member type"
+                  />
+
+                  <TextInput
+                    label="Passing Year / Current Year"
+                    name="academicYear"
+                    value={form.academicYear}
+                    onChange={updateField}
+                    placeholder="2026 / 1st Year / 2nd Year"
                   />
                 </div>
               </FormSection>
 
-              <FormSection title="Academic Qualification">
+              <FormSection title="SSC Information">
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+                  <TextInput
+                    label="Institute Name"
+                    name="sscInstitutionName"
+                    value={form.sscInstitutionName}
+                    onChange={updateField}
+                    placeholder="Pairahat High School"
+                  />
+
+                  <TextInput
+                    label="Group"
+                    name="sscGroup"
+                    value={form.sscGroup}
+                    onChange={updateField}
+                    placeholder="Science / Commerce / Arts"
+                  />
+
+                  <TextInput
+                    label="Passing Year"
+                    name="sscPassingYear"
+                    value={form.sscPassingYear}
+                    onChange={updateField}
+                    placeholder="2020"
+                  />
+                </div>
+              </FormSection>
+
+              <FormSection title="HSC Information">
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+                  <TextInput
+                    label="Institute Name"
+                    name="hscInstitutionName"
+                    value={form.hscInstitutionName}
+                    onChange={updateField}
+                    placeholder="Pairahat United College"
+                  />
+
+                  <TextInput
+                    label="Group"
+                    name="hscGroup"
+                    value={form.hscGroup}
+                    onChange={updateField}
+                    placeholder="Science / Commerce / Arts"
+                  />
+
+                  <TextInput
+                    label="Passing Year"
+                    name="hscPassingYear"
+                    value={form.hscPassingYear}
+                    onChange={updateField}
+                    placeholder="2022"
+                  />
+                </div>
+              </FormSection>
+
+              <FormSection title="Higher Degree">
                 <div className="space-y-4">
-                  {form.academicQualifications.map((item, index) => (
+                  {form.degreeQualifications.length === 0 ? (
+                    <p className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-4 text-sm text-slate-500">
+                      Higher degree is optional. Click Add Degree if you want to
+                      add one.
+                    </p>
+                  ) : null}
+
+                  {form.degreeQualifications.map((qualification, index) => (
                     <div
                       key={index}
                       className="rounded-2xl border border-slate-200 bg-slate-50 p-4"
                     >
                       <div className="mb-4 flex items-center justify-between gap-3">
                         <h4 className="text-sm font-bold text-slate-900">
-                          Qualification {index + 1}
+                          Degree {index + 1}
                         </h4>
 
                         <button
                           type="button"
-                          onClick={() => removeQualification(index)}
-                          disabled={form.academicQualifications.length === 1}
-                          className="rounded-xl border border-red-200 px-3 py-2 text-xs font-bold text-red-600 disabled:cursor-not-allowed disabled:opacity-40"
+                          onClick={() => removeDegreeQualification(index)}
+                          className="rounded-xl border border-red-200 px-3 py-2 text-xs font-bold text-red-600"
                         >
                           Remove
                         </button>
@@ -609,60 +922,43 @@ export default function ProfilePage() {
                       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                         <SelectInput
                           label="Degree Name"
-                          name="degree_name"
-                          value={item.degree_name}
+                          name="degreeName"
+                          value={qualification.degreeName}
                           onChange={(name, value) =>
-                            updateQualification(index, name, value)
+                            updateDegreeQualification(index, name, value)
                           }
-                          options={departmentOptions}
+                          options={degreeOptions}
                           placeholder="Select degree"
                         />
 
                         <TextInput
                           label="Institution Name"
-                          name="institution_name"
-                          value={item.institution_name}
+                          name="institutionName"
+                          value={qualification.institutionName}
                           onChange={(name, value) =>
-                            updateQualification(index, name, value)
+                            updateDegreeQualification(index, name, value)
                           }
+                          placeholder="University / Institution name"
                         />
 
                         <TextInput
-                          label="Passing Year"
-                          name="passing_year"
-                          value={item.passing_year}
+                          label="Subject / Department"
+                          name="subjectDepartment"
+                          value={qualification.subjectDepartment}
                           onChange={(name, value) =>
-                            updateQualification(index, name, value)
+                            updateDegreeQualification(index, name, value)
                           }
+                          placeholder="Subject / Department"
                         />
 
                         <TextInput
-                          label="Subject / Group / Department"
-                          name="subject_department"
-                          value={item.subject_department}
+                          label="Passing Year / Current Year"
+                          name="passingYear"
+                          value={qualification.passingYear}
                           onChange={(name, value) =>
-                            updateQualification(index, name, value)
+                            updateDegreeQualification(index, name, value)
                           }
-                        />
-
-                        <TextInput
-                          label="Academic Degree Name"
-                          name="academic_degree_name"
-                          value={item.academic_degree_name}
-                          onChange={(name, value) =>
-                            updateQualification(index, name, value)
-                          }
-                          placeholder="SSC / HSC / BBA / MBA"
-                        />
-
-                        <TextInput
-                          label="GPA"
-                          name="gpa"
-                          value={item.gpa}
-                          onChange={(name, value) =>
-                            updateQualification(index, name, value)
-                          }
-                          placeholder="Optional"
+                          placeholder="2026 / Running"
                         />
                       </div>
                     </div>
@@ -670,10 +966,10 @@ export default function ProfilePage() {
 
                   <button
                     type="button"
-                    onClick={addQualification}
+                    onClick={addDegreeQualification}
                     className="min-h-12 rounded-2xl border border-emerald-300 bg-emerald-50 px-5 text-sm font-bold text-emerald-700 hover:bg-emerald-100"
                   >
-                    + Add Qualification
+                    + Add Degree
                   </button>
                 </div>
               </FormSection>
@@ -714,7 +1010,7 @@ export default function ProfilePage() {
                 />
               </FormSection>
 
-              <FormSection title="Occupation">
+              <FormSection title="Professional Information">
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                   <SelectInput
                     label="Occupation"
@@ -724,18 +1020,71 @@ export default function ProfilePage() {
                     options={occupationOptions}
                   />
 
-                  <TextArea
-                    label="Professional Details"
-                    name="professionalDetails"
-                    value={form.professionalDetails}
+                  <SelectInput
+                    label="Organization Type"
+                    name="organizationType"
+                    value={form.organizationType}
                     onChange={updateField}
-                    disabled={isStudentOccupation}
+                    options={organizationTypeOptions}
                     placeholder={
                       isStudentOccupation
                         ? 'Disabled for students'
-                        : 'Write job/professional details'
+                        : 'Select organization type'
                     }
+                    disabled={isStudentOccupation}
                   />
+
+                  <TextInput
+                    label="Organization Name"
+                    name="organizationName"
+                    value={form.organizationName}
+                    onChange={updateField}
+                    placeholder="Organization / company name"
+                    disabled={isStudentOccupation}
+                  />
+
+                  <TextInput
+                    label="Designation"
+                    name="designation"
+                    value={form.designation}
+                    onChange={updateField}
+                    placeholder="Your designation"
+                    disabled={isStudentOccupation}
+                  />
+
+                  <TextInput
+                    label="Work Section"
+                    name="workSection"
+                    value={form.workSection}
+                    onChange={updateField}
+                    placeholder="Department / section"
+                    disabled={isStudentOccupation}
+                  />
+
+                  <TextArea
+                    label="Organization Address"
+                    name="organizationAddress"
+                    value={form.organizationAddress}
+                    onChange={updateField}
+                    placeholder="Office / organization address"
+                    disabled={isStudentOccupation}
+                    rows={3}
+                  />
+
+                  <div className="md:col-span-2">
+                    <TextArea
+                      label="Professional Details"
+                      name="professionalDetails"
+                      value={form.professionalDetails}
+                      onChange={updateField}
+                      disabled={isStudentOccupation}
+                      placeholder={
+                        isStudentOccupation
+                          ? 'Disabled for students'
+                          : 'Write short professional details, achievements, or current work summary'
+                      }
+                    />
+                  </div>
                 </div>
               </FormSection>
 
@@ -749,7 +1098,7 @@ export default function ProfilePage() {
                 />
               </FormSection>
 
-              <div className="sticky bottom-0 z-20 -mx-5 border-t border-slate-200 bg-white/95 px-5 py-3 backdrop-blur sm:static sm:mx-0 sm:border-0 sm:bg-transparent sm:p-0">
+              <div className="sticky bottom-0 z-20 -mx-4 border-t border-slate-200 bg-white/95 px-4 py-3 backdrop-blur sm:static sm:mx-0 sm:border-0 sm:bg-transparent sm:p-0">
                 <button
                   type="submit"
                   disabled={saving}
@@ -757,6 +1106,10 @@ export default function ProfilePage() {
                 >
                   {saving ? 'Submitting Request...' : 'Submit Update Request'}
                 </button>
+
+                {status.message ? (
+                  <StatusBox type={status.type} message={status.message} />
+                ) : null}
               </div>
             </form>
           </section>
@@ -779,7 +1132,7 @@ function ProfileHeader({ profile, onPhotoChange, photoUploading }) {
             />
           ) : (
             <div className="flex h-full w-full items-center justify-center text-3xl font-black text-slate-400">
-              {(profile.full_name || profile.email || '?')
+              {(profile.full_name || profile.nick_name || '?')
                 .charAt(0)
                 .toUpperCase()}
             </div>
@@ -788,7 +1141,7 @@ function ProfileHeader({ profile, onPhotoChange, photoUploading }) {
 
         <div className="flex-1">
           <h2 className="text-xl font-black text-slate-950">
-            {profile.full_name || profile.email}
+            {profile.full_name || profile.nick_name || 'Unnamed User'}
           </h2>
 
           <p className="mt-1 text-sm font-semibold capitalize text-slate-500">
@@ -813,6 +1166,20 @@ function ProfileHeader({ profile, onPhotoChange, photoUploading }) {
         </div>
       </div>
     </div>
+  );
+}
+
+function ProfileInfoGroup({ title, children }) {
+  return (
+    <section className="mt-5">
+      <h3 className="mb-3 text-sm font-black uppercase tracking-wider text-slate-500">
+        {title}
+      </h3>
+
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-1 2xl:grid-cols-2">
+        {children}
+      </div>
+    </section>
   );
 }
 
@@ -888,6 +1255,7 @@ function SelectInput({
   onChange,
   options,
   placeholder = '',
+  disabled = false,
 }) {
   return (
     <label className="block">
@@ -897,16 +1265,22 @@ function SelectInput({
 
       <select
         value={value || ''}
+        disabled={disabled}
         onChange={(event) => onChange(name, event.target.value)}
-        className="min-h-12 w-full rounded-2xl border border-slate-300 bg-white px-4 text-sm outline-none transition focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100"
+        className="min-h-12 w-full rounded-2xl border border-slate-300 bg-white px-4 text-sm outline-none transition focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400"
       >
         {placeholder ? <option value="">{placeholder}</option> : null}
 
-        {options.map((item) => (
-          <option key={item} value={item}>
-            {item}
-          </option>
-        ))}
+        {options.map((item) => {
+          const optionValue = typeof item === 'object' ? item.value : item;
+          const optionLabel = typeof item === 'object' ? item.label : item;
+
+          return (
+            <option key={optionValue} value={optionValue}>
+              {optionLabel}
+            </option>
+          );
+        })}
       </select>
     </label>
   );

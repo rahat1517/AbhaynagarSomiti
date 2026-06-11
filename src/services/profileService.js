@@ -1,8 +1,5 @@
 import { supabase } from '../lib/supabaseClient';
-import {
-  uploadProfilePhoto,
-  uploadUniversityDocument,
-} from './verificationService';
+import { uploadProfilePhoto } from './verificationService';
 
 function emptyToNull(value) {
   if (value === undefined || value === null) return null;
@@ -15,7 +12,7 @@ function isStudentOccupation(occupation) {
   return String(occupation || '').trim().toLowerCase() === 'student';
 }
 
-function mapAcademicQualifications(qualifications) {
+function mapDegreeQualifications(qualifications) {
   if (!Array.isArray(qualifications)) return [];
 
   return qualifications
@@ -24,19 +21,19 @@ function mapAcademicQualifications(qualifications) {
         String(item.degree_name || item.degreeName || '').trim() ||
         String(item.institution_name || item.institutionName || '').trim() ||
         String(item.passing_year || item.passingYear || '').trim() ||
-        String(item.subject_department || item.subjectDepartment || '').trim() ||
-        String(item.academic_degree_name || item.academicDegreeName || '').trim()
+        String(item.subject_department || item.subjectDepartment || '').trim()
       );
     })
     .map((item) => ({
-      degree_name: String(item.degree_name || item.degreeName || '').trim() || 'Other',
-      institution_name: String(item.institution_name || item.institutionName || '').trim(),
-      passing_year: String(item.passing_year || item.passingYear || '').trim(),
-      subject_department: String(item.subject_department || item.subjectDepartment || '').trim(),
-      academic_degree_name: String(
-        item.academic_degree_name || item.academicDegreeName || ''
+      degree_name:
+        String(item.degree_name || item.degreeName || '').trim() || 'Other',
+      institution_name: String(
+        item.institution_name || item.institutionName || ''
       ).trim(),
-      gpa: String(item.gpa || '').trim(),
+      passing_year: String(item.passing_year || item.passingYear || '').trim(),
+      subject_department: String(
+        item.subject_department || item.subjectDepartment || ''
+      ).trim(),
     }));
 }
 
@@ -72,9 +69,22 @@ export async function requestMyProfileUpdate(form) {
     contact_number: emptyToNull(form.contactNumber),
     facebook_profile_link: emptyToNull(form.facebookProfileLink),
 
+    university_degree: emptyToNull(form.universityDegree),
     university_hall_name: emptyToNull(form.universityHallName),
     first_year_admission_session: emptyToNull(form.firstYearAdmissionSession),
     university_subject: emptyToNull(form.universitySubject),
+    member_type: emptyToNull(form.memberType),
+    academic_year: emptyToNull(form.academicYear),
+
+    ssc_institution_name: emptyToNull(form.sscInstitutionName),
+    ssc_group: emptyToNull(form.sscGroup),
+    ssc_passing_year: emptyToNull(form.sscPassingYear),
+
+    hsc_institution_name: emptyToNull(form.hscInstitutionName),
+    hsc_group: emptyToNull(form.hscGroup),
+    hsc_passing_year: emptyToNull(form.hscPassingYear),
+
+    degree_qualifications: mapDegreeQualifications(form.degreeQualifications),
 
     union_pouroshova_name: emptyToNull(form.unionPouroshovaName),
     ward_village_name: emptyToNull(form.wardVillageName),
@@ -87,16 +97,33 @@ export async function requestMyProfileUpdate(form) {
       ? null
       : emptyToNull(form.professionalDetails),
 
-    life_story: emptyToNull(form.lifeStory),
+    organization_type: studentOccupation
+      ? null
+      : emptyToNull(form.organizationType),
 
-    academic_qualifications: mapAcademicQualifications(
-      form.academicQualifications
-    ),
+    organization_name: studentOccupation
+      ? null
+      : emptyToNull(form.organizationName),
+
+    designation: studentOccupation ? null : emptyToNull(form.designation),
+
+    work_section: studentOccupation ? null : emptyToNull(form.workSection),
+
+    organization_address: studentOccupation
+      ? null
+      : emptyToNull(form.organizationAddress),
+
+    life_story: emptyToNull(form.lifeStory),
   };
+
+  console.log('Profile update requestedData:', requestedData);
 
   const { data, error } = await supabase.rpc('request_member_profile_update', {
     p_requested_data: requestedData,
   });
+
+  console.log('Profile update response data:', data);
+  console.log('Profile update response error:', error);
 
   if (error) {
     console.error('request_member_profile_update error:', error);
@@ -137,43 +164,6 @@ export async function requestMyProfilePhotoUpdate(file) {
 
   if (error) {
     console.error('request profile photo update error:', error);
-    throw new Error(error.message);
-  }
-
-  return data;
-}
-
-export async function requestMyUniversityDocumentUpdate(file) {
-  if (!file) {
-    throw new Error('University document is required.');
-  }
-
-  const {
-    data: { user },
-    error: userError,
-  } = await supabase.auth.getUser();
-
-  if (userError) {
-    throw new Error(userError.message);
-  }
-
-  if (!user?.id) {
-    throw new Error('Authentication required.');
-  }
-
-  // const documentPath = await uploadUniversityDocument({
-  //   userId: user.id,
-  //   file,
-  // });
-
-  const { data, error } = await supabase.rpc('request_member_profile_update', {
-    p_requested_data: {
-      university_document_url: documentPath,
-    },
-  });
-
-  if (error) {
-    console.error('request university document update error:', error);
     throw new Error(error.message);
   }
 
