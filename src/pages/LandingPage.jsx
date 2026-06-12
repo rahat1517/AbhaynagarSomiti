@@ -342,10 +342,14 @@ function PublicMemberCard({ member }) {
       <div className="mt-4 space-y-2 rounded-2xl bg-slate-50 p-3 text-sm">
         <InfoLine label="Department" value={member.department_name} />
         <InfoLine label="Session" value={member.academic_session} />
+ 
+        
+        
 
         {memberType === 'alumni' ? (
           <InfoLine label="Occupation" value={member.occupation} />
         ) : null}
+        <InfoLine label="Union/Pouroshova" value={member.union_pouroshova_name}/>
       </div>
     </article>
   );
