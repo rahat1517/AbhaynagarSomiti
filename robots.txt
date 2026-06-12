@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://abhaynagar-somiti.vercel.app/sitemap.xml
+Sitemap: https://dhabiabhaynagar.netlify.app/sitemap.xmllo
