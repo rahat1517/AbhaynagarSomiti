@@ -207,7 +207,7 @@ function AppLayout() {
             onClick={closeMobileMenu}
             className="shrink-0 text-sm font-bold text-slate-950 sm:text-base"
           >
-            Dhabi Abhaynagar Poribar
+            ঢাবি অভয়নগর পরিবার
           </Link>
 
           <div className="hidden min-w-0 flex-1 items-center justify-end gap-1 md:flex">

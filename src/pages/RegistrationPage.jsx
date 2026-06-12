@@ -893,6 +893,13 @@ export default function RegistrationPage() {
           </form>
         </section>
       </section>
+      <footer className="border-t bg-white py-4">
+  <div className="mx-auto flex max-w-7xl items-center justify-center px-4">
+    <p className="text-center text-sm text-slate-500">
+      © {new Date().getFullYear()} Designed & Developed by Rahat. All rights reserved.
+    </p>
+  </div>
+</footer>
     </main>
   );
 }

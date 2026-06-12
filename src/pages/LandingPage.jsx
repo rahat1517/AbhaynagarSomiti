@@ -94,13 +94,12 @@ export default function LandingPage() {
               <div className="absolute right-0 top-0 h-full w-1/2 bg-[radial-gradient(circle_at_top_right,rgba(16,185,129,0.24),transparent_45%)]" />
 
               <div className="relative max-w-4xl">
-                <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-emerald-300 sm:text-xs sm:tracking-[0.35em]">
-                  About Dhabi Abhaynagar Poribar
-                </p>
+                
 
-                <h2 className="mt-4 text-2xl font-black leading-tight sm:text-4xl lg:text-5xl">
-                  Dhabi Abhaynagar Poribar - Student and Alumni Community
-                </h2>
+                <p className="mt-3 text-base font-semibold leading-8 text-white/90 sm:text-lg">
+  অভয়নগরের সন্তান, ঢাকা বিশ্ববিদ্যালয়ের শিক্ষার্থী একসাথে
+  এগিয়ে চলার প্রতিশ্রুতি।
+</p>
 
               </div>
             </div>
@@ -111,14 +110,9 @@ export default function LandingPage() {
                   ঢাকা বিশ্ববিদ্যালয় সংশ্লিষ্ট সামাজিক সংগঠন
                 </p>
 
-                <h3 className="mt-3 text-2xl font-black leading-tight text-slate-950 sm:text-3xl">
-                  ঢাবি অভয়নগর পরিবার
-                </h3>
+                
 
-                <p className="mt-3 text-base font-semibold leading-8 text-slate-700 sm:text-lg">
-                  অভয়নগরের সন্তান, ঢাকা বিশ্ববিদ্যালয়ের শিক্ষার্থী একসাথে
-                  এগিয়ে চলার প্রতিশ্রুতি।
-                </p>
+
 
                 <p className="mt-5 text-sm leading-7 text-slate-600 sm:text-base sm:leading-8">
                   ঢাবি অভয়নগর পরিবার হলো অভয়নগরের বাসিন্দা যারা ঢাকা
@@ -130,13 +124,10 @@ export default function LandingPage() {
               </div>
 
               <div className="rounded-[1.5rem] border border-emerald-100 bg-emerald-50 p-5 sm:p-7">
-                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-600 text-xl font-black text-white shadow-sm">
-                  স্বপ্ন
-                </div>
-
-                <h3 className="mt-4 text-2xl font-black text-slate-950">
-                  আমাদের স্বপ্ন
-                </h3>
+                <h3 className="mt-4 inline-flex items-center justify-center rounded-2xl bg-emerald-600 px-6 py-3 text-2xl font-black text-white shadow-sm">
+  আমাদের স্বপ্ন
+</h3>
+                
 
                 <p className="mt-4 text-sm leading-7 text-slate-700 sm:text-base sm:leading-8">
                   অভয়নগরের প্রতিটি শিক্ষার্থী যেন ঢাকা বিশ্ববিদ্যালয়ে নিরাপদ,
@@ -287,6 +278,13 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
+      <footer className="border-t bg-white py-4">
+  <div className="mx-auto flex max-w-7xl items-center justify-center px-4">
+    <p className="text-center text-sm text-slate-500">
+      © {new Date().getFullYear()} Designed & Developed by Rahat. All rights reserved.
+    </p>
+  </div>
+</footer>
     </main>
   );
 }
