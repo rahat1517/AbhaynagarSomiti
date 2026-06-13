@@ -73,7 +73,7 @@ const organizationTypeOptions = [
   "Construction Company",
   "Real Estate Company",
   "Engineering Firm",
-  "Chartered Accountant(CA)",
+  
   "Trading Company",
   "Import Business",
   "Export Business",
@@ -162,7 +162,7 @@ const occupationOptions = [
   "Self-Employed",
   "Freelancer",
   "Consultant",
-
+  "Chartered Accountant(CA)",
   "Student",
   "Research Scholar",
   "Teacher",
