@@ -73,7 +73,7 @@ const organizationTypeOptions = [
   "Construction Company",
   "Real Estate Company",
   "Engineering Firm",
-  
+
   "Trading Company",
   "Import Business",
   "Export Business",
@@ -333,7 +333,6 @@ const subjectOptions = [
   'World Religions and Culture',
   'Zoology',
 
-  // Institutes
   'Institute of Business Administration (IBA)',
   'Institute of Education and Research (IER)',
   'Institute of Statistical Research and Training (ISRT)',
@@ -346,7 +345,6 @@ const subjectOptions = [
   'Institute of Leather Engineering and Technology (ILET)',
   'Institute of Energy',
 
-  // Professional / Specialized Programs
   'Information Technology',
   'Leather Engineering',
   'Energy Science and Engineering',
@@ -440,8 +438,40 @@ const initialForm = {
   pdpoConsent: false,
 };
 
+const STORAGE_KEY = 'registrationFormDraft';
+
+function loadFromStorage() {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (!saved) return initialForm;
+    const parsed = JSON.parse(saved);
+    // profilePhotoFile cannot be stored in localStorage, always null on load
+    return { ...initialForm, ...parsed, profilePhotoFile: null };
+  } catch {
+    return initialForm;
+  }
+}
+
+function saveToStorage(form) {
+  try {
+    // Exclude profilePhotoFile — File objects cannot be serialized
+    const { profilePhotoFile, ...serializableForm } = form;
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(serializableForm));
+  } catch {
+    // localStorage full or unavailable — silently ignore
+  }
+}
+
+function clearStorage() {
+  try {
+    localStorage.removeItem(STORAGE_KEY);
+  } catch {
+    // ignore
+  }
+}
+
 export default function RegistrationPage() {
-  const [form, setForm] = useState(initialForm);
+  const [form, setForm] = useState(loadFromStorage);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [status, setStatus] = useState({ type: '', message: '' });
 
@@ -449,6 +479,11 @@ export default function RegistrationPage() {
     () => form.occupation?.toLowerCase() === 'student',
     [form.occupation]
   );
+
+  // Persist form to localStorage on every change
+  useEffect(() => {
+    saveToStorage(form);
+  }, [form]);
 
   useEffect(() => {
     if (!isStudentOccupation) return;
@@ -476,18 +511,10 @@ export default function RegistrationPage() {
       const nextQualifications = current.degreeQualifications.map(
         (item, itemIndex) => {
           if (itemIndex !== index) return item;
-
-          return {
-            ...item,
-            [name]: value,
-          };
+          return { ...item, [name]: value };
         }
       );
-
-      return {
-        ...current,
-        degreeQualifications: nextQualifications,
-      };
+      return { ...current, degreeQualifications: nextQualifications };
     });
   }
 
@@ -545,7 +572,9 @@ export default function RegistrationPage() {
           'Registration submitted successfully. Admin approval is required before your profile becomes visible.',
       });
 
+      // Clear form and storage only after successful submission
       setForm(initialForm);
+      clearStorage();
     } catch (error) {
       setStatus({
         type: 'error',
@@ -572,6 +601,8 @@ export default function RegistrationPage() {
             Fill the single member form. Admin approval is required before your
             profile becomes visible in public directory.
           </p>
+
+          
         </aside>
 
         <section className="rounded-2xl bg-white p-3 shadow-soft sm:rounded-3xl sm:p-6 md:p-8">
@@ -1060,6 +1091,7 @@ export default function RegistrationPage() {
                   type="button"
                   onClick={() => {
                     setForm(initialForm);
+                    clearStorage();
                     setStatus({ type: '', message: '' });
                   }}
                   className="min-h-11 rounded-xl border border-slate-300 px-4 text-sm font-semibold text-slate-700 sm:min-h-12 sm:rounded-2xl sm:px-5"
@@ -1083,13 +1115,14 @@ export default function RegistrationPage() {
           </form>
         </section>
       </section>
+
       <footer className="border-t bg-white py-4">
-  <div className="mx-auto flex max-w-7xl items-center justify-center px-4">
-    <p className="text-center text-sm text-slate-500">
-      © {new Date().getFullYear()} Designed & Developed by Rahat. All rights reserved.
-    </p>
-  </div>
-</footer>
+        <div className="mx-auto flex max-w-7xl items-center justify-center px-4">
+          <p className="text-center text-sm text-slate-500">
+            © {new Date().getFullYear()} Designed & Developed by Rahat. All rights reserved.
+          </p>
+        </div>
+      </footer>
     </main>
   );
 }
@@ -1145,16 +1178,11 @@ function MonthDayInput({
 
   const dayOptions = Array.from({ length: 31 }, (_item, index) => {
     const day = String(index + 1).padStart(2, '0');
-
-    return {
-      label: day,
-      value: day,
-    };
+    return { label: day, value: day };
   });
 
   function updateMonth(value) {
     onChange(monthName, value);
-
     if (value && dayValue) {
       onChange('dateOfBirth', `${value}-${dayValue}`);
     } else {
@@ -1164,7 +1192,6 @@ function MonthDayInput({
 
   function updateDay(value) {
     onChange(dayName, value);
-
     if (monthValue && value) {
       onChange('dateOfBirth', `${monthValue}-${value}`);
     } else {
@@ -1187,7 +1214,6 @@ function MonthDayInput({
           className="min-h-11 w-full rounded-xl border border-slate-300 bg-white px-3 text-sm outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 sm:min-h-12 sm:rounded-2xl sm:px-4"
         >
           <option value="">Month</option>
-
           {monthOptions.map((item) => (
             <option key={item.value} value={item.value}>
               {item.label}
@@ -1202,7 +1228,6 @@ function MonthDayInput({
           className="min-h-11 w-full rounded-xl border border-slate-300 bg-white px-3 text-sm outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 sm:min-h-12 sm:rounded-2xl sm:px-4"
         >
           <option value="">Day</option>
-
           {dayOptions.map((item) => (
             <option key={item.value} value={item.value}>
               {item.label}
